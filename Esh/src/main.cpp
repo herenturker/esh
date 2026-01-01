@@ -17,9 +17,20 @@ limitations under the License.
 #include <iostream>
 #include <string>
 
-#include "headers/Shell.h"
+#include "headers/Shell.hpp"
+
 
 int main() {
+
+    try {
+        std::string json = Shell::load_resource_json(101);
+        // std::cout << json << std::endl;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        
+        exit(EXIT_FAILURE);
+    }
 
     std::string raw_input;
 

@@ -15,10 +15,17 @@ limitations under the License.
 */
 
 #pragma once
+
 #include <string>
 
-class Lexer {
+#include "Shell.hpp"
+
+class Commands {
 
     public:
-        static void tokenizeInput (std::string& raw_input);
+        static bool isBuiltInCommand(const std::string& command);
 };
+
+
+
+

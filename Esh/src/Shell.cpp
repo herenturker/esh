@@ -14,12 +14,45 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "headers/Shell.h"
-#include "headers/Lexer.h"
+#include <windows.h>
+#include <string>
+#include <stdexcept>
+#include <iostream>
+
+#include "headers/Shell.hpp"
+#include "headers/Lexer.hpp"
 
 std::string Shell::raw_input_gathered;
 
 void Shell::handleRawInput(std::string& raw_input) {
     raw_input_gathered = raw_input;
-    Lexer::tokenizeInput(raw_input_gathered);
+    auto tokens = Lexer::tokenizeInput(raw_input_gathered);
+
+    /*
+    for (const auto& t : tokens) {
+        std::cout << "Token: [" << t.lexeme << "]  Type: " << t.type << '\n';
+    }
+    */
+}
+
+
+std::string Shell::load_resource_json(int resource_id) {
+    HMODULE hModule = GetModuleHandle(nullptr);
+
+    HRSRC hRes = FindResource(hModule,
+                             MAKEINTRESOURCE(resource_id),
+                             RT_RCDATA);
+    if (!hRes) {
+        throw std::runtime_error("FindResource failed");
+    }
+
+    HGLOBAL hData = LoadResource(hModule, hRes);
+    if (!hData) {
+        throw std::runtime_error("LoadResource failed");
+    }
+
+    DWORD size = SizeofResource(hModule, hRes);
+    const char* data = static_cast<const char*>(LockResource(hData));
+
+    return std::string(data, size);
 }

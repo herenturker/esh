@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.16)
-project(Esh LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.20)
+project(Esh LANGUAGES CXX RC)
 
 # C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -13,9 +13,9 @@ file(GLOB_RECURSE SOURCES
     Esh/src/*.cpp
 )
 
-add_executable(Esh ${SOURCES})
+add_executable(Esh ${SOURCES} resources.rc)
 
-target_include_directories(Esh PRIVATE Esh/src/headers)
+target_include_directories(Esh PRIVATE Esh/src/headers Esh/src/external)
 
 if (MSVC)
     target_compile_definitions(Esh PRIVATE _CRT_SECURE_NO_WARNINGS)

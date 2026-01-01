@@ -21,6 +21,7 @@ limitations under the License.
 class Shell {
 public:
     static void handleRawInput(std::string& raw_input);
+    static std::string load_resource_json(int resource_id);
 
 private:
     static std::string raw_input_gathered;

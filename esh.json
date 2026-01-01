@@ -1,0 +1,37 @@
+{
+    "commands": {
+        "builtin": {
+            "exit": {
+                "description": "Exits the Esh shell.",
+                "usage": "exit [status]",
+                "flags": {
+                    "--help": "Displays help information about the exit command."
+                }
+            },
+
+            "help": {
+                "description": "Provides help information for Esh commands.",
+                "usage": "help [command]",
+                "flags": {
+                    "-all": "Lists all available commands with brief descriptions."
+                }
+            },
+
+            "pwd": {
+                "description": "Prints the current working directory.",
+                "usage": "pwd",
+                "flags": {
+                    "--help": "Displays help information about the pwd command."
+                }
+            }
+        },
+
+        "external": {
+
+        },
+
+        "powershell": {
+
+        }
+    }
+}

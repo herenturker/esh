@@ -13,50 +13,63 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-#include <iostream>
 #include <string>
+#include <algorithm>
+#include <cctype>
+#include <iostream>
 
-#include "headers/Lexer.h"
+#include "headers/Lexer.hpp"
+#include "headers/Commands.hpp"
 
-void Lexer::tokenizeInput(std::string& raw_input) {
-    
-    // Check for empty input
-    if (raw_input.empty()) {
-        return;
+std::vector<Lexer::Token> Lexer::tokenizeInput(const std::string& input) {
+
+    std::vector<Token> tokens;
+
+    std::size_t pos = 0;
+    const std::size_t len = input.length();
+
+    while (pos < len) {
+
+        while (pos < len && input[pos] == ' ') {
+            ++pos;
+        }
+        if (pos >= len) break;
+
+        std::size_t start = pos;
+        while (pos < len && input[pos] != ' ') {
+            ++pos;
+        }
+
+        std::string token = input.substr(start, pos - start);
+        TokenType type = identifyTokenType(token);
+
+        tokens.push_back({ type, token });
     }
 
-    while (true) {
+    tokens.push_back({ TOKEN_EOF, "" });
 
-        // Find the position of the first space
-        size_t space_pos = raw_input.find(' ');
+    return tokens;
+}
 
-        // If no space is found, the rest of the string is a token
-        if (space_pos == std::string::npos) {
-            std::string token = raw_input;
+Lexer::TokenType Lexer::identifyTokenType(const std::string& token) {
 
-            if (!token.empty()) {
-                std::cout << "Token: " << token << std::endl;
-            }
-            break;
+    // Numeric (supports negative integers)
+    if (token[0] == '-' && token.size() > 1) {
+        if (std::all_of(token.begin() + 1, token.end(),
+                        [](unsigned char c) { return std::isdigit(c); })) {
+            return TOKEN_NUMBER;
         }
-
-        // Extract the token
-        std::string token = raw_input.substr(0, space_pos);
-        if (!token.empty()) {
-            std::cout << "Token: " << token << std::endl;
-        }
-
-        // Remove the processed token and leading spaces from the input
-        raw_input = raw_input.substr(space_pos + 1);
-        while (!raw_input.empty() && raw_input[0] == ' ') {
-            raw_input.erase(0, 1);
-        }
-        
-        // If the remaining input is empty, break the loop
-        if (raw_input.empty()) {
-            break;
-        }
+        return TOKEN_FLAG;
     }
 
+    if (std::all_of(token.begin(), token.end(),
+                    [](unsigned char c) { return std::isdigit(c); })) {
+        return TOKEN_NUMBER;
+    }
+
+    if (Commands::isBuiltInCommand(token)) {
+        return TOKEN_COMMAND;
+    }
+
+    return TOKEN_EXECUTEE;
 }
