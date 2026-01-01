@@ -70,5 +70,5 @@ class Lexer {
         
         static std::vector<Token> tokenizeInput(const std::string& input);
 
-        static TokenType identifyTokenType (const std::string& token);
+        static TokenType identifyTokenType(const std::string& token);
 };

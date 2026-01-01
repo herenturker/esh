@@ -16,17 +16,15 @@ limitations under the License.
 
 #pragma once
 
+#include <cstdint>
 #include <string>
-#include <vector>
-#include "Lexer.hpp"
+
 #include "Commands.hpp"
 
-class Parser {
+class Engine {
     public:
-        static void parseTokens(const std::vector<Lexer::Token>& tokens);
+        static void execute(CommandType command, uint8_t flags);
 
-        static CommandType parseCommand(const std::string& token);
-
-        static uint8_t parseFlags(const std::vector<std::string>& tokens);
-
+        static std::string executePWD();
+        static void executeEXIT();
 };

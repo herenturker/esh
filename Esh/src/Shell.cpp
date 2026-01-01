@@ -21,20 +21,14 @@ limitations under the License.
 
 #include "headers/Shell.hpp"
 #include "headers/Lexer.hpp"
-
-std::string Shell::raw_input_gathered;
+#include "headers/Parser.hpp"
 
 void Shell::handleRawInput(std::string& raw_input) {
-    raw_input_gathered = raw_input;
-    auto tokens = Lexer::tokenizeInput(raw_input_gathered);
 
-    /*
-    for (const auto& t : tokens) {
-        std::cout << "Token: [" << t.lexeme << "]  Type: " << t.type << '\n';
-    }
-    */
+    auto tokens = Lexer::tokenizeInput(raw_input);
+    Parser::parseTokens(tokens);
+    
 }
-
 
 std::string Shell::load_resource_json(int resource_id) {
     HMODULE hModule = GetModuleHandle(nullptr);

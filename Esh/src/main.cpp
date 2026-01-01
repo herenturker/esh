@@ -18,17 +18,15 @@ limitations under the License.
 #include <string>
 
 #include "headers/Shell.hpp"
-
+#include "headers/Engine.hpp"
 
 int main() {
 
     try {
         std::string json = Shell::load_resource_json(101);
-        // std::cout << json << std::endl;
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
-        
         exit(EXIT_FAILURE);
     }
 
@@ -36,7 +34,7 @@ int main() {
 
     while (true) {
 
-        std::cout << "Esh> ";
+        std::cout << "Esh " << Engine::executePWD() << "> ";
         std::getline(std::cin, raw_input);
         std::cout << std::endl;
 
