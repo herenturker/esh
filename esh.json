@@ -80,6 +80,22 @@
                 "flags": {
                     "--help": "Displays help information about the cd command."
                 }
+            },
+
+            "mkdir": {
+                "description": "Creates a new directory.",
+                "usage": "mkdir <directory_name>",
+                "flags": {
+                    "--help": "Displays help information about the mkdir command."
+                }
+            },
+
+            "rmdir": {
+                "description": "Removes an empty directory.",
+                "usage": "rmdir <directory_name>",
+                "flags": {
+                    "--help": "Displays help information about the rmdir command."
+                }
             }
 
         },

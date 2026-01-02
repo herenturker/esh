@@ -24,14 +24,24 @@ limitations under the License.
 #include "headers/Engine.hpp"
 #include "headers/Commands.hpp"
 #include "headers/Unicode.hpp"
+#include "headers/ConsoleColor.hpp"
 
 void Engine::execute(CommandType command, uint8_t flags, std::string executee)
 {
 
+    // Helper lambda to print boolean results with color coding
+    auto printBoolResult =
+        [](bool ok, std::string_view success, std::string_view failure)
+    {
+        console::setColor(ok ? ConsoleColor::Green : ConsoleColor::Red);
+        std::cout << (ok ? success : failure) << std::endl;
+        console::reset();
+    };
+
     // Implementation of command execution logic
     switch (command)
     {
-
+        
     case CommandType::PWD:
         // Execute pwd command
         std::cout << executePWD() << std::endl;
@@ -64,26 +74,57 @@ void Engine::execute(CommandType command, uint8_t flags, std::string executee)
 
     case CommandType::TOUCH:
         // Execute touch command
-        std::cout << (executeTOUCH(executee) ? "File created." : "File creation failed.") << std::endl;
+        printBoolResult(
+            executeTOUCH(executee),
+            "File created.",
+            "File creation failed.");
         break;
 
     case CommandType::RM:
         // Execute rm command
-        std::cout << (executeRM(executee) ? "File deleted." : "File deletion failed.") << std::endl;
+        printBoolResult(
+            executeRM(executee),
+            "File deleted.",
+            "File deletion failed.");
+
         break;
 
     case CommandType::CD:
         // Execute cd command
-        std::cout << (executeCD(executee) ? "Directory changed." : "Directory change failed.") << std::endl;
+        printBoolResult(
+            executeCD(executee),
+            "Directory changed.",
+            "Directory change failed.");
+        break;
+
+    case CommandType::MKDIR:
+        // Execute mkdir command
+        printBoolResult(
+            executeMKDIR(executee),
+            "Directory created.",
+            "Directory creation failed.");
+        break;
+
+    case CommandType::RMDIR:
+        // Execute rmdir command
+        printBoolResult(
+            executeRMDIR(executee),
+            "Directory removed.",
+            "Directory removal failed.");
         break;
 
     default:
         // Handle unknown command
+        console::setColor(ConsoleColor::Red);
         std::cerr << "Unknown command" << std::endl;
+        console::reset();
         break;
     }
 }
 
+// ------------------- COMMAND IMPLEMENTATION -------------------
+
+// PWD COMMAND
 std::string Engine::executePWD()
 {
     DWORD length = GetCurrentDirectoryW(0, nullptr);
@@ -97,12 +138,16 @@ std::string Engine::executePWD()
     return unicode::utf16_to_utf8(buffer.data());
 }
 
+// EXIT COMMAND
 void Engine::executeEXIT()
 {
+    console::setColor(ConsoleColor::Yellow);
     std::cout << "Exiting shell..." << std::endl;
+    console::reset();
     ExitProcess(0);
 }
 
+// WHOAMI COMMAND
 std::string Engine::executeWHOAMI()
 {
     DWORD length = 0;
@@ -117,6 +162,7 @@ std::string Engine::executeWHOAMI()
     return unicode::utf16_to_utf8(buffer.data());
 }
 
+// DATETIME COMMAND
 std::string Engine::executeDATETIME()
 {
     SYSTEMTIME st;
@@ -127,6 +173,7 @@ std::string Engine::executeDATETIME()
     return std::string(buffer);
 }
 
+// HOSTNAME COMMAND
 std::string Engine::executeHOSTNAME()
 {
     DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
@@ -138,6 +185,7 @@ std::string Engine::executeHOSTNAME()
     return unicode::utf16_to_utf8(std::wstring(buffer, size));
 }
 
+// DIR COMMAND
 std::string Engine::executeDIR(const std::string &path)
 {
     std::wstring wPath = unicode::utf8_to_utf16(path);
@@ -174,6 +222,7 @@ std::string Engine::executeDIR(const std::string &path)
     return result;
 }
 
+// TOUCH COMMAND
 bool Engine::executeTOUCH(const std::string &filename)
 {
     std::wstring wFilename = unicode::utf8_to_utf16(filename);
@@ -196,6 +245,7 @@ bool Engine::executeTOUCH(const std::string &filename)
     return true; // File created successfully
 }
 
+// RM COMMAND
 bool Engine::executeRM(const std::string &path)
 {
     std::wstring wPath = unicode::utf8_to_utf16(path);
@@ -210,16 +260,65 @@ bool Engine::executeRM(const std::string &path)
     }
 }
 
+// CD COMMAND
 bool Engine::executeCD(const std::string &path)
 {
-    std::wstring wPath = unicode::utf8_to_utf16(path);
+    if (path.empty())
+        return false;
 
-    if (SetCurrentDirectoryW(wPath.c_str()))
+    std::wstring wInput = unicode::utf8_to_utf16(path);
+
+    DWORD required = GetFullPathNameW(
+        wInput.c_str(),
+        0,
+        nullptr,
+        nullptr);
+
+    if (required == 0)
+        return false;
+
+    std::wstring wFullPath(required, L'\0');
+
+    DWORD written = GetFullPathNameW(
+        wInput.c_str(),
+        required,
+        wFullPath.data(),
+        nullptr);
+
+    if (written == 0)
+        return false;
+
+    wFullPath.resize(written);
+
+    return SetCurrentDirectoryW(wFullPath.c_str()) != 0;
+}
+
+// MKDIR COMMAND
+bool Engine::executeMKDIR(const std::string &dirname)
+{
+    std::wstring wDirname = unicode::utf8_to_utf16(dirname);
+
+    if (CreateDirectoryW(wDirname.c_str(), nullptr))
     {
-        return true; // Directory changed successfully
+        return true; // Directory created successfully
     }
     else
     {
-        return false; // Directory change failed
+        return false; // Directory creation failed
+    }
+}
+
+// RMDIR COMMAND
+bool Engine::executeRMDIR(const std::string &dirname)
+{
+    std::wstring wDirname = unicode::utf8_to_utf16(dirname);
+
+    if (RemoveDirectoryW(wDirname.c_str()))
+    {
+        return true; // Directory removed successfully
+    }
+    else
+    {
+        return false; // Directory removal failed
     }
 }

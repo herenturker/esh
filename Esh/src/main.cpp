@@ -19,22 +19,37 @@ limitations under the License.
 
 #include "headers/Shell.hpp"
 #include "headers/Engine.hpp"
+#include "headers/ConsoleColor.hpp"
 
-int main() {
+int main()
+{
 
-    try {
+    try
+    {
         std::string json = Shell::load_resource_json(101);
     }
-    catch (const std::exception& e) {
+    catch (const std::exception &e)
+    {
         std::cerr << "Error: " << e.what() << std::endl;
         exit(EXIT_FAILURE);
     }
 
     std::string raw_input;
 
-    while (true) {
+    while (true)
+    {
 
-        std::cout << "Esh " << Engine::executePWD() << "> ";
+        console::setColor(ConsoleColor::Blue);
+        std::cout << Engine::executeWHOAMI() << "@"
+                  << Engine::executeHOSTNAME() << " ";
+        console::reset();
+
+        console::setColor(ConsoleColor::Cyan);
+        std::cout << Engine::executePWD();
+        console::reset();
+
+        std::cout << " $ ";
+
         std::getline(std::cin, raw_input);
         std::cout << std::endl;
 

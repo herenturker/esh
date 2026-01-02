@@ -59,7 +59,7 @@ CommandType Parser::parseCommand(const std::string &token)
     auto it = commandMap.find(token);
     if (it != commandMap.end())
         return it->second;
-    return static_cast<CommandType>(0x00); // UNKNOWN
+    return static_cast<CommandType>(0x00); // RESERVED
 }
 
 uint8_t Parser::parseFlags(const std::vector<std::string> &tokens)

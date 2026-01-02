@@ -35,5 +35,7 @@ class Engine {
         static bool                         executeTOUCH(const std::string &filename);
         static bool                         executeRM(const std::string &path);
         static bool                         executeCD(const std::string &path);
+        static bool                         executeMKDIR(const std::string &dirname);
+        static bool                         executeRMDIR(const std::string &dirname);
 
 };

@@ -29,6 +29,9 @@ limitations under the License.
 #define COMMAND_DIR 0X08
 #define COMMAND_TOUCH 0X09
 #define COMMAND_RM 0X0A
+#define COMMAND_MKDIR 0X0B
+#define COMMAND_RMDIR 0X0C
+// --------------------------------------------
 
 #include <string>
 #include <unordered_map>
@@ -39,8 +42,7 @@ limitations under the License.
 class Commands {
 
     public:
-        static bool isBuiltInCommand(const std::string& command);
-        
+        static bool isBuiltInCommand(const std::string& command);    
 };
 
 // DEFINE COMMAND TYPES
@@ -55,7 +57,9 @@ enum class CommandType : uint8_t {
     HOSTNAME =          COMMAND_HOSTNAME,
     DIR =               COMMAND_DIR,
     TOUCH =             COMMAND_TOUCH,
-    RM =                COMMAND_RM
+    RM =                COMMAND_RM,
+    MKDIR =             COMMAND_MKDIR,
+    RMDIR =             COMMAND_RMDIR
 };
 
 // DEFINE FLAGS
@@ -77,7 +81,9 @@ static inline const std::unordered_map<std::string, CommandType> commandMap = {
     {"hostname", CommandType::HOSTNAME},
     {"dir", CommandType::DIR},
     {"touch", CommandType::TOUCH},
-    {"rm", CommandType::RM}
+    {"rm", CommandType::RM},
+    {"mkdir", CommandType::MKDIR},
+    {"rmdir", CommandType::RMDIR}
 
 };
 
