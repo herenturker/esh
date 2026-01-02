@@ -3,7 +3,7 @@
         "builtin": {
             "exit": {
                 "description": "Exits the Esh shell.",
-                "usage": "exit [status]",
+                "usage": "exit",
                 "flags": {
                     "--help": "Displays help information about the exit command."
                 }
@@ -23,7 +23,48 @@
                 "flags": {
                     "--help": "Displays help information about the pwd command."
                 }
+            },
+
+            "whoami": {
+                "description": "Displays the current user's username.",
+                "usage": "whoami",
+                "flags": {
+                    "--help": "Displays help information about the whoami command."
+                }
+            },
+
+            "datetime": {
+                "description": "Shows the current date and time.",
+                "usage": "datetime",
+                "flags": {
+                    "--help": "Displays help information about the datetime command."
+                }
+            },
+
+            "hostname": {
+                "description": "Displays the system's hostname.",
+                "usage": "hostname",
+                "flags": {
+                    "--help": "Displays help information about the hostname command."
+                }
+            },
+
+            "dir": {
+                "description": "Lists the contents of a directory.",
+                "usage": "dir [path]",
+                "flags": {
+                    "--help": "Displays help information about the dir command."
+                }
+            },
+
+            "touch": {
+                "description": "Creates a new empty file.",
+                "usage": "touch <filename>",
+                "flags": {
+                    "--help": "Displays help information about the touch command."
+                }
             }
+
         },
 
         "external": {

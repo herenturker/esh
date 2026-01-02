@@ -46,19 +46,19 @@ class Lexer {
 
             TOKEN_OPEN_PARENTHESIS,     /** ( */
             TOKEN_CLOSE_PARENTHESIS,    /** ) */
-            TOKEN_OPEN_BRACKET,         /** [ (used for memory references) */
+            TOKEN_OPEN_BRACKET,         /** [ */
             TOKEN_CLOSE_BRACKET,        /** ] */
 
-            TOKEN_DOLLAR_SIGN,      /** $ (current address) */
-            TOKEN_HASH_SIGN,        /** # (immediate value) */
-            TOKEN_AT_SIGN,          /** @ (used for labels) */
-            TOKEN_CARET,            /** ^ (used for indirection) */
-            TOKEN_AMPERSAND,        /** & (used for bitwise AND) */
-            TOKEN_PIPE,             /** | (used for bitwise OR) */
-            TOKEN_TILDE,            /** ~ (used for bitwise NOT) */
-            TOKEN_EQUAL,            /** = (assignment or equality) */
-            TOKEN_LESS_THAN,        /** < (less than comparison) */
-            TOKEN_GREATER_THAN,     /** > (greater than comparison) */
+            TOKEN_DOLLAR_SIGN,      /** $ */
+            TOKEN_HASH_SIGN,        /** # */
+            TOKEN_AT_SIGN,          /** @ */
+            TOKEN_CARET,            /** ^ */
+            TOKEN_AMPERSAND,        /** & */
+            TOKEN_PIPE,             /** | */
+            TOKEN_TILDE,            /** ~ */
+            TOKEN_EQUAL,            /** = */
+            TOKEN_LESS_THAN,        /** < */
+            TOKEN_GREATER_THAN,     /** > */
             TOKEN_EOF               /** End of input */
 
         } TokenType;

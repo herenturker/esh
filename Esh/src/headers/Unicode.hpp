@@ -16,21 +16,11 @@ limitations under the License.
 
 #pragma once
 
-#include <cstdint>
 #include <string>
 
-#include "Commands.hpp"
+namespace unicode
+{
+    std::wstring utf8_to_utf16(const std::string& utf8);
+    std::string  utf16_to_utf8(const std::wstring& utf16);
+}
 
-class Engine {
-    public:
-        static void execute(CommandType command, uint8_t flags, std::string executee);
-
-        static std::string executePWD();
-        static void executeEXIT();
-        static std::string executeWHOAMI();
-        static std::string executeHOSTNAME();
-        static std::string executeDIR(const std::string &path);
-        static std::string executeDATETIME();
-        static bool executeTOUCH(const std::string &filename);
-
-};

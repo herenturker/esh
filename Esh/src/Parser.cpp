@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include <stdint.h>
+#include <string>
 
 #include "headers/Parser.hpp"
 #include "headers/Engine.hpp"
@@ -24,6 +25,7 @@ void Parser::parseTokens(const std::vector<Lexer::Token> &tokens)
 
     uint8_t command = 0;
     uint8_t flagAccumulator = 0;
+    std::string executee;
 
     for (const auto &t : tokens)
     {
@@ -39,10 +41,15 @@ void Parser::parseTokens(const std::vector<Lexer::Token> &tokens)
             auto flagValue = Parser::parseFlags({t.lexeme});
             flagAccumulator |= flagValue;
         }
+
+        if (t.type == Lexer::TOKEN_EXECUTEE)
+        {
+            executee = t.lexeme;
+        }
     }
 
     if (command != 0) {
-        Engine::execute(static_cast<CommandType>(command), flagAccumulator);
+        Engine::execute(static_cast<CommandType>(command), flagAccumulator, executee);
     }
 
 }
