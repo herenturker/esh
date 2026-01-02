@@ -72,6 +72,11 @@ void Engine::execute(CommandType command, uint8_t flags, std::string executee)
         std::cout << (executeRM(executee) ? "File deleted." : "File deletion failed.") << std::endl;
         break;
 
+    case CommandType::CD:
+        // Execute cd command
+        std::cout << (executeCD(executee) ? "Directory changed." : "Directory change failed.") << std::endl;
+        break;
+
     default:
         // Handle unknown command
         std::cerr << "Unknown command" << std::endl;
@@ -202,5 +207,19 @@ bool Engine::executeRM(const std::string &path)
     else
     {
         return false; // File deletion failed
+    }
+}
+
+bool Engine::executeCD(const std::string &path)
+{
+    std::wstring wPath = unicode::utf8_to_utf16(path);
+
+    if (SetCurrentDirectoryW(wPath.c_str()))
+    {
+        return true; // Directory changed successfully
+    }
+    else
+    {
+        return false; // Directory change failed
     }
 }

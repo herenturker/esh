@@ -72,6 +72,14 @@
                     "--help": "Displays help information about the rm command.",
                     "-r": "Recursively removes directories and their contents."
                 }
+            },
+
+            "cd": {
+                "description": "Changes the current directory.",
+                "usage": "cd <path>",
+                "flags": {
+                    "--help": "Displays help information about the cd command."
+                }
             }
 
         },

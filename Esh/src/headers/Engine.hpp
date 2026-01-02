@@ -34,5 +34,6 @@ class Engine {
         static std::string                  executeDATETIME();
         static bool                         executeTOUCH(const std::string &filename);
         static bool                         executeRM(const std::string &path);
+        static bool                         executeCD(const std::string &path);
 
 };

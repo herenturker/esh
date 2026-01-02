@@ -16,6 +16,8 @@ limitations under the License.
 
 #pragma once
 
+// --------- DEFINE COMMAND CONSTANTS ---------
+
 #define COMMAND_RESERVED 0X00
 #define COMMAND_LS 0X01
 #define COMMAND_PWD 0X02
@@ -40,19 +42,20 @@ class Commands {
         static bool isBuiltInCommand(const std::string& command);
         
 };
+
 // DEFINE COMMAND TYPES
 enum class CommandType : uint8_t {
-    RESERVED = COMMAND_RESERVED,
-    LS  = COMMAND_LS,
-    PWD = COMMAND_PWD,
-    EXIT = COMMAND_EXIT,
-    CD = COMMAND_CD,
-    WHOAMI = COMMAND_WHOAMI,
-    DATETIME = COMMAND_DATETIME,
-    HOSTNAME = COMMAND_HOSTNAME,
-    DIR = COMMAND_DIR,
-    TOUCH = COMMAND_TOUCH,
-    RM = COMMAND_RM
+    RESERVED =          COMMAND_RESERVED,
+    LS  =               COMMAND_LS,
+    PWD =               COMMAND_PWD,
+    EXIT =              COMMAND_EXIT,
+    CD =                COMMAND_CD,
+    WHOAMI =            COMMAND_WHOAMI,
+    DATETIME =          COMMAND_DATETIME,
+    HOSTNAME =          COMMAND_HOSTNAME,
+    DIR =               COMMAND_DIR,
+    TOUCH =             COMMAND_TOUCH,
+    RM =                COMMAND_RM
 };
 
 // DEFINE FLAGS
