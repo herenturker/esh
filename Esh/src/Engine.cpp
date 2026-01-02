@@ -25,96 +25,107 @@ limitations under the License.
 #include "headers/Commands.hpp"
 #include "headers/Unicode.hpp"
 #include "headers/ConsoleColor.hpp"
+#include "headers/Error.hpp"
+#include "headers/Result.hpp"
 
 void Engine::execute(CommandType command, uint8_t flags, std::string executee)
 {
-
-    // Helper lambda to print boolean results with color coding
+    // Helper lambda to print boolean command results
+    // This is the ONLY place where colored output is handled
     auto printBoolResult =
-        [](bool ok, std::string_view success, std::string_view failure)
+        [](const BoolResult &res, std::string_view successMsg)
     {
-        console::setColor(ok ? ConsoleColor::Green : ConsoleColor::Red);
-        std::cout << (ok ? success : failure) << std::endl;
+        if (res.ok())
+        {
+            console::setColor(ConsoleColor::Green);
+            std::cout << successMsg << std::endl;
+        }
+        else
+        {
+            console::setColor(ConsoleColor::Red);
+            std::cerr << res.error.message << std::endl;
+        }
         console::reset();
     };
 
     // Implementation of command execution logic
     switch (command)
     {
-        
+
     case CommandType::PWD:
-        // Execute pwd command
-        std::cout << executePWD() << std::endl;
+        // Print working directory
+        std::cout << executePWD().value << std::endl;
         break;
 
     case CommandType::EXIT:
-        // Execute exit
-        executeEXIT();
-        break;
+        // Exit shell immediately
+        console::setColor(ConsoleColor::Yellow);
+        std::cout << "Exiting shell..." << std::endl;
+        console::reset();
+        ExitProcess(0);
 
     case CommandType::WHOAMI:
-        // Execute whoami command
-        std::cout << executeWHOAMI() << std::endl;
+        // Print current user name
+        std::cout << executeWHOAMI().value << std::endl;
         break;
 
     case CommandType::HOSTNAME:
-        // Execute hostname command
-        std::cout << executeHOSTNAME() << std::endl;
+        // Print host machine name
+        std::cout << executeHOSTNAME().value << std::endl;
         break;
 
     case CommandType::DIR:
-        // Execute dir command
-        std::cout << executeDIR(".") << std::endl; // Current directory
+        // List directory contents (current directory if no argument)
+        std::cout << executeDIR(executee.empty() ? "." : executee).value;
         break;
 
     case CommandType::DATETIME:
-        // Execute datetime command
-        std::cout << executeDATETIME() << std::endl;
+        // Print local date and time
+        std::cout << executeDATETIME().value << std::endl;
         break;
 
     case CommandType::TOUCH:
-        // Execute touch command
+        // Create a new empty file
         printBoolResult(
             executeTOUCH(executee),
-            "File created.",
-            "File creation failed.");
+            "File created.");
         break;
 
     case CommandType::RM:
-        // Execute rm command
+        // Remove a file
         printBoolResult(
             executeRM(executee),
-            "File deleted.",
-            "File deletion failed.");
-
+            "File deleted.");
         break;
 
     case CommandType::CD:
-        // Execute cd command
+        // Change current working directory
         printBoolResult(
             executeCD(executee),
-            "Directory changed.",
-            "Directory change failed.");
+            "Directory changed.");
         break;
 
     case CommandType::MKDIR:
-        // Execute mkdir command
+        // Create a new directory
         printBoolResult(
             executeMKDIR(executee),
-            "Directory created.",
-            "Directory creation failed.");
+            "Directory created.");
         break;
 
     case CommandType::RMDIR:
-        // Execute rmdir command
+        // Remove an empty directory
         printBoolResult(
             executeRMDIR(executee),
-            "Directory removed.",
-            "Directory removal failed.");
+            "Directory removed.");
+        break;
+
+    case CommandType::CLEAR:
+        // Clear the Esh console screen
+        executeCLEAR();
         break;
 
     default:
-        // Handle unknown command
+        // Unknown or unsupported command
         console::setColor(ConsoleColor::Red);
         std::cerr << "Unknown command" << std::endl;
         console::reset();
@@ -125,107 +136,94 @@ void Engine::execute(CommandType command, uint8_t flags, std::string executee)
 // ------------------- COMMAND IMPLEMENTATION -------------------
 
 // PWD COMMAND
-std::string Engine::executePWD()
+Result<std::string> Engine::executePWD()
 {
     DWORD length = GetCurrentDirectoryW(0, nullptr);
     if (length == 0)
-        return "";
+        return {"", makeLastError("pwd")};
 
     std::vector<wchar_t> buffer(length);
     if (GetCurrentDirectoryW(length, buffer.data()) == 0)
-        return "";
+        return {"", makeLastError("pwd")};
 
-    return unicode::utf16_to_utf8(buffer.data());
-}
-
-// EXIT COMMAND
-void Engine::executeEXIT()
-{
-    console::setColor(ConsoleColor::Yellow);
-    std::cout << "Exiting shell..." << std::endl;
-    console::reset();
-    ExitProcess(0);
+    return {unicode::utf16_to_utf8(buffer.data()), {}};
 }
 
 // WHOAMI COMMAND
-std::string Engine::executeWHOAMI()
+Result<std::string> Engine::executeWHOAMI()
 {
     DWORD length = 0;
     GetUserNameW(nullptr, &length);
-    if (length == 0)
-        return "";
 
     std::vector<wchar_t> buffer(length);
     if (!GetUserNameW(buffer.data(), &length))
-        return "";
+        return {"", makeLastError("whoami")};
 
-    return unicode::utf16_to_utf8(buffer.data());
-}
-
-// DATETIME COMMAND
-std::string Engine::executeDATETIME()
-{
-    SYSTEMTIME st;
-    GetLocalTime(&st);
-    char buffer[100];
-    snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d",
-             st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
-    return std::string(buffer);
+    return {unicode::utf16_to_utf8(buffer.data()), {}};
 }
 
 // HOSTNAME COMMAND
-std::string Engine::executeHOSTNAME()
+Result<std::string> Engine::executeHOSTNAME()
 {
-    DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
     wchar_t buffer[MAX_COMPUTERNAME_LENGTH + 1];
+    DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
 
     if (!GetComputerNameW(buffer, &size))
-        return "";
+        return {"", makeLastError("hostname")};
 
-    return unicode::utf16_to_utf8(std::wstring(buffer, size));
+    return {unicode::utf16_to_utf8(std::wstring(buffer, size)), {}};
+}
+
+// DATETIME COMMAND
+Result<std::string> Engine::executeDATETIME()
+{
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer),
+             "%04d-%02d-%02d %02d:%02d:%02d",
+             st.wYear, st.wMonth, st.wDay,
+             st.wHour, st.wMinute, st.wSecond);
+
+    return {buffer, {}};
 }
 
 // DIR COMMAND
-std::string Engine::executeDIR(const std::string &path)
+Result<std::string> Engine::executeDIR(const std::string &path)
 {
-    std::wstring wPath = unicode::utf8_to_utf16(path);
-    std::wstring searchPath = wPath + L"\\*";
+    std::wstring wSearchPath =
+        unicode::utf8_to_utf16(path + "\\*");
 
     WIN32_FIND_DATAW ffd;
-    HANDLE hFind = FindFirstFileW(searchPath.c_str(), &ffd);
+    HANDLE hFind = FindFirstFileW(wSearchPath.c_str(), &ffd);
 
     if (hFind == INVALID_HANDLE_VALUE)
-        return "Directory not found or access denied.";
+        return {"", makeLastError("dir")};
 
     std::string result;
 
     do
     {
-        std::string filename = unicode::utf16_to_utf8(ffd.cFileName);
+        std::string name =
+            unicode::utf16_to_utf8(ffd.cFileName);
 
         if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-        {
-            result += filename + "  <DIR>\n";
-        }
+            result += name + "/\n";
         else
-        {
-            LARGE_INTEGER filesize;
-            filesize.LowPart = ffd.nFileSizeLow;
-            filesize.HighPart = ffd.nFileSizeHigh;
-
-            result += filename + "  " + std::to_string(filesize.QuadPart) + " bytes\n";
-        }
+            result += name + "\n";
 
     } while (FindNextFileW(hFind, &ffd));
 
     FindClose(hFind);
-    return result;
+    return {result, {}};
 }
 
 // TOUCH COMMAND
-bool Engine::executeTOUCH(const std::string &filename)
+BoolResult Engine::executeTOUCH(const std::string &filename)
 {
-    std::wstring wFilename = unicode::utf8_to_utf16(filename);
+    std::wstring wFilename =
+        unicode::utf8_to_utf16(filename);
 
     HANDLE hFile = CreateFileW(
         wFilename.c_str(),
@@ -237,88 +235,81 @@ bool Engine::executeTOUCH(const std::string &filename)
         nullptr);
 
     if (hFile == INVALID_HANDLE_VALUE)
-    {
-        return false; // File creation failed
-    }
+        return {false, makeLastError("touch")};
 
     CloseHandle(hFile);
-    return true; // File created successfully
+    return {true, {}};
 }
 
 // RM COMMAND
-bool Engine::executeRM(const std::string &path)
+BoolResult Engine::executeRM(const std::string &path)
 {
-    std::wstring wPath = unicode::utf8_to_utf16(path);
+    if (!DeleteFileW(unicode::utf8_to_utf16(path).c_str()))
+        return {false, makeLastError("rm")};
 
-    if (DeleteFileW(wPath.c_str()))
-    {
-        return true; // File deleted successfully
-    }
-    else
-    {
-        return false; // File deletion failed
-    }
+    return {true, {}};
 }
 
 // CD COMMAND
-bool Engine::executeCD(const std::string &path)
+BoolResult Engine::executeCD(const std::string &path)
 {
     if (path.empty())
-        return false;
+        return {false, {0, "cd: missing operand"}};
 
-    std::wstring wInput = unicode::utf8_to_utf16(path);
+    if (!SetCurrentDirectoryW(unicode::utf8_to_utf16(path).c_str()))
+        return {false, makeLastError("cd")};
 
-    DWORD required = GetFullPathNameW(
-        wInput.c_str(),
-        0,
-        nullptr,
-        nullptr);
-
-    if (required == 0)
-        return false;
-
-    std::wstring wFullPath(required, L'\0');
-
-    DWORD written = GetFullPathNameW(
-        wInput.c_str(),
-        required,
-        wFullPath.data(),
-        nullptr);
-
-    if (written == 0)
-        return false;
-
-    wFullPath.resize(written);
-
-    return SetCurrentDirectoryW(wFullPath.c_str()) != 0;
+    return {true, {}};
 }
 
 // MKDIR COMMAND
-bool Engine::executeMKDIR(const std::string &dirname)
+BoolResult Engine::executeMKDIR(const std::string &dirname)
 {
-    std::wstring wDirname = unicode::utf8_to_utf16(dirname);
+    if (!CreateDirectoryW(
+            unicode::utf8_to_utf16(dirname).c_str(),
+            nullptr))
+        return {false, makeLastError("mkdir")};
 
-    if (CreateDirectoryW(wDirname.c_str(), nullptr))
-    {
-        return true; // Directory created successfully
-    }
-    else
-    {
-        return false; // Directory creation failed
-    }
+    return {true, {}};
 }
 
 // RMDIR COMMAND
-bool Engine::executeRMDIR(const std::string &dirname)
+BoolResult Engine::executeRMDIR(const std::string &dirname)
 {
-    std::wstring wDirname = unicode::utf8_to_utf16(dirname);
+    if (!RemoveDirectoryW(
+            unicode::utf8_to_utf16(dirname).c_str()))
+        return {false, makeLastError("rmdir")};
 
-    if (RemoveDirectoryW(wDirname.c_str()))
-    {
-        return true; // Directory removed successfully
-    }
-    else
-    {
-        return false; // Directory removal failed
-    }
+    return {true, {}};
+}
+
+void Engine::executeCLEAR()
+{
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE)
+        return;
+
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (!GetConsoleScreenBufferInfo(hOut, &csbi))
+        return;
+
+    DWORD cellCount = csbi.dwSize.X * csbi.dwSize.Y;
+    DWORD written;
+    COORD home = {0, 0};
+
+    FillConsoleOutputCharacterW(
+        hOut,
+        L' ',
+        cellCount,
+        home,
+        &written);
+
+    FillConsoleOutputAttribute(
+        hOut,
+        csbi.wAttributes,
+        cellCount,
+        home,
+        &written);
+
+    SetConsoleCursorPosition(hOut, home);
 }

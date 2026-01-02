@@ -1,0 +1,33 @@
+#include <windows.h>
+
+IDI_APP_ICON ICON "Esh\icon\Esh.ico"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION     0,1,0,0
+ PRODUCTVERSION  0,1,0,0
+ FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+ FILEFLAGS       0
+ FILEOS          VOS__WINDOWS32
+ FILETYPE        VFT_APP
+ FILESUBTYPE     0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0" // US English, Unicode
+        BEGIN
+            VALUE "CompanyName",      "Habil Eren Turker"
+            VALUE "FileDescription",  "Esh - Easy Shell"
+            VALUE "FileVersion",      "0.1.0"
+            VALUE "InternalName",     "Esh"
+            VALUE "OriginalFilename", "Esh.exe"
+            VALUE "ProductName",      "Esh Shell"
+            VALUE "ProductVersion",   "0.1.0"
+            VALUE "LegalCopyright",   "Copyright (C) 2026"
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END

@@ -13,7 +13,7 @@ file(GLOB_RECURSE SOURCES
     Esh/src/*.cpp
 )
 
-add_executable(Esh ${SOURCES} resources.rc)
+add_executable(Esh ${SOURCES} resources.rc app.rc)
 
 target_include_directories(Esh PRIVATE Esh/src/headers Esh/src/external)
 

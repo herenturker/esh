@@ -20,22 +20,24 @@ limitations under the License.
 #include <string>
 
 #include "Commands.hpp"
+#include "Result.hpp"
 
 class Engine {
     public:
         static void execute(CommandType command, uint8_t flags, std::string executee);
 
         // COMMAND IMPLEMENTATION           Function prototypes
-        static std::string                  executePWD();
         static void                         executeEXIT();
-        static std::string                  executeWHOAMI();
-        static std::string                  executeHOSTNAME();
-        static std::string                  executeDIR(const std::string &path);
-        static std::string                  executeDATETIME();
-        static bool                         executeTOUCH(const std::string &filename);
-        static bool                         executeRM(const std::string &path);
-        static bool                         executeCD(const std::string &path);
-        static bool                         executeMKDIR(const std::string &dirname);
-        static bool                         executeRMDIR(const std::string &dirname);
+        static void                         executeCLEAR();
+        static Result<std::string>          executePWD();
+        static Result<std::string>          executeWHOAMI();
+        static Result<std::string>          executeHOSTNAME();
+        static Result<std::string>          executeDIR(const std::string &path);
+        static Result<std::string>          executeDATETIME();
+        static BoolResult                   executeTOUCH(const std::string &filename);
+        static BoolResult                   executeRM(const std::string &path);
+        static BoolResult                   executeCD(const std::string &path);
+        static BoolResult                   executeMKDIR(const std::string &dirname);
+        static BoolResult                   executeRMDIR(const std::string &dirname);
 
 };

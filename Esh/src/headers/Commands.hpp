@@ -31,6 +31,7 @@ limitations under the License.
 #define COMMAND_RM 0X0A
 #define COMMAND_MKDIR 0X0B
 #define COMMAND_RMDIR 0X0C
+#define COMMAND_CLEAR 0X0D // SAME AS CLS
 // --------------------------------------------
 
 #include <string>
@@ -40,7 +41,6 @@ limitations under the License.
 #include "Shell.hpp"
 
 class Commands {
-
     public:
         static bool isBuiltInCommand(const std::string& command);    
 };
@@ -59,7 +59,9 @@ enum class CommandType : uint8_t {
     TOUCH =             COMMAND_TOUCH,
     RM =                COMMAND_RM,
     MKDIR =             COMMAND_MKDIR,
-    RMDIR =             COMMAND_RMDIR
+    RMDIR =             COMMAND_RMDIR,
+    CLEAR =             COMMAND_CLEAR,
+    CLS =               COMMAND_CLEAR, // SAME AS CLEAR
 };
 
 // DEFINE FLAGS
@@ -83,8 +85,9 @@ static inline const std::unordered_map<std::string, CommandType> commandMap = {
     {"touch", CommandType::TOUCH},
     {"rm", CommandType::RM},
     {"mkdir", CommandType::MKDIR},
-    {"rmdir", CommandType::RMDIR}
-
+    {"rmdir", CommandType::RMDIR},
+    {"clear", CommandType::CLEAR},
+    {"cls", CommandType::CLEAR}
 };
 
 // MAP FLAG STRINGS TO FLAG TYPES

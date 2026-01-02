@@ -20,32 +20,57 @@ limitations under the License.
 #include "headers/Shell.hpp"
 #include "headers/Engine.hpp"
 #include "headers/ConsoleColor.hpp"
+#include "headers/Result.hpp"
+#include "headers/Error.hpp"
 
 int main()
 {
+    // Generic helper to print Result<std::string> or error
+    auto printOrError =
+    [](const Result<std::string>& res) -> bool
+    {
+        if (!res.ok())
+        {
+            console::setColor(ConsoleColor::Red);
+            std::cerr << res.error.message << std::endl;
+            console::reset();
+            return false;
+        }
+
+        std::cout << res.value;
+        return true;
+    };
 
     try
     {
         std::string json = Shell::load_resource_json(101);
+        (void)json; // explicitly unused for now
     }
     catch (const std::exception &e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     std::string raw_input;
 
     while (true)
     {
-
+        /* user@host */
         console::setColor(ConsoleColor::Blue);
-        std::cout << Engine::executeWHOAMI() << "@"
-                  << Engine::executeHOSTNAME() << " ";
+
+        if (!printOrError(Engine::executeWHOAMI())) continue;
+        std::cout << "@";
+        if (!printOrError(Engine::executeHOSTNAME())) continue;
+        std::cout << " ";
+
         console::reset();
 
+        /* current working directory */
         console::setColor(ConsoleColor::Cyan);
-        std::cout << Engine::executePWD();
+
+        if (!printOrError(Engine::executePWD())) continue;
+
         console::reset();
 
         std::cout << " $ ";
@@ -56,5 +81,5 @@ int main()
         Shell::handleRawInput(raw_input);
     }
 
-    return (0);
+    return 0;
 }

@@ -96,6 +96,22 @@
                 "flags": {
                     "--help": "Displays help information about the rmdir command."
                 }
+            },
+
+            "clear": {
+                "description": "Clears the terminal screen.",
+                "usage": "clear",
+                "flags": {
+                    "--help": "Displays help information about the clear command."
+                }
+            },
+
+            "cls": {
+                "description": "Clears the terminal screen (Windows alias).",
+                "usage": "cls",
+                "flags": {
+                    "--help": "Displays help information about the cls command."
+                }
             }
 
         },
