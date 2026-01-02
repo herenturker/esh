@@ -17,8 +17,9 @@ limitations under the License.
 #include <cstdint>
 #include <iostream>
 #include <vector>
-#include <windows.h>
 #include <string>
+
+#include <windows.h>
 
 #include "headers/Engine.hpp"
 #include "headers/Commands.hpp"
@@ -62,7 +63,13 @@ void Engine::execute(CommandType command, uint8_t flags, std::string executee)
         break;
 
     case CommandType::TOUCH:
+        // Execute touch command
         std::cout << (executeTOUCH(executee) ? "File created." : "File creation failed.") << std::endl;
+        break;
+
+    case CommandType::RM:
+        // Execute rm command
+        std::cout << (executeRM(executee) ? "File deleted." : "File deletion failed.") << std::endl;
         break;
 
     default:
@@ -85,8 +92,6 @@ std::string Engine::executePWD()
     return unicode::utf16_to_utf8(buffer.data());
 }
 
-
-
 void Engine::executeEXIT()
 {
     std::cout << "Exiting shell..." << std::endl;
@@ -106,7 +111,6 @@ std::string Engine::executeWHOAMI()
 
     return unicode::utf16_to_utf8(buffer.data());
 }
-
 
 std::string Engine::executeDATETIME()
 {
@@ -129,7 +133,7 @@ std::string Engine::executeHOSTNAME()
     return unicode::utf16_to_utf8(std::wstring(buffer, size));
 }
 
-std::string Engine::executeDIR(const std::string& path)
+std::string Engine::executeDIR(const std::string &path)
 {
     std::wstring wPath = unicode::utf8_to_utf16(path);
     std::wstring searchPath = wPath + L"\\*";
@@ -153,12 +157,10 @@ std::string Engine::executeDIR(const std::string& path)
         else
         {
             LARGE_INTEGER filesize;
-            filesize.LowPart  = ffd.nFileSizeLow;
+            filesize.LowPart = ffd.nFileSizeLow;
             filesize.HighPart = ffd.nFileSizeHigh;
 
-            result += filename + "  "
-                   + std::to_string(filesize.QuadPart)
-                   + " bytes\n";
+            result += filename + "  " + std::to_string(filesize.QuadPart) + " bytes\n";
         }
 
     } while (FindNextFileW(hFind, &ffd));
@@ -178,8 +180,7 @@ bool Engine::executeTOUCH(const std::string &filename)
         nullptr,
         CREATE_NEW,
         FILE_ATTRIBUTE_NORMAL,
-        nullptr
-    );
+        nullptr);
 
     if (hFile == INVALID_HANDLE_VALUE)
     {
@@ -188,4 +189,18 @@ bool Engine::executeTOUCH(const std::string &filename)
 
     CloseHandle(hFile);
     return true; // File created successfully
+}
+
+bool Engine::executeRM(const std::string &path)
+{
+    std::wstring wPath = unicode::utf8_to_utf16(path);
+
+    if (DeleteFileW(wPath.c_str()))
+    {
+        return true; // File deleted successfully
+    }
+    else
+    {
+        return false; // File deletion failed
+    }
 }

@@ -16,6 +16,18 @@ limitations under the License.
 
 #pragma once
 
+#define COMMAND_RESERVED 0X00
+#define COMMAND_LS 0X01
+#define COMMAND_PWD 0X02
+#define COMMAND_EXIT 0X03
+#define COMMAND_CD 0X04
+#define COMMAND_WHOAMI 0X05
+#define COMMAND_DATETIME 0X06
+#define COMMAND_HOSTNAME 0X07
+#define COMMAND_DIR 0X08
+#define COMMAND_TOUCH 0X09
+#define COMMAND_RM 0X0A
+
 #include <string>
 #include <unordered_map>
 #include <cstdint>
@@ -30,16 +42,17 @@ class Commands {
 };
 // DEFINE COMMAND TYPES
 enum class CommandType : uint8_t {
-    UNKNOWN = 0x00,
-    LS  = 0x01,
-    PWD = 0x02,
-    EXIT = 0x03,
-    CD = 0x04,
-    WHOAMI = 0x05,
-    DATETIME = 0x06,
-    HOSTNAME = 0x07,
-    DIR = 0x08,
-    TOUCH = 0x09
+    RESERVED = COMMAND_RESERVED,
+    LS  = COMMAND_LS,
+    PWD = COMMAND_PWD,
+    EXIT = COMMAND_EXIT,
+    CD = COMMAND_CD,
+    WHOAMI = COMMAND_WHOAMI,
+    DATETIME = COMMAND_DATETIME,
+    HOSTNAME = COMMAND_HOSTNAME,
+    DIR = COMMAND_DIR,
+    TOUCH = COMMAND_TOUCH,
+    RM = COMMAND_RM
 };
 
 // DEFINE FLAGS
@@ -60,7 +73,8 @@ static inline const std::unordered_map<std::string, CommandType> commandMap = {
     {"datetime", CommandType::DATETIME},
     {"hostname", CommandType::HOSTNAME},
     {"dir", CommandType::DIR},
-    {"touch", CommandType::TOUCH}
+    {"touch", CommandType::TOUCH},
+    {"rm", CommandType::RM}
 
 };
 

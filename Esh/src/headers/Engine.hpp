@@ -25,12 +25,14 @@ class Engine {
     public:
         static void execute(CommandType command, uint8_t flags, std::string executee);
 
-        static std::string executePWD();
-        static void executeEXIT();
-        static std::string executeWHOAMI();
-        static std::string executeHOSTNAME();
-        static std::string executeDIR(const std::string &path);
-        static std::string executeDATETIME();
-        static bool executeTOUCH(const std::string &filename);
+        // COMMAND IMPLEMENTATION           Function prototypes
+        static std::string                  executePWD();
+        static void                         executeEXIT();
+        static std::string                  executeWHOAMI();
+        static std::string                  executeHOSTNAME();
+        static std::string                  executeDIR(const std::string &path);
+        static std::string                  executeDATETIME();
+        static bool                         executeTOUCH(const std::string &filename);
+        static bool                         executeRM(const std::string &path);
 
 };

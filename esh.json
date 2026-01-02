@@ -63,6 +63,15 @@
                 "flags": {
                     "--help": "Displays help information about the touch command."
                 }
+            },
+
+            "rm": {
+                "description": "Removes a file or directory.",
+                "usage": "rm <path>",
+                "flags": {
+                    "--help": "Displays help information about the rm command.",
+                    "-r": "Recursively removes directories and their contents."
+                }
             }
 
         },
