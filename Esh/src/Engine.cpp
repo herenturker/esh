@@ -194,7 +194,7 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
 
     case CommandType::LS:
     {
-        // List directory contents in a tree-like format
+        // List directory contents
         std::string path = args.empty() ? "." : args[0];
         // executeLSTree(path, L"");
         executeLS(path);
@@ -705,7 +705,6 @@ void Engine::executeSYSTEMSTATS()
         }
     }
 }
-
 
 std::string getFileTypeChar(DWORD attributes)
 {
