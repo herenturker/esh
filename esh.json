@@ -2,7 +2,7 @@
     "commands": {
         "builtin": {
             "exit": {
-                "description": "Exits the Esh shell.",
+                "description": "Exits the esh shell.",
                 "usage": "exit",
                 "flags": {
                     "--help": "Displays help information about the exit command."

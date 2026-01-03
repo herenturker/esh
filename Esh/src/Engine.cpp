@@ -144,7 +144,7 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
         break;
 
     case CommandType::CLEAR:
-        // Clear the Esh console screen
+        // Clear the esh console screen
         executeCLEAR();
         break;
 

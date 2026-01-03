@@ -9,7 +9,7 @@ compile:
 	cmake --build build --verbose
 
 run: compile
-	powershell -Command "& '.\\build\\Esh.exe'"
+	powershell -Command "& '.\\build\\esh.exe'"
 
 clean:
 	powershell -Command "Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue"

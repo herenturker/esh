@@ -2,10 +2,10 @@
   "version": "0.1.0",
   "configurations": [
     {
-      "name": "Debug Esh",
+      "name": "Debug esh",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/Esh.exe",
+      "program": "${workspaceFolder}/build/esh.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

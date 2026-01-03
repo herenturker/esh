@@ -1,6 +1,6 @@
 #include <windows.h>
 
-IDI_APP_ICON ICON "Esh\icon\Esh.ico"
+IDI_APP_ICON ICON "esh\icon\esh.ico"
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION     0,1,0,0
@@ -16,13 +16,13 @@ BEGIN
         BLOCK "040904B0" // US English, Unicode
         BEGIN
             VALUE "CompanyName",      "Habil Eren Turker"
-            VALUE "FileDescription",  "Esh - Easy Shell"
+            VALUE "FileDescription",  "esh - Easy Shell"
             VALUE "FileVersion",      "0.1.0"
-            VALUE "InternalName",     "Esh"
-            VALUE "OriginalFilename", "Esh.exe"
-            VALUE "ProductName",      "Esh Shell"
+            VALUE "InternalName",     "esh"
+            VALUE "OriginalFilename", "esh.exe"
+            VALUE "ProductName",      "esh"
             VALUE "ProductVersion",   "0.1.0"
-            VALUE "LegalCopyright",   "Copyright (C) 2026 Habil Eren Turker"
+            VALUE "LegalCopyright",   "Copyright (C) 2026, Habil Eren Turker"
         END
     END
 
