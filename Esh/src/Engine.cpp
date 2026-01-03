@@ -195,8 +195,15 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
     case CommandType::LS:
     {
         // List directory contents
+        
+        if (flags & static_cast<uint8_t>(Flag::RECURSIVE))
+        {
+            std::string path = args.empty() ? "." : args[0];
+            executeLSTree(path, L"");
+            break;
+        }
+
         std::string path = args.empty() ? "." : args[0];
-        // executeLSTree(path, L"");
         executeLS(path);
         break;
     }
@@ -655,7 +662,6 @@ double Engine::getNetworkUsage()
 
     return mbPerSec;
 }
-
 
 // SYSTEMSTATS COMMAND
 void Engine::executeSYSTEMSTATS()

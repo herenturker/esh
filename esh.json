@@ -148,10 +148,11 @@
             },
 
             "ls": {
-                "description": "Lists directory contents in a tree-like format.",
+                "description": "Lists directory contents",
                 "usage": "ls [path]",
                 "flags": {
-                    "--help": "Displays help information about the ls command."
+                    "--help": "Displays help information about the ls command.",
+                    "-r": "Lists all directory contents (including subfiles) as tree structure."
                 }
             }
 
