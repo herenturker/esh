@@ -13,7 +13,7 @@
                 "description": "Provides help information for Esh commands.",
                 "usage": "help [command]",
                 "flags": {
-                    "-all": "Lists all available commands with brief descriptions."
+                    "-a": "Lists all available commands with brief descriptions."
                 }
             },
 
@@ -129,8 +129,31 @@
                     "--help": "Displays help information about the cp command.",
                     "-r": "Recursively copies directories and their contents."
                 }
-            }
+            },
 
+            "systeminfo": {
+                "description": "Displays detailed system information.",
+                "usage": "systeminfo",
+                "flags": {
+                    "--help": "Displays help information about the systeminfo command."
+                }
+            },
+
+            "systemstats": {
+                "description": "Displays system statistics.",
+                "usage": "systemstats",
+                "flags": {
+                    "--help": "Displays help information about the systemstats command."
+                }
+            },
+
+            "ls": {
+                "description": "Lists directory contents in a tree-like format.",
+                "usage": "ls [path]",
+                "flags": {
+                    "--help": "Displays help information about the ls command."
+                }
+            }
 
         },
 

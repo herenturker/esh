@@ -31,10 +31,19 @@ class Engine {
 
         static void                         executeEXIT();
         static void                         executeCLEAR();
-
+        static void                         executeSYSTEMINFO();
+        static void                         executeSYSTEMSTATS();
+        static void                         executeLS(const std::string &pathStr);
+        static void                         executeLSTree(const std::string &pathStr, const std::wstring &prefix);
+        
         static bool                         isDirectory(const std::wstring& path);
         static bool                         copyFile(const std::wstring& src, const std::wstring& dst);
         static bool                         copyDirectory(const std::wstring& src, const std::wstring& dst);
+
+        static double                       getCPUUsage();
+        static double                       getRAMUsage();
+        static double                       getDiskUsage(const std::wstring& drive);
+        static double                       getNetworkUsage();
 
         static Result<std::string>          executePWD();
         static Result<std::string>          executeWHOAMI();

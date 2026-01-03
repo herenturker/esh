@@ -19,7 +19,12 @@ limitations under the License.
 #include <vector>
 #include <string>
 
+#include <iomanip>
 #include <windows.h>
+#include <pdh.h>
+#include <conio.h>
+
+#pragma comment(lib, "pdh.lib")
 
 #include "headers/Engine.hpp"
 #include "headers/Commands.hpp"
@@ -28,7 +33,7 @@ limitations under the License.
 #include "headers/Error.hpp"
 #include "headers/Result.hpp"
 
-// helper function
+// helper functions
 std::wstring basename(const std::wstring& path)
 {
     size_t pos = path.find_last_of(L"\\/");
@@ -37,10 +42,20 @@ std::wstring basename(const std::wstring& path)
         : path.substr(pos + 1);
 }
 
+std::wstring makeBar(double percent, int width = 30)
+{
+    int filled = static_cast<int>((percent / 100.0) * width);
+    std::wstring bar = L"[";
+    for (int i = 0; i < width; ++i)
+        bar += (i < filled ? L'/' : L' ');
+    bar += L"] ";
+    bar += std::to_wstring(static_cast<int>(percent)) + L"%";
+    return bar;
+}
+
 void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::string> &args)
 {
     // Helper lambda to print boolean command results
-    // This is the ONLY place where colored output is handled
     auto printBoolResult =
         [](const BoolResult &res, std::string_view successMsg)
     {
@@ -164,6 +179,25 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
         printBoolResult(
             executeCP(args[0], args[1]),
             "Copy operation successful.");
+        break;
+    }
+
+    case CommandType::SYSTEMINFO:
+        // Display system information
+        executeSYSTEMINFO();
+        break;
+    
+    case CommandType::SYSTEMSTATS:
+        // Display real-time system statistics
+        executeSYSTEMSTATS();
+        break;
+
+    case CommandType::LS:
+    {
+        // List directory contents in a tree-like format
+        std::string path = args.empty() ? "." : args[0];
+        // executeLSTree(path, L"");
+        executeLS(path);
         break;
     }
 
@@ -326,6 +360,7 @@ BoolResult Engine::executeRMDIR(const std::string &dirname)
     return {true, {}};
 }
 
+// CLEAR COMMAND
 void Engine::executeCLEAR()
 {
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -432,6 +467,7 @@ bool Engine::copyDirectory(const std::wstring &src, const std::wstring &dst)
     return true;
 }
 
+// MV COMMAND
 BoolResult Engine::executeMV(const std::string& src,
                              const std::string& dst)
 {
@@ -456,6 +492,7 @@ BoolResult Engine::executeMV(const std::string& src,
     return {true, {}};
 }
 
+// CP COMMAND
 BoolResult Engine::executeCP(const std::string& src,
                              const std::string& dst)
 {
@@ -482,4 +519,303 @@ BoolResult Engine::executeCP(const std::string& src,
         return {false, makeLastError("cp")};
 
     return {true, {}};
+}
+
+// SYSTEMINFO COMMAND
+void Engine::executeSYSTEMINFO()
+{
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+
+    auto printSize = [](uintptr_t addr) {
+        double bytes = static_cast<double>(addr);
+        double kb = bytes / 1024.0;
+        double mb = kb / 1024.0;
+        double gb = mb / 1024.0;
+        double tb = gb / 1024.0;
+        std::wcout << L"Bytes: " << bytes
+                   << L", KB: " << kb
+                   << L", MB: " << mb
+                   << L", GB: " << gb
+                   << L", TB: " << tb << std::endl;
+    };
+
+    std::wcout << L"----- System Information -----" << std::endl;
+    std::wcout << L"Processor Architecture: ";
+    switch (si.wProcessorArchitecture)
+    {
+    case PROCESSOR_ARCHITECTURE_AMD64:
+        std::wcout << L"x64 (AMD or Intel)" << std::endl;
+        break;
+    case PROCESSOR_ARCHITECTURE_ARM:
+        std::wcout << L"ARM" << std::endl;
+        break;
+    case PROCESSOR_ARCHITECTURE_ARM64:
+        std::wcout << L"ARM64" << std::endl;
+        break;
+    case PROCESSOR_ARCHITECTURE_INTEL:
+        std::wcout << L"x86" << std::endl;
+        break;
+    default:
+        std::wcout << L"Unknown" << std::endl;
+        break;
+    }
+    std::wcout << L"Number of Processors: " << si.dwNumberOfProcessors << std::endl;
+    std::wcout << L"Page Size: " << si.dwPageSize << L" bytes" << std::endl;
+
+    std::wcout << L"Minimum Application Address: " << si.lpMinimumApplicationAddress << " ";
+    printSize(reinterpret_cast<uintptr_t>(si.lpMinimumApplicationAddress));
+
+    std::wcout << L"Maximum Application Address: " << si.lpMaximumApplicationAddress << " ";
+    printSize(reinterpret_cast<uintptr_t>(si.lpMaximumApplicationAddress));
+
+    std::wcout << L"Active Processor Mask: " << si.dwActiveProcessorMask << std::endl;
+    std::wcout << L"Processor Level: " << si.wProcessorLevel << std::endl;
+    std::wcout << L"Processor Revision: " << si.wProcessorRevision << std::endl;
+
+    std::wcout << L"--------------------------------" << std::endl;
+}
+
+double Engine::getCPUUsage()
+{
+    static ULONGLONG lastIdle = 0, lastKernel = 0, lastUser = 0;
+
+    FILETIME idle, kernel, user;
+    GetSystemTimes(&idle, &kernel, &user);
+
+    ULONGLONG i = ((ULONGLONG)idle.dwHighDateTime << 32) | idle.dwLowDateTime;
+    ULONGLONG k = ((ULONGLONG)kernel.dwHighDateTime << 32) | kernel.dwLowDateTime;
+    ULONGLONG u = ((ULONGLONG)user.dwHighDateTime << 32) | user.dwLowDateTime;
+
+    ULONGLONG idleDiff = i - lastIdle;
+    ULONGLONG totalDiff = (k + u) - (lastKernel + lastUser);
+
+    lastIdle = i;
+    lastKernel = k;
+    lastUser = u;
+
+    if (totalDiff == 0) return 0.0;
+    return (1.0 - (double)idleDiff / totalDiff) * 100.0;
+}
+
+double Engine::getRAMUsage()
+{
+    MEMORYSTATUSEX mem{};
+    mem.dwLength = sizeof(mem);
+    GlobalMemoryStatusEx(&mem);
+    return mem.dwMemoryLoad;
+}
+
+double Engine::getDiskUsage(const std::wstring& drive = L"C:\\")
+{
+    ULARGE_INTEGER freeBytesAvailable, totalBytes, totalFreeBytes;
+    if (!GetDiskFreeSpaceExW(drive.c_str(), &freeBytesAvailable, &totalBytes, &totalFreeBytes))
+        return 0.0;
+
+    return 100.0 * (1.0 - static_cast<double>(totalFreeBytes.QuadPart) / static_cast<double>(totalBytes.QuadPart));
+}
+
+double Engine::getNetworkUsage()
+{
+    static PDH_HQUERY query = nullptr;
+    static std::vector<PDH_HCOUNTER> counters;
+    static bool init = false;
+    static double lastValue = 0.0;
+
+    if (!init)
+    {
+        PdhOpenQuery(nullptr, 0, &query);
+
+        PDH_STATUS status;
+        DWORD counterListSize = 0;
+
+        PdhEnumObjectsW(nullptr, nullptr, nullptr, 0, PERF_DETAIL_WIZARD, TRUE);
+
+        PdhAddEnglishCounterW(query,
+            L"\\Network Interface(*)\\Bytes Total/sec",
+            0, &counters.emplace_back());
+
+        PdhCollectQueryData(query);
+        init = true;
+        return 0.0;
+    }
+
+    PdhCollectQueryData(query);
+
+    double totalBytesPerSec = 0.0;
+
+    for (auto counter : counters)
+    {
+        PDH_FMT_COUNTERVALUE value;
+        PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, nullptr, &value);
+        totalBytesPerSec += value.doubleValue;
+    }
+
+    double mbPerSec = totalBytesPerSec / (1024.0 * 1024.0);
+
+    return mbPerSec;
+}
+
+
+// SYSTEMSTATS COMMAND
+void Engine::executeSYSTEMSTATS()
+{
+    getCPUUsage();
+    getNetworkUsage();
+
+    const int refreshIntervalMs = 500; // refresh every 0.5s
+    const int inputCheckIntervalMs = 50;
+
+    ULONGLONG lastTime = GetTickCount64();
+
+    while (true)
+    {
+        Engine::executeCLEAR();
+
+        double cpu  = getCPUUsage();
+        double ram  = getRAMUsage();
+        double disk = getDiskUsage();
+        double net  = getNetworkUsage();
+
+        console::reset();
+        std::wcout << L"----- System Statistics -----" << std::endl;
+        console::setColor(ConsoleColor::Cyan);
+        std::wcout << L"CPU   " << makeBar(cpu) << std::endl;
+        console::setColor(ConsoleColor::Green);
+        std::wcout << L"RAM   " << makeBar(ram) << std::endl;
+        console::setColor(ConsoleColor::Blue);
+        std::wcout << L"DISK  " << makeBar(disk) << std::endl;
+        console::setColor(ConsoleColor::Yellow);
+        std::wcout << L"NET   " << net << L" MB/s" << std::endl;
+        console::reset();
+        std::wcout << L"-----------------------------" << std::endl;
+
+        std::wcout << L"\nPress 'q' to quit: " << std::endl;
+
+        ULONGLONG start = GetTickCount64();
+        while (GetTickCount64() - start < refreshIntervalMs)
+        {
+            if (_kbhit())
+            {
+                wchar_t q = _getwch();
+                if (q == L'q' || q == L'Q')
+                    return;
+            }
+            Sleep(inputCheckIntervalMs);
+        }
+    }
+}
+
+
+std::string getFileTypeChar(DWORD attributes)
+{
+    if (attributes & FILE_ATTRIBUTE_DIRECTORY)
+        return "d";
+    else if (attributes & FILE_ATTRIBUTE_REPARSE_POINT)
+        return "l";
+    else
+        return "-";
+}
+
+std::string fileTimeToString(const FILETIME &ft)
+{
+    SYSTEMTIME stUTC, stLocal;
+    FileTimeToSystemTime(&ft, &stUTC);
+    SystemTimeToTzSpecificLocalTime(nullptr, &stUTC, &stLocal);
+
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d",
+             stLocal.wYear, stLocal.wMonth, stLocal.wDay,
+             stLocal.wHour, stLocal.wMinute);
+    return std::string(buffer);
+}
+
+void Engine::executeLS(const std::string &pathStr)
+{
+    std::wstring path(pathStr.begin(), pathStr.end());
+    std::wstring searchPath = path + L"\\*";
+
+    WIN32_FIND_DATAW ffd;
+    HANDLE hFind = FindFirstFileW(searchPath.c_str(), &ffd);
+
+    if (hFind == INVALID_HANDLE_VALUE)
+    {
+        std::wcerr << L"ls: cannot access '" << path << L"'\n";
+        return;
+    }
+
+    std::vector<WIN32_FIND_DATAW> files;
+    do { files.push_back(ffd); } while (FindNextFileW(hFind, &ffd) != 0);
+    FindClose(hFind);
+
+    for (const auto &f : files)
+    {
+        std::wstring name = f.cFileName;
+        if (name == L"." || name == L"..") continue;
+
+        DWORD attrs = f.dwFileAttributes;
+
+        if (attrs & FILE_ATTRIBUTE_DIRECTORY)
+            console::setColor(ConsoleColor::Blue);
+        else if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
+            console::setColor(ConsoleColor::Cyan);
+        else if (attrs & FILE_ATTRIBUTE_HIDDEN)
+            console::setColor(ConsoleColor::Gray);
+        else
+            console::setColor(ConsoleColor::Default);
+
+        LARGE_INTEGER filesize;
+        filesize.LowPart = f.nFileSizeLow;
+        filesize.HighPart = f.nFileSizeHigh;
+
+        std::wcout << (attrs & FILE_ATTRIBUTE_DIRECTORY ? L"d " : L"- ")
+                   << (attrs & FILE_ATTRIBUTE_DIRECTORY ? L"-" : std::to_wstring(filesize.QuadPart))
+                   << L" "
+                   << name << std::endl;
+
+        console::reset();
+    }
+}
+
+void Engine::executeLSTree(const std::string &pathStr, const std::wstring &prefix = L"")
+{
+    std::wstring path(pathStr.begin(), pathStr.end());
+    std::wstring searchPath = path + L"\\*";
+
+    WIN32_FIND_DATAW ffd;
+    HANDLE hFind = FindFirstFileW(searchPath.c_str(), &ffd);
+    if (hFind == INVALID_HANDLE_VALUE) return;
+
+    std::vector<WIN32_FIND_DATAW> files;
+    do { files.push_back(ffd); } while (FindNextFileW(hFind, &ffd) != 0);
+    FindClose(hFind);
+
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        const auto &f = files[i];
+        std::wstring name = f.cFileName;
+        if (name == L"." || name == L"..") continue;
+
+        bool isLast = (i == files.size() - 1);
+        std::wstring connector = isLast ? L"|___" : L"|---";
+
+        DWORD attrs = f.dwFileAttributes;
+        if (attrs & FILE_ATTRIBUTE_DIRECTORY)
+            console::setColor(ConsoleColor::Blue);
+        else if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
+            console::setColor(ConsoleColor::Cyan);
+        else if (attrs & FILE_ATTRIBUTE_HIDDEN)
+            console::setColor(ConsoleColor::Gray);
+        else
+            console::setColor(ConsoleColor::Default);
+
+        std::wcout << prefix << connector << name << std::endl;
+        console::reset();
+
+        if ((attrs & FILE_ATTRIBUTE_DIRECTORY) && name[0] != L'.')
+        {
+            std::wstring newPrefix = prefix + (isLast ? L"    " : L"|   ");
+            executeLSTree(pathStr + "\\" + std::string(name.begin(), name.end()), newPrefix);
+        }
+    }
 }

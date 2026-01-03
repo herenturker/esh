@@ -16,25 +16,28 @@ limitations under the License.
 
 #pragma once
 
-// --------- DEFINE COMMAND CONSTANTS ---------
-
-#define COMMAND_RESERVED 0X00
-#define COMMAND_LS 0X01
-#define COMMAND_PWD 0X02
-#define COMMAND_EXIT 0X03
-#define COMMAND_CD 0X04
-#define COMMAND_WHOAMI 0X05
-#define COMMAND_DATETIME 0X06
-#define COMMAND_HOSTNAME 0X07
-#define COMMAND_DIR 0X08
-#define COMMAND_TOUCH 0X09
-#define COMMAND_RM 0X0A
-#define COMMAND_MKDIR 0X0B
-#define COMMAND_RMDIR 0X0C
-#define COMMAND_CLEAR 0X0D // SAME AS CLS
-#define COMMAND_MV 0X0E
-#define COMMAND_CP 0X0F 
-// --------------------------------------------
+// --------- DEFINE COMMAND CONSTANTS ---------------
+// Command Types                         Hex Values  |
+// --------------------------------------------------
+#define COMMAND_RESERVED                    0X00
+#define COMMAND_LS                          0X01
+#define COMMAND_PWD                         0X02
+#define COMMAND_EXIT                        0X03
+#define COMMAND_CD                          0X04
+#define COMMAND_WHOAMI                      0X05
+#define COMMAND_DATETIME                    0X06
+#define COMMAND_HOSTNAME                    0X07
+#define COMMAND_DIR                         0X08
+#define COMMAND_TOUCH                       0X09
+#define COMMAND_RM                          0X0A
+#define COMMAND_MKDIR                       0X0B
+#define COMMAND_RMDIR                       0X0C
+#define COMMAND_CLEAR                       0X0D // SAME AS CLS
+#define COMMAND_MV                          0X0E
+#define COMMAND_CP                          0X0F 
+#define COMMAND_SYSTEMINFO                  0X10
+#define COMMAND_SYSTEMSTATS                 0X11
+// -------------------------------------------------
 
 #include <string>
 #include <unordered_map>
@@ -65,7 +68,9 @@ enum class CommandType : uint8_t {
     CLEAR =             COMMAND_CLEAR,
     CLS =               COMMAND_CLEAR, // SAME AS CLEAR
     MV =                COMMAND_MV,
-    CP =                COMMAND_CP
+    CP =                COMMAND_CP,
+    SYSTEMINFO =        COMMAND_SYSTEMINFO,
+    SYSTEMSTATS =       COMMAND_SYSTEMSTATS
 };
 
 // DEFINE FLAGS
@@ -94,7 +99,9 @@ static inline const std::unordered_map<std::string, CommandType> commandMap = {
     {"clear", CommandType::CLEAR},
     {"cls", CommandType::CLEAR},
     {"mv", CommandType::MV},
-    {"cp", CommandType::CP}
+    {"cp", CommandType::CP},
+    {"systeminfo", CommandType::SYSTEMINFO},
+    {"systemstats", CommandType::SYSTEMSTATS}
 };
 
 // MAP FLAG STRINGS TO FLAG TYPES
