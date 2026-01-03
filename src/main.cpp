@@ -17,27 +17,35 @@ limitations under the License.
 #include <iostream>
 #include <string>
 
+#include <io.h>
+#include <fcntl.h>
+
 #include "headers/Shell.hpp"
 #include "headers/Engine.hpp"
-#include "headers/ConsoleColor.hpp"
+#include "headers/Console.hpp"
 #include "headers/Result.hpp"
 #include "headers/Error.hpp"
+#include "headers/Unicode.hpp"
 
-int main()
+int wmain()
 {
-    // Generic helper to print Result<std::string> or error
+    _setmode(_fileno(stdin),  _O_WTEXT);
+    _setmode(_fileno(stdout), _O_WTEXT);
+    _setmode(_fileno(stderr), _O_WTEXT);
+
+    // Generic helper to print Result<std::wstring> or error
     auto printOrError =
-    [](const Result<std::string>& res) -> bool
+        [](const Result<std::wstring> &res) -> bool
     {
         if (!res.ok())
         {
             console::setColor(ConsoleColor::Red);
-            std::cerr << res.error.message << std::endl;
+            std::wcerr << res.error.message << L"\n";
             console::reset();
             return false;
         }
 
-        std::cout << res.value;
+        console::write(res.value);
         return true;
     };
 
@@ -48,35 +56,38 @@ int main()
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::wcerr << L"Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 
-    std::string raw_input;
+    std::wstring raw_input;
 
     while (true)
     {
         /* user@host */
         console::setColor(ConsoleColor::Blue);
 
-        if (!printOrError(Engine::executeWHOAMI())) continue;
-        std::cout << "@";
-        if (!printOrError(Engine::executeHOSTNAME())) continue;
-        std::cout << " ";
+        if (!printOrError(Engine::executeWHOAMI()))
+            continue;
+        console::write(L"@");
+        if (!printOrError(Engine::executeHOSTNAME()))
+            continue;
+        console::write(L" ");
 
         console::reset();
 
         /* current working directory */
         console::setColor(ConsoleColor::Cyan);
 
-        if (!printOrError(Engine::executePWD())) continue;
-
+        if (!printOrError(Engine::executePWD()))
+            continue;
+        console::write(L" ");
         console::reset();
 
-        std::cout << " $ ";
+        console::write(L"$ ");
 
-        std::getline(std::cin, raw_input);
-        std::cout << std::endl;
+        std::getline(std::wcin, raw_input);
+        console::write(L"\n");
 
         Shell::handleRawInput(raw_input);
     }

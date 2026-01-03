@@ -22,53 +22,65 @@ limitations under the License.
 #include "headers/Lexer.hpp"
 #include "headers/Commands.hpp"
 
-std::vector<Lexer::Token> Lexer::tokenizeInput(const std::string& input) {
+std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input)
+{
 
     std::vector<Token> tokens;
 
     std::size_t pos = 0;
     const std::size_t len = input.length();
 
-    while (pos < len) {
+    while (pos < len)
+    {
 
-        while (pos < len && input[pos] == ' ') {
+        while (pos < len && input[pos] == ' ')
+        {
             ++pos;
         }
-        if (pos >= len) break;
+        if (pos >= len)
+            break;
 
         std::size_t start = pos;
-        while (pos < len && input[pos] != ' ') {
+        while (pos < len && input[pos] != ' ')
+        {
             ++pos;
         }
 
-        std::string token = input.substr(start, pos - start);
+        std::wstring token = input.substr(start, pos - start);
         TokenType type = identifyTokenType(token);
 
-        tokens.push_back({ type, token });
+        tokens.push_back({type, token});
     }
 
-    tokens.push_back({ TOKEN_EOF, "" });
+    tokens.push_back({TOKEN_EOF, L""});
 
     return tokens;
 }
 
-Lexer::TokenType Lexer::identifyTokenType(const std::string& token) {
+Lexer::TokenType Lexer::identifyTokenType(const std::wstring &token)
+{
 
     // Numeric (supports negative integers)
-    if (token[0] == '-' && token.size() > 1) {
+    if (token[0] == '-' && token.size() > 1)
+    {
         if (std::all_of(token.begin() + 1, token.end(),
-                        [](unsigned char c) { return std::isdigit(c); })) {
+                        [](unsigned char c)
+                        { return std::isdigit(c); }))
+        {
             return TOKEN_NUMBER;
         }
         return TOKEN_FLAG;
     }
 
     if (std::all_of(token.begin(), token.end(),
-                    [](unsigned char c) { return std::isdigit(c); })) {
+                    [](unsigned char c)
+                    { return std::isdigit(c); }))
+    {
         return TOKEN_NUMBER;
     }
 
-    if (Commands::isBuiltInCommand(token)) {
+    if (Commands::isBuiltInCommand(token))
+    {
         return TOKEN_COMMAND;
     }
 

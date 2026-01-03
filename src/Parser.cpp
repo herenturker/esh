@@ -25,7 +25,7 @@ void Parser::parseTokens(const std::vector<Lexer::Token> &tokens)
 
     uint8_t command = 0;
     uint8_t flagAccumulator = 0;
-    std::vector<std::string> args;
+    std::vector<std::wstring> args;
 
     for (const auto& t : tokens)
     {
@@ -49,7 +49,7 @@ void Parser::parseTokens(const std::vector<Lexer::Token> &tokens)
     }
 }
 
-CommandType Parser::parseCommand(const std::string &token)
+CommandType Parser::parseCommand(const std::wstring &token)
 {
     auto it = commandMap.find(token);
     if (it != commandMap.end())
@@ -57,7 +57,7 @@ CommandType Parser::parseCommand(const std::string &token)
     return static_cast<CommandType>(0x00); // RESERVED
 }
 
-uint8_t Parser::parseFlags(const std::vector<std::string> &tokens)
+uint8_t Parser::parseFlags(const std::vector<std::wstring> &tokens)
 {
     uint8_t result = 0;
     for (const auto &t : tokens)

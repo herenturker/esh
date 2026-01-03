@@ -65,10 +65,10 @@ class Lexer {
 
         struct Token {
             TokenType type;
-            std::string lexeme;
+            std::wstring lexeme;
         };
         
-        static std::vector<Token> tokenizeInput(const std::string& input);
+        static std::vector<Token> tokenizeInput(const std::wstring& input);
 
-        static TokenType identifyTokenType(const std::string& token);
+        static TokenType identifyTokenType(const std::wstring& token);
 };

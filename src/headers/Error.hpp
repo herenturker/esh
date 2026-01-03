@@ -21,10 +21,10 @@ limitations under the License.
 
 struct Error {
     DWORD code = 0;
-    std::string message;
+    std::wstring message;
 
     bool hasError() const { return code != 0 || !message.empty(); }
 };
 
-Error makeLastError(const std::string& prefix = "");
+Error makeLastError(const std::wstring& prefix = L"");
 

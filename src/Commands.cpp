@@ -23,7 +23,7 @@ limitations under the License.
 
 using json = nlohmann::json;
 
-bool Commands::isBuiltInCommand(const std::string &command)
+bool Commands::isBuiltInCommand(const std::wstring &command)
 {
     try
     {
@@ -32,7 +32,7 @@ bool Commands::isBuiltInCommand(const std::string &command)
 
         const auto &builtins = j.at("commands").at("builtin");
 
-        return (builtins.contains(command) ? true : false);
+        return (builtins.contains(std::string(command.begin(), command.end())) ? true : false);
     }
     catch (const std::exception &e)
     {

@@ -29,17 +29,17 @@ limitations under the License.
 #include "headers/Engine.hpp"
 #include "headers/Commands.hpp"
 #include "headers/Unicode.hpp"
-#include "headers/ConsoleColor.hpp"
+#include "headers/Console.hpp"
 #include "headers/Error.hpp"
 #include "headers/Result.hpp"
 
 // helper functions
-std::wstring basename(const std::wstring& path)
+std::wstring basename(const std::wstring &path)
 {
     size_t pos = path.find_last_of(L"\\/");
     return (pos == std::wstring::npos)
-        ? path
-        : path.substr(pos + 1);
+               ? path
+               : path.substr(pos + 1);
 }
 
 std::wstring makeBar(double percent, int width = 30)
@@ -53,21 +53,58 @@ std::wstring makeBar(double percent, int width = 30)
     return bar;
 }
 
-void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::string> &args)
+std::wstring process_escapes(const std::wstring &input)
+{
+    std::wstring out;
+    out.reserve(input.size());
+
+    for (size_t i = 0; i < input.size(); ++i)
+    {
+        if (input[i] == L'\\' && i + 1 < input.size())
+        {
+            switch (input[i + 1])
+            {
+            case L'n':
+                out.push_back(L'\n');
+                break;
+            case L't':
+                out.push_back(L'\t');
+                break;
+            case L'\\':
+                out.push_back(L'\\');
+                break;
+            default:
+                out.push_back(input[i]);
+                continue;
+            }
+            ++i;
+        }
+        else
+        {
+            out.push_back(input[i]);
+        }
+    }
+
+    return out;
+}
+
+// ------------------- COMMAND DISPATCHER -------------------
+
+void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args)
 {
     // Helper lambda to print boolean command results
     auto printBoolResult =
-        [](const BoolResult &res, std::string_view successMsg)
+        [](const BoolResult &res, const std::wstring& successMsg)
     {
         if (res.ok())
         {
             console::setColor(ConsoleColor::Green);
-            std::cout << successMsg << std::endl;
+            console::writeln(successMsg);
         }
         else
         {
             console::setColor(ConsoleColor::Red);
-            std::cerr << res.error.message << std::endl;
+            std::wcerr << res.error.message << std::endl;
         }
         console::reset();
     };
@@ -78,69 +115,69 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
 
     case CommandType::PWD:
         // Print working directory
-        std::cout << executePWD().value << std::endl;
+        console::writeln(executePWD().value);
         break;
 
     case CommandType::EXIT:
         // Exit shell immediately
         console::setColor(ConsoleColor::Yellow);
-        std::cout << "Exiting shell..." << std::endl;
+        console::writeln(L"Exiting esh...");
         console::reset();
         ExitProcess(0);
 
     case CommandType::WHOAMI:
         // Print current user name
-        std::cout << executeWHOAMI().value << std::endl;
+        console::writeln(executeWHOAMI().value);
         break;
 
     case CommandType::HOSTNAME:
         // Print host machine name
-        std::cout << executeHOSTNAME().value << std::endl;
+        console::writeln(executeHOSTNAME().value);
         break;
 
     case CommandType::DIR:
         // List directory contents (current directory if no argument)
-        std::cout << executeDIR(args.empty() ? "." : args[0]).value;
+        console::writeln(executeDIR(args.empty() ? L"." : args[0]).value);
         break;
 
     case CommandType::DATETIME:
         // Print local date and time
-        std::cout << executeDATETIME().value << std::endl;
+        console::writeln(executeDATETIME().value);
         break;
 
     case CommandType::TOUCH:
         // Create a new empty file
         printBoolResult(
-            executeTOUCH(args.empty() ? "" : args[0]),
-            "File created.");
+            executeTOUCH(args.empty() ? L"" : args[0]),
+            L"File created.");
         break;
 
     case CommandType::RM:
         // Remove a file
         printBoolResult(
-            executeRM(args.empty() ? "" : args[0]),
-            "File deleted.");
+            executeRM(args.empty() ? L"" : args[0]),
+            L"File deleted.");
         break;
 
     case CommandType::CD:
         // Change current working directory
         printBoolResult(
-            executeCD(args.empty() ? "" : args[0]),
-            "Directory changed.");
+            executeCD(args.empty() ? L"" : args[0]),
+            L"Directory changed.");
         break;
 
     case CommandType::MKDIR:
         // Create a new directory
         printBoolResult(
-            executeMKDIR(args.empty() ? "" : args[0]),
-            "Directory created.");
+            executeMKDIR(args.empty() ? L"" : args[0]),
+            L"Directory created.");
         break;
 
     case CommandType::RMDIR:
         // Remove an empty directory
         printBoolResult(
-            executeRMDIR(args.empty() ? "" : args[0]),
-            "Directory removed.");
+            executeRMDIR(args.empty() ? L"" : args[0]),
+            L"Directory removed.");
         break;
 
     case CommandType::CLEAR:
@@ -153,15 +190,12 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
         // Move (rename) a file or directory
         if (args.size() < 2)
         {
-            printBoolResult(
-                {false, {0, "Usage: mv <source> <destination>"}},
-                "");
+            makeLastError(L"mv");
             break;
         }
 
-        printBoolResult(
-            executeMV(args[0], args[1]),
-            "Move operation successful.");
+        executeMV(args[0], args[1]);
+        console::writeln(L"Move operation successful.");
         break;
     }
 
@@ -170,15 +204,12 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
         // Copy a file or directory
         if (args.size() < 2)
         {
-            printBoolResult(
-                {false, {0, "Usage: cp <source> <destination>"}},
-                "");
+            makeLastError(L"cp");
             break;
         }
 
-        printBoolResult(
-            executeCP(args[0], args[1]),
-            "Copy operation successful.");
+        executeCP(args[0], args[1]);
+        console::writeln(L"Copy operation successful.");
         break;
     }
 
@@ -186,7 +217,7 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
         // Display system information
         executeSYSTEMINFO();
         break;
-    
+
     case CommandType::SYSTEMSTATS:
         // Display real-time system statistics
         executeSYSTEMSTATS();
@@ -195,23 +226,44 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
     case CommandType::LS:
     {
         // List directory contents
-        
+
         if (flags & static_cast<uint8_t>(Flag::RECURSIVE))
         {
-            std::string path = args.empty() ? "." : args[0];
+            std::wstring path = args.empty() ? L"." : args[0];
             executeLSTree(path, L"");
             break;
         }
 
-        std::string path = args.empty() ? "." : args[0];
+        std::wstring path = args.empty() ? L"." : args[0];
         executeLS(path);
+        break;
+    }
+
+    case CommandType::REVIEW:
+    {
+        // Review the contents of a file
+        if (args.empty())
+        {
+            console::setColor(ConsoleColor::Red);
+            std::wcerr << L"Usage: review <file>" << std::endl;
+            console::reset();
+            break;
+        }
+
+        executeREVIEW(args[0]);
+        break;
+    }
+
+    case CommandType::ECHO:
+    {
+        executeECHO(args);
         break;
     }
 
     default:
         // Unknown or unsupported command
         console::setColor(ConsoleColor::Red);
-        std::cerr << "Unknown command" << std::endl;
+        std::wcerr << L"Unknown command" << std::endl;
         console::reset();
         break;
     }
@@ -220,53 +272,52 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
 // ------------------- COMMAND IMPLEMENTATION -------------------
 
 // PWD COMMAND
-Result<std::string> Engine::executePWD()
+Result<std::wstring> Engine::executePWD()
 {
     DWORD length = GetCurrentDirectoryW(0, nullptr);
     if (length == 0)
-        return {"", makeLastError("pwd")};
+        return {L"", makeLastError(L"pwd")};
 
     std::vector<wchar_t> buffer(length);
     if (GetCurrentDirectoryW(length, buffer.data()) == 0)
-        return {"", makeLastError("pwd")};
-
-    return {unicode::utf16_to_utf8(buffer.data()), {}};
+        return {L"", makeLastError(L"pwd")};
+    return {std::wstring(buffer.data()), {}};
 }
 
 // WHOAMI COMMAND
-Result<std::string> Engine::executeWHOAMI()
+Result<std::wstring> Engine::executeWHOAMI()
 {
     DWORD length = 0;
     GetUserNameW(nullptr, &length);
 
     std::vector<wchar_t> buffer(length);
     if (!GetUserNameW(buffer.data(), &length))
-        return {"", makeLastError("whoami")};
+        return {L"", makeLastError(L"whoami")};
 
-    return {unicode::utf16_to_utf8(buffer.data()), {}};
+    return {std::wstring(buffer.data()), {}};
 }
 
 // HOSTNAME COMMAND
-Result<std::string> Engine::executeHOSTNAME()
+Result<std::wstring> Engine::executeHOSTNAME()
 {
     wchar_t buffer[MAX_COMPUTERNAME_LENGTH + 1];
     DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
 
     if (!GetComputerNameW(buffer, &size))
-        return {"", makeLastError("hostname")};
+        return {L"", makeLastError(L"hostname")};
 
-    return {unicode::utf16_to_utf8(std::wstring(buffer, size)), {}};
+    return {std::wstring(buffer, size), {}};
 }
 
 // DATETIME COMMAND
-Result<std::string> Engine::executeDATETIME()
+Result<std::wstring> Engine::executeDATETIME()
 {
     SYSTEMTIME st;
     GetLocalTime(&st);
 
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer),
-             "%04d-%02d-%02d %02d:%02d:%02d",
+    wchar_t buffer[64];
+    swprintf(buffer, sizeof(buffer) / sizeof(wchar_t),
+             L"%04d-%02d-%02d %02d:%02d:%02d",
              st.wYear, st.wMonth, st.wDay,
              st.wHour, st.wMinute, st.wSecond);
 
@@ -274,28 +325,27 @@ Result<std::string> Engine::executeDATETIME()
 }
 
 // DIR COMMAND
-Result<std::string> Engine::executeDIR(const std::string &path)
+Result<std::wstring> Engine::executeDIR(const std::wstring &path)
 {
     std::wstring wSearchPath =
-        unicode::utf8_to_utf16(path + "\\*");
+        path + L"\\*";
 
     WIN32_FIND_DATAW ffd;
     HANDLE hFind = FindFirstFileW(wSearchPath.c_str(), &ffd);
 
     if (hFind == INVALID_HANDLE_VALUE)
-        return {"", makeLastError("dir")};
+        return {L"", makeLastError(L"dir")};
 
-    std::string result;
+    std::wstring result;
 
     do
     {
-        std::string name =
-            unicode::utf16_to_utf8(ffd.cFileName);
+        std::wstring name = ffd.cFileName;
 
         if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-            result += name + "/\n";
+            result += name + L"/\n";
         else
-            result += name + "\n";
+            result += name + L"\n";
 
     } while (FindNextFileW(hFind, &ffd));
 
@@ -304,10 +354,9 @@ Result<std::string> Engine::executeDIR(const std::string &path)
 }
 
 // TOUCH COMMAND
-BoolResult Engine::executeTOUCH(const std::string &filename)
+BoolResult Engine::executeTOUCH(const std::wstring &filename)
 {
-    std::wstring wFilename =
-        unicode::utf8_to_utf16(filename);
+    std::wstring wFilename = filename;
 
     HANDLE hFile = CreateFileW(
         wFilename.c_str(),
@@ -319,50 +368,50 @@ BoolResult Engine::executeTOUCH(const std::string &filename)
         nullptr);
 
     if (hFile == INVALID_HANDLE_VALUE)
-        return {false, makeLastError("touch")};
+        return {false, makeLastError(L"touch")};
 
     CloseHandle(hFile);
     return {true, {}};
 }
 
 // RM COMMAND
-BoolResult Engine::executeRM(const std::string &path)
+BoolResult Engine::executeRM(const std::wstring &path)
 {
-    if (!DeleteFileW(unicode::utf8_to_utf16(path).c_str()))
-        return {false, makeLastError("rm")};
+    if (!DeleteFileW(path.c_str()))
+        return {false, makeLastError(L"rm")};
 
     return {true, {}};
 }
 
 // CD COMMAND
-BoolResult Engine::executeCD(const std::string &path)
+BoolResult Engine::executeCD(const std::wstring &path)
 {
     if (path.empty())
-        return {false, {0, "cd: missing operand"}};
+        return {false, {0, L"cd: missing operand"}};
 
-    if (!SetCurrentDirectoryW(unicode::utf8_to_utf16(path).c_str()))
-        return {false, makeLastError("cd")};
+    if (!SetCurrentDirectoryW(path.c_str()))
+        return {false, makeLastError(L"cd")};
 
     return {true, {}};
 }
 
 // MKDIR COMMAND
-BoolResult Engine::executeMKDIR(const std::string &dirname)
+BoolResult Engine::executeMKDIR(const std::wstring &dirname)
 {
     if (!CreateDirectoryW(
-            unicode::utf8_to_utf16(dirname).c_str(),
+            dirname.c_str(),
             nullptr))
-        return {false, makeLastError("mkdir")};
+        return {false, makeLastError(L"mkdir")};
 
     return {true, {}};
 }
 
 // RMDIR COMMAND
-BoolResult Engine::executeRMDIR(const std::string &dirname)
+BoolResult Engine::executeRMDIR(const std::wstring &dirname)
 {
     if (!RemoveDirectoryW(
-            unicode::utf8_to_utf16(dirname).c_str()))
-        return {false, makeLastError("rmdir")};
+            dirname.c_str()))
+        return {false, makeLastError(L"rmdir")};
 
     return {true, {}};
 }
@@ -378,8 +427,8 @@ void Engine::executeCLEAR()
     if (!GetConsoleScreenBufferInfo(hOut, &csbi))
         return;
 
-    SHORT width  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
-    SHORT height = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
+    SHORT width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    SHORT height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 
     SMALL_RECT tinyWindow = {0, 0, 0, 0};
     SetConsoleWindowInfo(hOut, TRUE, &tinyWindow);
@@ -475,12 +524,11 @@ bool Engine::copyDirectory(const std::wstring &src, const std::wstring &dst)
 }
 
 // MV COMMAND
-BoolResult Engine::executeMV(const std::string& src,
-                             const std::string& dst)
+BoolResult Engine::executeMV(const std::wstring &src,
+                             const std::wstring &dst)
 {
-    std::wstring wSrc = unicode::utf8_to_utf16(src);
-    std::wstring wDst = unicode::utf8_to_utf16(dst);
-
+    std::wstring wSrc = src;
+    std::wstring wDst = dst;
     if (isDirectory(wDst))
     {
         wDst += L"\\";
@@ -491,24 +539,23 @@ BoolResult Engine::executeMV(const std::string& src,
             wSrc.c_str(),
             wDst.c_str(),
             MOVEFILE_REPLACE_EXISTING |
-            MOVEFILE_COPY_ALLOWED))
+                MOVEFILE_COPY_ALLOWED))
     {
-        return {false, makeLastError("mv")};
+        return {false, makeLastError(L"mv")};
     }
 
     return {true, {}};
 }
 
 // CP COMMAND
-BoolResult Engine::executeCP(const std::string& src,
-                             const std::string& dst)
+BoolResult Engine::executeCP(const std::wstring &src,
+                             const std::wstring &dst)
 {
-    std::wstring wSrc = unicode::utf8_to_utf16(src);
-    std::wstring wDst = unicode::utf8_to_utf16(dst);
-
+    std::wstring wSrc = src;
+    std::wstring wDst = dst;
     DWORD attr = GetFileAttributesW(wSrc.c_str());
     if (attr == INVALID_FILE_ATTRIBUTES)
-        return {false, makeLastError("cp")};
+        return {false, makeLastError(L"cp")};
 
     if (isDirectory(wDst))
     {
@@ -523,7 +570,7 @@ BoolResult Engine::executeCP(const std::string& src,
         ok = copyFile(wSrc, wDst);
 
     if (!ok)
-        return {false, makeLastError("cp")};
+        return {false, makeLastError(L"cp")};
 
     return {true, {}};
 }
@@ -534,7 +581,8 @@ void Engine::executeSYSTEMINFO()
     SYSTEM_INFO si;
     GetSystemInfo(&si);
 
-    auto printSize = [](uintptr_t addr) {
+    auto printSize = [](uintptr_t addr)
+    {
         double bytes = static_cast<double>(addr);
         double kb = bytes / 1024.0;
         double mb = kb / 1024.0;
@@ -601,7 +649,8 @@ double Engine::getCPUUsage()
     lastKernel = k;
     lastUser = u;
 
-    if (totalDiff == 0) return 0.0;
+    if (totalDiff == 0)
+        return 0.0;
     return (1.0 - (double)idleDiff / totalDiff) * 100.0;
 }
 
@@ -613,7 +662,7 @@ double Engine::getRAMUsage()
     return mem.dwMemoryLoad;
 }
 
-double Engine::getDiskUsage(const std::wstring& drive = L"C:\\")
+double Engine::getDiskUsage(const std::wstring &drive = L"C:\\")
 {
     ULARGE_INTEGER freeBytesAvailable, totalBytes, totalFreeBytes;
     if (!GetDiskFreeSpaceExW(drive.c_str(), &freeBytesAvailable, &totalBytes, &totalFreeBytes))
@@ -639,8 +688,8 @@ double Engine::getNetworkUsage()
         PdhEnumObjectsW(nullptr, nullptr, nullptr, 0, PERF_DETAIL_WIZARD, TRUE);
 
         PdhAddEnglishCounterW(query,
-            L"\\Network Interface(*)\\Bytes Total/sec",
-            0, &counters.emplace_back());
+                              L"\\Network Interface(*)\\Bytes Total/sec",
+                              0, &counters.emplace_back());
 
         PdhCollectQueryData(query);
         init = true;
@@ -678,10 +727,10 @@ void Engine::executeSYSTEMSTATS()
     {
         Engine::executeCLEAR();
 
-        double cpu  = getCPUUsage();
-        double ram  = getRAMUsage();
+        double cpu = getCPUUsage();
+        double ram = getRAMUsage();
         double disk = getDiskUsage();
-        double net  = getNetworkUsage();
+        double net = getNetworkUsage();
 
         console::reset();
         std::wcout << L"----- System Statistics -----" << std::endl;
@@ -712,30 +761,7 @@ void Engine::executeSYSTEMSTATS()
     }
 }
 
-std::string getFileTypeChar(DWORD attributes)
-{
-    if (attributes & FILE_ATTRIBUTE_DIRECTORY)
-        return "d";
-    else if (attributes & FILE_ATTRIBUTE_REPARSE_POINT)
-        return "l";
-    else
-        return "-";
-}
-
-std::string fileTimeToString(const FILETIME &ft)
-{
-    SYSTEMTIME stUTC, stLocal;
-    FileTimeToSystemTime(&ft, &stUTC);
-    SystemTimeToTzSpecificLocalTime(nullptr, &stUTC, &stLocal);
-
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d",
-             stLocal.wYear, stLocal.wMonth, stLocal.wDay,
-             stLocal.wHour, stLocal.wMinute);
-    return std::string(buffer);
-}
-
-void Engine::executeLS(const std::string &pathStr)
+void Engine::executeLS(const std::wstring &pathStr)
 {
     std::wstring path(pathStr.begin(), pathStr.end());
     std::wstring searchPath = path + L"\\*";
@@ -750,13 +776,17 @@ void Engine::executeLS(const std::string &pathStr)
     }
 
     std::vector<WIN32_FIND_DATAW> files;
-    do { files.push_back(ffd); } while (FindNextFileW(hFind, &ffd) != 0);
+    do
+    {
+        files.push_back(ffd);
+    } while (FindNextFileW(hFind, &ffd) != 0);
     FindClose(hFind);
 
     for (const auto &f : files)
     {
         std::wstring name = f.cFileName;
-        if (name == L"." || name == L"..") continue;
+        if (name == L"." || name == L"..")
+            continue;
 
         DWORD attrs = f.dwFileAttributes;
 
@@ -773,33 +803,38 @@ void Engine::executeLS(const std::string &pathStr)
         filesize.LowPart = f.nFileSizeLow;
         filesize.HighPart = f.nFileSizeHigh;
 
-        std::wcout << (attrs & FILE_ATTRIBUTE_DIRECTORY ? L"d " : L"- ")
-                   << (attrs & FILE_ATTRIBUTE_DIRECTORY ? L"-" : std::to_wstring(filesize.QuadPart))
-                   << L" "
-                   << name << std::endl;
+        console::write(attrs & FILE_ATTRIBUTE_DIRECTORY ? L"d " : L"- ");
+        console::write(std::to_wstring(filesize.QuadPart) + L" ");
+        console::writeln(name);
+
 
         console::reset();
     }
 }
 
-void Engine::executeLSTree(const std::string &pathStr, const std::wstring &prefix = L"")
+void Engine::executeLSTree(const std::wstring &pathStr, const std::wstring &prefix = L"")
 {
     std::wstring path(pathStr.begin(), pathStr.end());
     std::wstring searchPath = path + L"\\*";
 
     WIN32_FIND_DATAW ffd;
     HANDLE hFind = FindFirstFileW(searchPath.c_str(), &ffd);
-    if (hFind == INVALID_HANDLE_VALUE) return;
+    if (hFind == INVALID_HANDLE_VALUE)
+        return;
 
     std::vector<WIN32_FIND_DATAW> files;
-    do { files.push_back(ffd); } while (FindNextFileW(hFind, &ffd) != 0);
+    do
+    {
+        files.push_back(ffd);
+    } while (FindNextFileW(hFind, &ffd) != 0);
     FindClose(hFind);
 
     for (size_t i = 0; i < files.size(); ++i)
     {
         const auto &f = files[i];
         std::wstring name = f.cFileName;
-        if (name == L"." || name == L"..") continue;
+        if (name == L"." || name == L"..")
+            continue;
 
         bool isLast = (i == files.size() - 1);
         std::wstring connector = isLast ? L"|___" : L"|---";
@@ -814,13 +849,92 @@ void Engine::executeLSTree(const std::string &pathStr, const std::wstring &prefi
         else
             console::setColor(ConsoleColor::Default);
 
-        std::wcout << prefix << connector << name << std::endl;
+        console::write(prefix);
+        console::write(connector);
+        console::writeln(name);
         console::reset();
 
         if ((attrs & FILE_ATTRIBUTE_DIRECTORY) && name[0] != L'.')
         {
             std::wstring newPrefix = prefix + (isLast ? L"    " : L"|   ");
-            executeLSTree(pathStr + "\\" + std::string(name.begin(), name.end()), newPrefix);
+            executeLSTree(pathStr + L"\\" + name, newPrefix);
         }
     }
+}
+
+void Engine::executeREVIEW(const std::wstring &filename)
+{
+    std::wstring wFilename = filename;
+
+    HANDLE hFile = CreateFileW(
+        wFilename.c_str(),
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        nullptr,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        nullptr);
+
+    if (hFile == INVALID_HANDLE_VALUE)
+    {
+        console::setColor(ConsoleColor::Red);
+        makeLastError(L"review");
+        console::write(L"review: cannot open file '" + wFilename + L"'\n");
+        makeLastError(L"review");
+        console::reset();
+        return;
+    }
+
+    char buffer[4096];
+    DWORD bytesRead;
+
+    while (ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, nullptr) && bytesRead > 0)
+    {
+        std::string chunk(buffer, bytesRead);
+        std::wstring w = unicode::utf8_to_utf16(chunk);
+        console::write(w);
+    }
+
+    CloseHandle(hFile);
+}
+
+BoolResult Engine::executeECHO(const std::vector<std::wstring> &args)
+{
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE)
+        return {false, makeLastError(L"echo")};
+
+    bool newline = true;
+    size_t start = 0;
+
+    if (!args.empty() && args[0] == L"-n")
+    {
+        newline = false;
+        start = 1;
+    }
+
+    std::wstring output;
+
+    for (size_t i = start; i < args.size(); ++i)
+    {
+        std::wstring w = args[i];
+        w = process_escapes(w);
+
+        output += w;
+        if (i + 1 < args.size())
+            output += L" ";
+    }
+
+    if (newline)
+        output += L"\n";
+
+    DWORD written;
+    WriteConsoleW(
+        hOut,
+        output.c_str(),
+        static_cast<DWORD>(output.size()),
+        &written,
+        nullptr);
+
+    return {true, {}};
 }

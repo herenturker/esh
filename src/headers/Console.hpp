@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include <windows.h>
+#include <string>
 
 enum class ConsoleColor : WORD
 {
@@ -41,6 +42,24 @@ namespace console
     inline void reset()
     {
         setColor(ConsoleColor::Default);
+    }
+
+    inline void write(const std::wstring& text)
+    {
+        DWORD written;
+        WriteConsoleW(
+            GetStdHandle(STD_OUTPUT_HANDLE),
+            text.c_str(),
+            static_cast<DWORD>(text.size()),
+            &written,
+            nullptr
+        );
+    }
+
+    inline void writeln(const std::wstring& text)
+    {
+        write(text);
+        write(L"\n");
     }
 
 }

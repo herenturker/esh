@@ -17,10 +17,9 @@ limitations under the License.
 #include "headers/Error.hpp"
 #include "headers/Unicode.hpp"
 
-Error makeLastError(const std::string& prefix)
+Error makeLastError(const std::wstring& prefix)
 {
     DWORD code = GetLastError();
-
     if (code == 0)
         return {};
 
@@ -38,11 +37,16 @@ Error makeLastError(const std::string& prefix)
         nullptr
     );
 
-    std::string msg = unicode::utf16_to_utf8(buffer);
-    LocalFree(buffer);
+    std::wstring message;
+
+    if (buffer)
+    {
+        message = buffer;
+        LocalFree(buffer);
+    }
 
     if (!prefix.empty())
-        msg = prefix + ": " + msg;
+        message = prefix + L": " + message;
 
-    return { code, msg };
+    return { code, message };
 }

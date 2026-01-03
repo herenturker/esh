@@ -25,8 +25,8 @@ class Parser {
     public:
         static void parseTokens(const std::vector<Lexer::Token>& tokens);
 
-        static CommandType parseCommand(const std::string& token);
+        static CommandType parseCommand(const std::wstring& token);
 
-        static uint8_t parseFlags(const std::vector<std::string>& tokens);
+        static uint8_t parseFlags(const std::vector<std::wstring>& tokens);
 
 };

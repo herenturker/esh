@@ -154,8 +154,23 @@
                     "--help": "Displays help information about the ls command.",
                     "-r": "Lists all directory contents (including subfiles) as tree structure."
                 }
-            }
+            },
 
+            "review": {
+                "description": "Review the contents of a file.",
+                "usage": "review <file>",
+                "flags": {
+                    "--help": "Displays help information about the review command."
+                }
+            },
+
+            "echo": {
+                "description": "Displays a line of text.",
+                "usage": "echo <text>",
+                "flags": {
+                    "--help": "Displays help information about the echo command."
+                }
+            }
         },
 
         "external": {

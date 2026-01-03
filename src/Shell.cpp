@@ -23,7 +23,7 @@ limitations under the License.
 #include "headers/Lexer.hpp"
 #include "headers/Parser.hpp"
 
-void Shell::handleRawInput(std::string& raw_input) {
+void Shell::handleRawInput(std::wstring& raw_input) {
 
     auto tokens = Lexer::tokenizeInput(raw_input);
     Parser::parseTokens(tokens);

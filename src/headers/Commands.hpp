@@ -37,6 +37,8 @@ limitations under the License.
 #define COMMAND_CP                          0X0F 
 #define COMMAND_SYSTEMINFO                  0X10
 #define COMMAND_SYSTEMSTATS                 0X11
+#define COMMAND_REVIEW                      0X12
+#define COMMAND_ECHO                        0X13
 // -------------------------------------------------
 
 #include <string>
@@ -47,7 +49,7 @@ limitations under the License.
 
 class Commands {
     public:
-        static bool isBuiltInCommand(const std::string& command);    
+        static bool isBuiltInCommand(const std::wstring& command);    
 };
 
 // DEFINE COMMAND TYPES
@@ -70,7 +72,9 @@ enum class CommandType : uint8_t {
     MV =                COMMAND_MV,
     CP =                COMMAND_CP,
     SYSTEMINFO =        COMMAND_SYSTEMINFO,
-    SYSTEMSTATS =       COMMAND_SYSTEMSTATS
+    SYSTEMSTATS =       COMMAND_SYSTEMSTATS,
+    REVIEW =            COMMAND_REVIEW,
+    ECHO =              COMMAND_ECHO
 };
 
 // DEFINE FLAGS
@@ -83,33 +87,35 @@ enum class Flag : uint8_t {
 };
 
 // MAP COMMAND STRINGS TO COMMAND TYPES
-static inline const std::unordered_map<std::string, CommandType> commandMap = {
-    {"ls", CommandType::LS},
-    {"pwd", CommandType::PWD},
-    {"exit", CommandType::EXIT},
-    {"cd", CommandType::CD},
-    {"whoami", CommandType::WHOAMI},
-    {"datetime", CommandType::DATETIME},
-    {"hostname", CommandType::HOSTNAME},
-    {"dir", CommandType::DIR},
-    {"touch", CommandType::TOUCH},
-    {"rm", CommandType::RM},
-    {"mkdir", CommandType::MKDIR},
-    {"rmdir", CommandType::RMDIR},
-    {"clear", CommandType::CLEAR},
-    {"cls", CommandType::CLEAR},
-    {"mv", CommandType::MV},
-    {"cp", CommandType::CP},
-    {"systeminfo", CommandType::SYSTEMINFO},
-    {"systemstats", CommandType::SYSTEMSTATS}
+static inline const std::unordered_map<std::wstring, CommandType> commandMap = {
+    {L"ls", CommandType::LS},
+    {L"pwd", CommandType::PWD},
+    {L"exit", CommandType::EXIT},
+    {L"cd", CommandType::CD},
+    {L"whoami", CommandType::WHOAMI},
+    {L"datetime", CommandType::DATETIME},
+    {L"hostname", CommandType::HOSTNAME},
+    {L"dir", CommandType::DIR},
+    {L"touch", CommandType::TOUCH},
+    {L"rm", CommandType::RM},
+    {L"mkdir", CommandType::MKDIR},
+    {L"rmdir", CommandType::RMDIR},
+    {L"clear", CommandType::CLEAR},
+    {L"cls", CommandType::CLEAR},
+    {L"mv", CommandType::MV},
+    {L"cp", CommandType::CP},
+    {L"systeminfo", CommandType::SYSTEMINFO},
+    {L"systemstats", CommandType::SYSTEMSTATS},
+    {L"review", CommandType::REVIEW},
+    {L"echo", CommandType::ECHO}
 };
 
 // MAP FLAG STRINGS TO FLAG TYPES
-static inline const std::unordered_map<std::string, Flag> flagMap = {
-    {"-r", Flag::RECURSIVE},
-    {"-v", Flag::VERBOSE},
-    {"-f", Flag::FORCE},
-    {"-a", Flag::ALL},
-    {"--help", Flag::HELP}
+static inline const std::unordered_map<std::wstring, Flag> flagMap = {
+    {L"-r", Flag::RECURSIVE},
+    {L"-v", Flag::VERBOSE},
+    {L"-f", Flag::FORCE},
+    {L"-a", Flag::ALL},
+    {L"--help", Flag::HELP}
 };
 

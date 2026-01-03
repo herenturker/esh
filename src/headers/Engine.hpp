@@ -25,7 +25,7 @@ limitations under the License.
 
 class Engine {
     public:
-        static void execute(CommandType command, uint8_t flags, const std::vector<std::string>& args);
+        static void execute(CommandType command, uint8_t flags, const std::vector<std::wstring>& args);
 
         // COMMAND IMPLEMENTATION           Function prototypes
 
@@ -33,8 +33,9 @@ class Engine {
         static void                         executeCLEAR();
         static void                         executeSYSTEMINFO();
         static void                         executeSYSTEMSTATS();
-        static void                         executeLS(const std::string &pathStr);
-        static void                         executeLSTree(const std::string &pathStr, const std::wstring &prefix);
+        static void                         executeLS(const std::wstring &pathStr);
+        static void                         executeLSTree(const std::wstring &pathStr, const std::wstring &prefix);
+        static void                         executeREVIEW(const std::wstring &filename);
         
         static bool                         isDirectory(const std::wstring& path);
         static bool                         copyFile(const std::wstring& src, const std::wstring& dst);
@@ -45,18 +46,18 @@ class Engine {
         static double                       getDiskUsage(const std::wstring& drive);
         static double                       getNetworkUsage();
 
-        static Result<std::string>          executePWD();
-        static Result<std::string>          executeWHOAMI();
-        static Result<std::string>          executeHOSTNAME();
-        static Result<std::string>          executeDIR(const std::string &path);
-        static Result<std::string>          executeDATETIME();
-
-        static BoolResult                   executeTOUCH(const std::string &filename);
-        static BoolResult                   executeRM(const std::string &path);
-        static BoolResult                   executeCD(const std::string &path);
-        static BoolResult                   executeMKDIR(const std::string &dirname);
-        static BoolResult                   executeRMDIR(const std::string &dirname);
-        static BoolResult                   executeMV(const std::string& src, const std::string& dst);
-        static BoolResult                   executeCP(const std::string& src, const std::string& dst);
+        static Result<std::wstring>         executePWD();
+        static Result<std::wstring>         executeWHOAMI();
+        static Result<std::wstring>         executeHOSTNAME();
+        static Result<std::wstring>         executeDIR(const std::wstring &path);
+        static Result<std::wstring>         executeDATETIME();
+        static BoolResult                   executeTOUCH(const std::wstring &filename);
+        static BoolResult                   executeRM(const std::wstring &path);
+        static BoolResult                   executeCD(const std::wstring &path);
+        static BoolResult                   executeMKDIR(const std::wstring &dirname);
+        static BoolResult                   executeRMDIR(const std::wstring &dirname);
+        static BoolResult                   executeMV(const std::wstring& src, const std::wstring& dst);
+        static BoolResult                   executeCP(const std::wstring& src, const std::wstring& dst);
+        static BoolResult                   executeECHO(const std::vector<std::wstring>& args);
 
 };
