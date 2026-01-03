@@ -25,33 +25,28 @@ void Parser::parseTokens(const std::vector<Lexer::Token> &tokens)
 
     uint8_t command = 0;
     uint8_t flagAccumulator = 0;
-    std::string executee;
+    std::vector<std::string> args;
 
-    for (const auto &t : tokens)
+    for (const auto& t : tokens)
     {
-
         if (t.type == Lexer::TOKEN_COMMAND)
-        {
-            auto commandType = Parser::parseCommand(t.lexeme);
-            command = static_cast<uint8_t>(commandType);
-        }
+            command = static_cast<uint8_t>(Parser::parseCommand(t.lexeme));
 
-        if (t.type == Lexer::TOKEN_FLAG)
-        {
-            auto flagValue = Parser::parseFlags({t.lexeme});
-            flagAccumulator |= flagValue;
-        }
+        else if (t.type == Lexer::TOKEN_FLAG)
+            flagAccumulator |= Parser::parseFlags({t.lexeme});
 
-        if (t.type == Lexer::TOKEN_EXECUTEE)
-        {
-            executee = t.lexeme;
-        }
+        else if (t.type == Lexer::TOKEN_EXECUTEE)
+            args.push_back(t.lexeme);
     }
 
-    if (command != 0) {
-        Engine::execute(static_cast<CommandType>(command), flagAccumulator, executee);
+    if (command != 0)
+    {
+        Engine::execute(
+            static_cast<CommandType>(command),
+            flagAccumulator,
+            args
+        );
     }
-
 }
 
 CommandType Parser::parseCommand(const std::string &token)

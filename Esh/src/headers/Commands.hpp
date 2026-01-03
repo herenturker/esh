@@ -32,6 +32,8 @@ limitations under the License.
 #define COMMAND_MKDIR 0X0B
 #define COMMAND_RMDIR 0X0C
 #define COMMAND_CLEAR 0X0D // SAME AS CLS
+#define COMMAND_MV 0X0E
+#define COMMAND_CP 0X0F 
 // --------------------------------------------
 
 #include <string>
@@ -62,6 +64,8 @@ enum class CommandType : uint8_t {
     RMDIR =             COMMAND_RMDIR,
     CLEAR =             COMMAND_CLEAR,
     CLS =               COMMAND_CLEAR, // SAME AS CLEAR
+    MV =                COMMAND_MV,
+    CP =                COMMAND_CP
 };
 
 // DEFINE FLAGS
@@ -69,7 +73,8 @@ enum class Flag : uint8_t {
     RECURSIVE   = 0x01, // -r 
     VERBOSE     = 0x02, // -v 
     FORCE       = 0x04, // -f 
-    ALL         = 0x08  // -a 
+    ALL         = 0x08, // -a 
+    HELP        = 0x10  // --help
 };
 
 // MAP COMMAND STRINGS TO COMMAND TYPES
@@ -87,7 +92,9 @@ static inline const std::unordered_map<std::string, CommandType> commandMap = {
     {"mkdir", CommandType::MKDIR},
     {"rmdir", CommandType::RMDIR},
     {"clear", CommandType::CLEAR},
-    {"cls", CommandType::CLEAR}
+    {"cls", CommandType::CLEAR},
+    {"mv", CommandType::MV},
+    {"cp", CommandType::CP}
 };
 
 // MAP FLAG STRINGS TO FLAG TYPES
@@ -95,6 +102,7 @@ static inline const std::unordered_map<std::string, Flag> flagMap = {
     {"-r", Flag::RECURSIVE},
     {"-v", Flag::VERBOSE},
     {"-f", Flag::FORCE},
-    {"-a", Flag::ALL}
+    {"-a", Flag::ALL},
+    {"--help", Flag::HELP}
 };
 

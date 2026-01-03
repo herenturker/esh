@@ -18,26 +18,36 @@ limitations under the License.
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "Commands.hpp"
 #include "Result.hpp"
 
 class Engine {
     public:
-        static void execute(CommandType command, uint8_t flags, std::string executee);
+        static void execute(CommandType command, uint8_t flags, const std::vector<std::string>& args);
 
         // COMMAND IMPLEMENTATION           Function prototypes
+
         static void                         executeEXIT();
         static void                         executeCLEAR();
+
+        static bool                         isDirectory(const std::wstring& path);
+        static bool                         copyFile(const std::wstring& src, const std::wstring& dst);
+        static bool                         copyDirectory(const std::wstring& src, const std::wstring& dst);
+
         static Result<std::string>          executePWD();
         static Result<std::string>          executeWHOAMI();
         static Result<std::string>          executeHOSTNAME();
         static Result<std::string>          executeDIR(const std::string &path);
         static Result<std::string>          executeDATETIME();
+
         static BoolResult                   executeTOUCH(const std::string &filename);
         static BoolResult                   executeRM(const std::string &path);
         static BoolResult                   executeCD(const std::string &path);
         static BoolResult                   executeMKDIR(const std::string &dirname);
         static BoolResult                   executeRMDIR(const std::string &dirname);
+        static BoolResult                   executeMV(const std::string& src, const std::string& dst);
+        static BoolResult                   executeCP(const std::string& src, const std::string& dst);
 
 };

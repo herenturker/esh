@@ -28,7 +28,16 @@ limitations under the License.
 #include "headers/Error.hpp"
 #include "headers/Result.hpp"
 
-void Engine::execute(CommandType command, uint8_t flags, std::string executee)
+// helper function
+std::wstring basename(const std::wstring& path)
+{
+    size_t pos = path.find_last_of(L"\\/");
+    return (pos == std::wstring::npos)
+        ? path
+        : path.substr(pos + 1);
+}
+
+void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::string> &args)
 {
     // Helper lambda to print boolean command results
     // This is the ONLY place where colored output is handled
@@ -76,7 +85,7 @@ void Engine::execute(CommandType command, uint8_t flags, std::string executee)
 
     case CommandType::DIR:
         // List directory contents (current directory if no argument)
-        std::cout << executeDIR(executee.empty() ? "." : executee).value;
+        std::cout << executeDIR(args.empty() ? "." : args[0]).value;
         break;
 
     case CommandType::DATETIME:
@@ -87,35 +96,35 @@ void Engine::execute(CommandType command, uint8_t flags, std::string executee)
     case CommandType::TOUCH:
         // Create a new empty file
         printBoolResult(
-            executeTOUCH(executee),
+            executeTOUCH(args.empty() ? "" : args[0]),
             "File created.");
         break;
 
     case CommandType::RM:
         // Remove a file
         printBoolResult(
-            executeRM(executee),
+            executeRM(args.empty() ? "" : args[0]),
             "File deleted.");
         break;
 
     case CommandType::CD:
         // Change current working directory
         printBoolResult(
-            executeCD(executee),
+            executeCD(args.empty() ? "" : args[0]),
             "Directory changed.");
         break;
 
     case CommandType::MKDIR:
         // Create a new directory
         printBoolResult(
-            executeMKDIR(executee),
+            executeMKDIR(args.empty() ? "" : args[0]),
             "Directory created.");
         break;
 
     case CommandType::RMDIR:
         // Remove an empty directory
         printBoolResult(
-            executeRMDIR(executee),
+            executeRMDIR(args.empty() ? "" : args[0]),
             "Directory removed.");
         break;
 
@@ -123,6 +132,40 @@ void Engine::execute(CommandType command, uint8_t flags, std::string executee)
         // Clear the Esh console screen
         executeCLEAR();
         break;
+
+    case CommandType::MV:
+    {
+        // Move (rename) a file or directory
+        if (args.size() < 2)
+        {
+            printBoolResult(
+                {false, {0, "Usage: mv <source> <destination>"}},
+                "");
+            break;
+        }
+
+        printBoolResult(
+            executeMV(args[0], args[1]),
+            "Move operation successful.");
+        break;
+    }
+
+    case CommandType::CP:
+    {
+        // Copy a file or directory
+        if (args.size() < 2)
+        {
+            printBoolResult(
+                {false, {0, "Usage: cp <source> <destination>"}},
+                "");
+            break;
+        }
+
+        printBoolResult(
+            executeCP(args[0], args[1]),
+            "Copy operation successful.");
+        break;
+    }
 
     default:
         // Unknown or unsupported command
@@ -293,23 +336,150 @@ void Engine::executeCLEAR()
     if (!GetConsoleScreenBufferInfo(hOut, &csbi))
         return;
 
-    DWORD cellCount = csbi.dwSize.X * csbi.dwSize.Y;
-    DWORD written;
-    COORD home = {0, 0};
+    SHORT width  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
+    SHORT height = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
 
+    SMALL_RECT tinyWindow = {0, 0, 0, 0};
+    SetConsoleWindowInfo(hOut, TRUE, &tinyWindow);
+
+    COORD tinyBuffer = {width, 1};
+    SetConsoleScreenBufferSize(hOut, tinyBuffer);
+
+    COORD newBuffer = {width, height};
+    SetConsoleScreenBufferSize(hOut, newBuffer);
+
+    SMALL_RECT newWindow = {0, 0, (SHORT)(width - 1), (SHORT)(height - 1)};
+    SetConsoleWindowInfo(hOut, TRUE, &newWindow);
+
+    SetConsoleCursorPosition(hOut, {0, 0});
+
+    DWORD written;
     FillConsoleOutputCharacterW(
         hOut,
         L' ',
-        cellCount,
-        home,
+        width * height,
+        {0, 0},
         &written);
 
     FillConsoleOutputAttribute(
         hOut,
         csbi.wAttributes,
-        cellCount,
-        home,
+        width * height,
+        {0, 0},
         &written);
 
-    SetConsoleCursorPosition(hOut, home);
+    std::wcout << L"\x1b[3J\x1b[H" << std::flush;
+}
+
+bool Engine::isDirectory(const std::wstring &path)
+{
+    DWORD attr = GetFileAttributesW(path.c_str());
+    if (attr == INVALID_FILE_ATTRIBUTES)
+        return false;
+
+    return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
+}
+
+bool Engine::copyFile(const std::wstring &src, const std::wstring &dst)
+{
+    return CopyFileW(
+               src.c_str(),
+               dst.c_str(),
+               FALSE // overwrite allowed
+               ) != 0;
+}
+
+bool Engine::copyDirectory(const std::wstring &src, const std::wstring &dst)
+{
+    CreateDirectoryW(dst.c_str(), nullptr);
+
+    WIN32_FIND_DATAW ffd;
+    std::wstring search = src + L"\\*";
+
+    HANDLE hFind = FindFirstFileW(search.c_str(), &ffd);
+    if (hFind == INVALID_HANDLE_VALUE)
+        return false;
+
+    do
+    {
+        if (wcscmp(ffd.cFileName, L".") == 0 ||
+            wcscmp(ffd.cFileName, L"..") == 0)
+            continue;
+
+        std::wstring srcPath = src + L"\\" + ffd.cFileName;
+        std::wstring dstPath = dst + L"\\" + ffd.cFileName;
+
+        if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+        {
+            if (!copyDirectory(srcPath, dstPath))
+            {
+                FindClose(hFind);
+                return false;
+            }
+        }
+        else
+        {
+            if (!CopyFileW(srcPath.c_str(), dstPath.c_str(), FALSE))
+            {
+                FindClose(hFind);
+                return false;
+            }
+        }
+
+    } while (FindNextFileW(hFind, &ffd));
+
+    FindClose(hFind);
+    return true;
+}
+
+BoolResult Engine::executeMV(const std::string& src,
+                             const std::string& dst)
+{
+    std::wstring wSrc = unicode::utf8_to_utf16(src);
+    std::wstring wDst = unicode::utf8_to_utf16(dst);
+
+    if (isDirectory(wDst))
+    {
+        wDst += L"\\";
+        wDst += basename(wSrc);
+    }
+
+    if (!MoveFileExW(
+            wSrc.c_str(),
+            wDst.c_str(),
+            MOVEFILE_REPLACE_EXISTING |
+            MOVEFILE_COPY_ALLOWED))
+    {
+        return {false, makeLastError("mv")};
+    }
+
+    return {true, {}};
+}
+
+BoolResult Engine::executeCP(const std::string& src,
+                             const std::string& dst)
+{
+    std::wstring wSrc = unicode::utf8_to_utf16(src);
+    std::wstring wDst = unicode::utf8_to_utf16(dst);
+
+    DWORD attr = GetFileAttributesW(wSrc.c_str());
+    if (attr == INVALID_FILE_ATTRIBUTES)
+        return {false, makeLastError("cp")};
+
+    if (isDirectory(wDst))
+    {
+        wDst += L"\\";
+        wDst += basename(wSrc);
+    }
+
+    bool ok;
+    if (attr & FILE_ATTRIBUTE_DIRECTORY)
+        ok = copyDirectory(wSrc, wDst);
+    else
+        ok = copyFile(wSrc, wDst);
+
+    if (!ok)
+        return {false, makeLastError("cp")};
+
+    return {true, {}};
 }

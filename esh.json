@@ -112,7 +112,25 @@
                 "flags": {
                     "--help": "Displays help information about the cls command."
                 }
+            },
+
+            "mv": {
+                "description": "Moves or renames a file or directory.",
+                "usage": "mv <source> <destination>",
+                "flags": {
+                    "--help": "Displays help information about the mv command."
+                }
+            },
+
+            "cp": {
+                "description": "Copies a file or directory.",
+                "usage": "cp <source> <destination>",
+                "flags": {
+                    "--help": "Displays help information about the cp command.",
+                    "-r": "Recursively copies directories and their contents."
+                }
             }
+
 
         },
 

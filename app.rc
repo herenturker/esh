@@ -22,7 +22,7 @@ BEGIN
             VALUE "OriginalFilename", "Esh.exe"
             VALUE "ProductName",      "Esh Shell"
             VALUE "ProductVersion",   "0.1.0"
-            VALUE "LegalCopyright",   "Copyright (C) 2026"
+            VALUE "LegalCopyright",   "Copyright (C) 2026 Habil Eren Turker"
         END
     END
 
