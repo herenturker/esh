@@ -16,14 +16,27 @@ limitations under the License.
 
 #pragma once
 
-#include <cstdint>
-#include <string>
 #include <vector>
+#include <string>
+#include <cstdint>
 
-#include "Commands.hpp"
+#include "../headers/Result.hpp"
+#include "../headers/Commands.hpp"
 
-class Engine {
-    public:
-        static void execute(CommandType command, uint8_t flags, const std::vector<std::wstring>& args);
-        
-};
+/*
+
+namespace Process {
+
+    class ProcessCommands
+    {
+        public:
+            static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring>& args);
+
+        private:
+            // COMMAND IMPLEMENTATION           Function prototypes
+            static BoolResult                   executePS(); // will add
+            static BoolResult                   executeKILL(uint32_t pid); // will add
+    };
+}
+
+*/

@@ -16,14 +16,24 @@ limitations under the License.
 
 #pragma once
 
-#include <cstdint>
-#include <string>
 #include <vector>
+#include <string>
+#include <cstdint>
 
-#include "Commands.hpp"
+#include "../headers/Result.hpp"
+#include "../headers/Commands.hpp"
 
-class Engine {
-    public:
-        static void execute(CommandType command, uint8_t flags, const std::vector<std::wstring>& args);
-        
-};
+namespace ShellCmds {
+
+    class ShellCommands
+    {
+        public:
+            static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring>& args);
+
+        private:
+            // COMMAND IMPLEMENTATION           Function prototypes
+            static void                         executeEXIT();
+            static void                         executeCLEAR();
+            static BoolResult                   executeECHO(const std::vector<std::wstring>& args);
+    };
+}

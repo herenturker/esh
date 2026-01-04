@@ -21,7 +21,7 @@ limitations under the License.
 #include <fcntl.h>
 
 #include "headers/Shell.hpp"
-#include "headers/Engine.hpp"
+#include "env/EnvironmentCommands.hpp"
 #include "headers/Console.hpp"
 #include "headers/Result.hpp"
 #include "headers/Error.hpp"
@@ -29,7 +29,7 @@ limitations under the License.
 
 int wmain()
 {
-    _setmode(_fileno(stdin),  _O_WTEXT);
+    _setmode(_fileno(stdin), _O_WTEXT);
     _setmode(_fileno(stdout), _O_WTEXT);
     _setmode(_fileno(stderr), _O_WTEXT);
 
@@ -64,32 +64,40 @@ int wmain()
 
     while (true)
     {
-        /* user@host */
+        std::vector<std::wstring> args;
+
+        auto who  = Environment::EnvironmentCommands::executeWHOAMI();
+        auto host = Environment::EnvironmentCommands::executeHOSTNAME();
+        auto pwd  = Environment::EnvironmentCommands::executePWD();
+
+        if (!who.ok() || !host.ok() || !pwd.ok())
+        {
+            console::setColor(ConsoleColor::Red);
+            if (!who.ok())  std::wcerr << who.error.message << L"\n";
+            if (!host.ok()) std::wcerr << host.error.message << L"\n";
+            if (!pwd.ok())  std::wcerr << pwd.error.message << L"\n";
+            console::reset();
+            continue;
+        }
+
         console::setColor(ConsoleColor::Blue);
-
-        if (!printOrError(Engine::executeWHOAMI()))
-            continue;
+        console::write(who.value);
         console::write(L"@");
-        if (!printOrError(Engine::executeHOSTNAME()))
-            continue;
+        console::write(host.value);
         console::write(L" ");
-
         console::reset();
 
-        /* current working directory */
         console::setColor(ConsoleColor::Cyan);
-
-        if (!printOrError(Engine::executePWD()))
-            continue;
-        console::write(L" ");
+        console::write(pwd.value);
         console::reset();
 
-        console::write(L"$ ");
+        console::write(L" $ ");
 
         std::getline(std::wcin, raw_input);
         console::write(L"\n");
 
         Shell::handleRawInput(raw_input);
+        console::writeln(L"");
     }
 
     return 0;

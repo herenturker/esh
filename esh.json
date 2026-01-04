@@ -49,14 +49,6 @@
                 }
             },
 
-            "dir": {
-                "description": "Lists the contents of a directory.",
-                "usage": "dir [path]",
-                "flags": {
-                    "--help": "Displays help information about the dir command."
-                }
-            },
-
             "touch": {
                 "description": "Creates a new empty file.",
                 "usage": "touch <filename>",

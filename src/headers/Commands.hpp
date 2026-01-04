@@ -27,7 +27,7 @@ limitations under the License.
 #define COMMAND_WHOAMI                      0X05
 #define COMMAND_DATETIME                    0X06
 #define COMMAND_HOSTNAME                    0X07
-#define COMMAND_DIR                         0X08
+// #define COMMAND_RESERVED2                   0X08 // Fill here
 #define COMMAND_TOUCH                       0X09
 #define COMMAND_RM                          0X0A
 #define COMMAND_MKDIR                       0X0B
@@ -83,7 +83,7 @@ enum class CommandType : uint8_t {
     WHOAMI =            COMMAND_WHOAMI,
     DATETIME =          COMMAND_DATETIME,
     HOSTNAME =          COMMAND_HOSTNAME,
-    DIR =               COMMAND_DIR,
+    // 
     TOUCH =             COMMAND_TOUCH,
     RM =                COMMAND_RM,
     MKDIR =             COMMAND_MKDIR,
@@ -116,6 +116,16 @@ enum class Flag : uint8_t {
     COUNT       = FLAG_COUNT  // -n (used for line counts)
 };
 
+// COMMAND GROUP FOR ENGINE
+enum class CommandGroup : uint8_t {
+    FILE_IO,
+    PROCESS,
+    ENVIRONMENT,
+    SHELL,
+    SYSTEM,
+    UNKNOWN
+};
+
 // MAP COMMAND STRINGS TO COMMAND TYPES
 static inline const std::unordered_map<std::wstring, CommandType> commandMap = {
     {L"ls", CommandType::LS},
@@ -125,7 +135,6 @@ static inline const std::unordered_map<std::wstring, CommandType> commandMap = {
     {L"whoami", CommandType::WHOAMI},
     {L"datetime", CommandType::DATETIME},
     {L"hostname", CommandType::HOSTNAME},
-    {L"dir", CommandType::DIR},
     {L"touch", CommandType::TOUCH},
     {L"rm", CommandType::RM},
     {L"mkdir", CommandType::MKDIR},
@@ -157,4 +166,56 @@ static inline const std::unordered_map<std::wstring, Flag> flagMap = {
     {L"--help", Flag::HELP},
     {L"-n", Flag::COUNT}
 };
+
+// Get command group from command given.
+inline CommandGroup getCommandGroup(CommandType cmd)
+{
+    switch (cmd)
+    {
+        // -------- FILE COMMANDS --------
+        case CommandType::LS:
+        case CommandType::STATS:
+        case CommandType::HEAD:
+        case CommandType::TAIL:
+        case CommandType::ATTRIB:
+        case CommandType::TOUCH:
+        case CommandType::RM:
+        case CommandType::CP:
+        case CommandType::MV:
+        case CommandType::MKDIR:
+        case CommandType::RMDIR:
+        case CommandType::REW:
+            return CommandGroup::FILE_IO;
+
+        // -------- PROCESS COMMANDS --------
+        case CommandType::PS:
+        case CommandType::KILL:
+            return CommandGroup::PROCESS;
+
+        // -------- ENVIRONMENT COMMANDS --------
+        case CommandType::ENV:
+        case CommandType::SET:
+        case CommandType::CD:
+        case CommandType::PWD:
+        case CommandType::WHOAMI:
+        case CommandType::DATETIME:
+        case CommandType::HOSTNAME:
+            return CommandGroup::ENVIRONMENT;
+
+        // -------- SHELL COMMANDS --------
+        case CommandType::EXIT:
+        case CommandType::CLEAR:
+        case CommandType::ECHO:
+
+            return CommandGroup::SHELL;
+
+        // -------- SYSTEM COMMANDS --------
+        case CommandType::SYSTEMINFO:
+        case CommandType::SYSTEMSTATS:
+            return CommandGroup::SYSTEM;
+
+        default:
+            return CommandGroup::UNKNOWN;
+    }
+}
 

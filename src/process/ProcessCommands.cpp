@@ -14,16 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include <cstdint>
-#include <string>
 #include <vector>
+#include <string>
+#include <cstdint>
 
-#include "Commands.hpp"
+#include "../headers/Result.hpp"
+#include "../headers/Commands.hpp"
+#include "ProcessCommands.hpp"
 
-class Engine {
-    public:
-        static void execute(CommandType command, uint8_t flags, const std::vector<std::wstring>& args);
-        
-};
+namespace Process {
+
+}

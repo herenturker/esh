@@ -11,11 +11,16 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 file(GLOB_RECURSE SOURCES
     src/*.cpp
+    src/env/*.cpp
+    src/file/*.cpp
+    src/process/*.cpp
+    src/shell/*.cpp 
+    src/system/*.cpp
 )
 
 add_executable(esh ${SOURCES} resources.rc app.rc)
 
-target_include_directories(esh PRIVATE src/headers src/external)
+target_include_directories(esh PRIVATE src/headers src/external src/env src/file src/process src/shell src/system)
 
 if (MSVC)
     target_compile_definitions(esh PRIVATE _CRT_SECURE_NO_WARNINGS)
