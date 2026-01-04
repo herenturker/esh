@@ -18,6 +18,7 @@ limitations under the License.
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 
 #include <iomanip>
 #include <windows.h>
@@ -112,6 +113,59 @@ static void setColorByAttributes(DWORD attrs)
         console::setColor(ConsoleColor::Default);
 }
 
+static std::wstring FileTimeToWString(const FILETIME &ft)
+{
+    FILETIME ftLocal;
+    SYSTEMTIME st;
+
+    FileTimeToLocalFileTime(&ft, &ftLocal);
+    FileTimeToSystemTime(&ftLocal, &st);
+
+    std::wstringstream ss;
+    ss << std::setfill(L'0')
+       << std::setw(4) << st.wYear << L'-'
+       << std::setw(2) << st.wMonth << L'-'
+       << std::setw(2) << st.wDay << L' '
+       << std::setw(2) << st.wHour << L':'
+       << std::setw(2) << st.wMinute << L':'
+       << std::setw(2) << st.wSecond;
+
+    return ss.str();
+}
+
+static std::wstring attributesToWSTRING(DWORD attrs)
+{
+    std::wstring result;
+
+    if (attrs & FILE_ATTRIBUTE_DIRECTORY)
+        result += L"Directory ";
+    if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
+        result += L"Reparse Point ";
+    if (attrs & FILE_ATTRIBUTE_HIDDEN)
+        result += L"Hidden ";
+    if (attrs & FILE_ATTRIBUTE_READONLY)
+        result += L"Read-Only ";
+    if (attrs & FILE_ATTRIBUTE_SYSTEM)
+        result += L"System ";
+    if (attrs & FILE_ATTRIBUTE_ARCHIVE)
+        result += L"Archive ";
+    if (attrs & FILE_ATTRIBUTE_TEMPORARY)
+        result += L"Temporary ";
+    if (attrs & FILE_ATTRIBUTE_COMPRESSED)
+        result += L"Compressed ";
+    if (attrs & FILE_ATTRIBUTE_ENCRYPTED)
+        result += L"Encrypted ";
+    if (attrs & FILE_ATTRIBUTE_NORMAL)
+        result += L"Normal ";
+
+    if (result.empty())
+        result = L"Unknown";
+
+    if (!result.empty() && result.back() == L' ')
+        result.pop_back();
+
+    return result;
+}
 
 // ------------------- COMMAND DISPATCHER -------------------
 
@@ -119,7 +173,7 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
 {
     // Helper lambda to print boolean command results
     auto printBoolResult =
-        [](const BoolResult &res, const std::wstring& successMsg)
+        [](const BoolResult &res, const std::wstring &successMsg)
     {
         if (res.ok())
         {
@@ -250,13 +304,10 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
 
     case CommandType::LS:
     {
+        // List directory contents
         std::wstring path = args.empty() ? L"." : args[0];
 
-        executeLS(
-            path,
-            flags
-        );
-
+        executeLS(path, flags);
         break;
     }
 
@@ -277,7 +328,71 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
 
     case CommandType::ECHO:
     {
+        // Echo the args
         executeECHO(args);
+        break;
+    }
+
+    case CommandType::STATS:
+    {
+        // Show detailed information about a file
+        if (args.empty())
+        {
+            console::setColor(ConsoleColor::Red);
+            std::wcerr << L"Usage: stats <file>" << std::endl;
+            console::reset();
+            break;
+        }
+
+        auto res = executeSTATS(args[0]);
+        if (res.ok())
+        {
+            console::writeln(res.value);
+        }
+        else
+        {
+            console::setColor(ConsoleColor::Red);
+            std::wcerr << res.error.message << std::endl;
+            console::reset();
+        }
+        break;
+    }
+
+    case CommandType::HEAD:
+    {
+        // Get contents from a file using line count
+        if (args.empty() || !(flags & FLAG_COUNT) || args.size() < 2)
+        {
+            console::setColor(ConsoleColor::Red);
+            std::wcerr << L"Usage: head <file> -n <line count>" << std::endl;
+            console::reset();
+            break;
+        }
+
+        size_t lineCount = 0;
+        try
+        {
+            lineCount = static_cast<size_t>(std::stoull(args[1])); // string → size_t
+        }
+        catch (const std::exception &e)
+        {
+            console::setColor(ConsoleColor::Red);
+            std::wcerr << L"Invalid line count: " << args[1] << std::endl;
+            console::reset();
+            break;
+        }
+
+        auto res = executeHEAD(args[0], lineCount);
+        if (res.ok())
+        {
+            console::writeln(res.value);
+        }
+        else
+        {
+            console::setColor(ConsoleColor::Red);
+            std::wcerr << res.error.message << std::endl;
+            console::reset();
+        }
         break;
     }
 
@@ -784,14 +899,14 @@ void Engine::executeSYSTEMSTATS()
 
 // LS COMMAND
 
-static void printLsEntry(const WIN32_FIND_DATAW& f, const std::wstring& prefix, uint8_t flags)
+static void printLsEntry(const WIN32_FIND_DATAW &f, const std::wstring &prefix, uint8_t flags)
 {
     DWORD attrs = f.dwFileAttributes;
 
     setColorByAttributes(attrs);
 
     LARGE_INTEGER size;
-    size.LowPart  = f.nFileSizeLow;
+    size.LowPart = f.nFileSizeLow;
     size.HighPart = f.nFileSizeHigh;
 
     if (flags & static_cast<uint8_t>(Flag::VERBOSE))
@@ -810,7 +925,7 @@ static void printLsEntry(const WIN32_FIND_DATAW& f, const std::wstring& prefix, 
     console::reset();
 }
 
-void Engine::executeLS(const std::wstring& pathStr, uint8_t flags, const std::wstring& prefix)
+void Engine::executeLS(const std::wstring &pathStr, uint8_t flags, const std::wstring &prefix)
 {
     std::wstring searchPath = pathStr + L"\\*";
 
@@ -828,14 +943,13 @@ void Engine::executeLS(const std::wstring& pathStr, uint8_t flags, const std::ws
     do
     {
         entries.push_back(ffd);
-    }
-    while (FindNextFileW(hFind, &ffd));
+    } while (FindNextFileW(hFind, &ffd));
 
     FindClose(hFind);
 
     for (size_t i = 0; i < entries.size(); ++i)
     {
-        const auto& f = entries[i];
+        const auto &f = entries[i];
         std::wstring name = f.cFileName;
 
         if (name == L"." || name == L"..")
@@ -943,4 +1057,120 @@ BoolResult Engine::executeECHO(const std::vector<std::wstring> &args)
         nullptr);
 
     return {true, {}};
+}
+
+// STATS COMMAND
+Result<std::wstring> Engine::executeSTATS(const std::wstring &filename)
+{
+    HANDLE hFile = CreateFileW(
+        filename.c_str(),
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        nullptr,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        nullptr);
+
+    if (hFile == INVALID_HANDLE_VALUE)
+        return {L"", makeLastError(L"stats")};
+
+    DWORD lineCount = 0;
+    DWORD wordCount = 0;
+    DWORD byteCount = 0;
+
+    BYTE buffer[4096];
+    DWORD bytesRead;
+    bool inWord = false;
+
+    while (ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, nullptr) && bytesRead > 0)
+    {
+        byteCount += bytesRead;
+        for (DWORD i = 0; i < bytesRead; ++i)
+        {
+            BYTE c = buffer[i];
+            if (c == '\n')
+                lineCount++;
+            if (isspace(c))
+                inWord = false;
+            else if (!inWord)
+            {
+                wordCount++;
+                inWord = true;
+            }
+        }
+    }
+
+    BY_HANDLE_FILE_INFORMATION info;
+    if (!GetFileInformationByHandle(hFile, &info))
+    {
+        CloseHandle(hFile);
+        return {L"", makeLastError(L"stats")};
+    }
+
+    FILETIME fileCreationTime = info.ftCreationTime;
+    FILETIME lastAccessTime = info.ftLastAccessTime;
+    FILETIME lastWriteTime = info.ftLastWriteTime;
+
+    CloseHandle(hFile);
+
+    LARGE_INTEGER size;
+    size.HighPart = info.nFileSizeHigh;
+    size.LowPart = info.nFileSizeLow;
+
+    std::wstring result;
+    result += L"Lines              : " + std::to_wstring(lineCount) + L"\n";
+    result += L"Words              : " + std::to_wstring(wordCount) + L"\n";
+    result += L"Bytes              : " + std::to_wstring(byteCount) + L"\n";
+    result += L"File size          : " + std::to_wstring(size.QuadPart) + L" bytes\n";
+    result += L"Attributes         : " + attributesToWSTRING(info.dwFileAttributes) + L"\n";
+    result += L"File Creation Time : " + FileTimeToWString(fileCreationTime) + L"\n";
+    result += L"Last Access Time   : " + FileTimeToWString(lastAccessTime) + L"\n";
+    result += L"Last Write Time    : " + FileTimeToWString(lastWriteTime) + L"\n";
+
+    return {result, {}};
+}
+
+// HEAD COMMAND
+Result<std::wstring> Engine::executeHEAD(const std::wstring &filename, size_t lineCount)
+{
+    HANDLE hFile = CreateFileW(
+        filename.c_str(),
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        nullptr,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        nullptr);
+
+    if (hFile == INVALID_HANDLE_VALUE)
+        return {L"", makeLastError(L"head")};
+
+    BYTE buffer[4096];
+    DWORD bytesRead;
+    bool done = false;
+    size_t currentLine = 0;
+    std::wstring result;
+
+    while (!done && ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, nullptr) && bytesRead > 0)
+    {
+        for (DWORD i = 0; i < bytesRead; ++i)
+        {
+            wchar_t c = buffer[i];
+
+            result += c;
+
+            if (c == L'\n')
+            {
+                currentLine++;
+                if (currentLine >= lineCount)
+                {
+                    done = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    CloseHandle(hFile);
+    return {result, {}};
 }

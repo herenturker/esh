@@ -152,7 +152,8 @@
                 "usage": "ls [path]",
                 "flags": {
                     "--help": "Displays help information about the ls command.",
-                    "-r": "Lists all directory contents (including subfiles) as tree structure."
+                    "-r": "Lists all directory contents (including subfiles) as tree structure.",
+                    "-v": "Enables verbose output, providing detailed information about each file and directory."
                 }
             },
 
@@ -170,7 +171,74 @@
                 "flags": {
                     "--help": "Displays help information about the echo command."
                 }
+            },
+
+            "stats": {
+                "description": "Displays statistics about a file.",
+                "usage": "stats <file>",
+                "flags": {
+                    "--help": "Displays help information about the stats command."
+                }
+            },
+
+            "head": {
+                "description": "Displays the first lines of a file.",
+                "usage": "head <file> [-n lines]",
+                "flags": {
+                    "--help": "Displays help information about the head command.",
+                    "-n": "Specifies the number of lines to display from the start of the file."
+                }
+            },
+
+            "tail": {
+                "description": "Displays the last lines of a file.",
+                "usage": "tail <file> [-n lines]",
+                "flags": {
+                    "--help": "Displays help information about the tail command.",
+                    "-n": "Specifies the number of lines to display from the end of the file."
+                }
+            },
+
+            "attrib": {
+                "description": "Displays or changes file attributes.",
+                "usage": "attrib <file> [attributes]",
+                "flags": {
+                    "--help": "Displays help information about the attrib command."
+                }
+            },
+
+            "ps": {
+                "description": "Displays currently running processes.",
+                "usage": "ps",
+                "flags": {
+                    "--help": "Displays help information about the ps command."
+                }
+            },
+
+            "kill": {
+                "description": "Terminates a process by its ID.",
+                "usage": "kill <process_id>",
+                "flags": {
+                    "--help": "Displays help information about the kill command."
+                }
+            },
+
+            "env": {
+                "description": "Displays environment variables.",
+                "usage": "env",
+                "flags": {
+                    "--help": "Displays help information about the env command."
+                }
+            },
+
+            "set": {
+                "description": "Sets an environment variable.",
+                "usage": "set <variable>=<value>",
+                "flags": {
+                    "--help": "Displays help information about the set command."
+                }
             }
+
         },
 
         "external": {

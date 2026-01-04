@@ -51,6 +51,15 @@ class Engine {
         static Result<std::wstring>         executeHOSTNAME();
         static Result<std::wstring>         executeDIR(const std::wstring &path);
         static Result<std::wstring>         executeDATETIME();
+        static Result<std::wstring>         executeSTATS(const std::wstring &filename);
+        static Result<std::wstring>         executeHEAD(const std::wstring &filename, size_t lineCount);
+        static Result<std::wstring>         executeTAIL(const std::wstring &filename, size_t lineCount);
+
+        static BoolResult                   executeATTRIB(const std::wstring &path, const std::wstring &attributes);
+        static BoolResult                   executePS();
+        static BoolResult                   executeKILL(uint32_t pid);
+        static BoolResult                   executeENV();
+        static BoolResult                   executeSET(const std::wstring &var, const std::wstring &value);
         static BoolResult                   executeTOUCH(const std::wstring &filename);
         static BoolResult                   executeRM(const std::wstring &path);
         static BoolResult                   executeCD(const std::wstring &path);

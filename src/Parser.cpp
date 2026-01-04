@@ -37,6 +37,9 @@ void Parser::parseTokens(const std::vector<Lexer::Token> &tokens)
 
         else if (t.type == Lexer::TOKEN_EXECUTEE)
             args.push_back(t.lexeme);
+
+        else if (t.type == Lexer::TOKEN_NUMBER)
+            args.push_back(t.lexeme);
     }
 
     if (command != 0)

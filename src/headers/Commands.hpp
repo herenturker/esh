@@ -39,7 +39,28 @@ limitations under the License.
 #define COMMAND_SYSTEMSTATS                 0X11
 #define COMMAND_REW                         0X12
 #define COMMAND_ECHO                        0X13
-// -------------------------------------------------
+#define COMMAND_STATS                       0X14
+#define COMMAND_HEAD                        0X15
+#define COMMAND_TAIL                        0X16
+#define COMMAND_ATTRIB                      0X17
+#define COMMAND_PS                          0X18
+#define COMMAND_KILL                        0X19
+#define COMMAND_ENV                         0X1A
+#define COMMAND_SET                         0X1B
+// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+// ________________________________________________________________
+
+// --------- DEFINE FLAG CONSTANTS ---------------
+// Flag Types                            Hex Values  |
+// --------------------------------------------------
+#define FLAG_RECURSIVE                     0X01 // -r
+#define FLAG_VERBOSE                       0X02 // -v
+#define FLAG_FORCE                         0X04 // -f
+#define FLAG_ALL                           0X08 // -a
+#define FLAG_HELP                          0X10 // --help
+#define FLAG_COUNT                         0X20 // -n (used for line counts)
+// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 #include <string>
 #include <unordered_map>
@@ -74,16 +95,25 @@ enum class CommandType : uint8_t {
     SYSTEMINFO =        COMMAND_SYSTEMINFO,
     SYSTEMSTATS =       COMMAND_SYSTEMSTATS,
     REW =               COMMAND_REW,
-    ECHO =              COMMAND_ECHO
+    ECHO =              COMMAND_ECHO,
+    STATS =             COMMAND_STATS,
+    HEAD =              COMMAND_HEAD,
+    TAIL =              COMMAND_TAIL,
+    ATTRIB =            COMMAND_ATTRIB,
+    PS =                COMMAND_PS,
+    KILL =              COMMAND_KILL,
+    ENV =               COMMAND_ENV,
+    SET =               COMMAND_SET
 };
 
 // DEFINE FLAGS
 enum class Flag : uint8_t {
-    RECURSIVE   = 0x01, // -r 
-    VERBOSE     = 0x02, // -v 
-    FORCE       = 0x04, // -f 
-    ALL         = 0x08, // -a 
-    HELP        = 0x10  // --help
+    RECURSIVE   = FLAG_RECURSIVE, // -r 
+    VERBOSE     = FLAG_VERBOSE, // -v 
+    FORCE       = FLAG_FORCE, // -f 
+    ALL         = FLAG_ALL, // -a 
+    HELP        = FLAG_HELP, // --help
+    COUNT       = FLAG_COUNT  // -n (used for line counts)
 };
 
 // MAP COMMAND STRINGS TO COMMAND TYPES
@@ -107,7 +137,15 @@ static inline const std::unordered_map<std::wstring, CommandType> commandMap = {
     {L"systeminfo", CommandType::SYSTEMINFO},
     {L"systemstats", CommandType::SYSTEMSTATS},
     {L"rew", CommandType::REW},
-    {L"echo", CommandType::ECHO}
+    {L"echo", CommandType::ECHO},
+    {L"stats", CommandType::STATS},
+    {L"head", CommandType::HEAD},
+    {L"tail", CommandType::TAIL},
+    {L"attrib", CommandType::ATTRIB},
+    {L"ps", CommandType::PS},
+    {L"kill", CommandType::KILL},
+    {L"env", CommandType::ENV},
+    {L"set", CommandType::SET}
 };
 
 // MAP FLAG STRINGS TO FLAG TYPES
@@ -116,6 +154,7 @@ static inline const std::unordered_map<std::wstring, Flag> flagMap = {
     {L"-v", Flag::VERBOSE},
     {L"-f", Flag::FORCE},
     {L"-a", Flag::ALL},
-    {L"--help", Flag::HELP}
+    {L"--help", Flag::HELP},
+    {L"-n", Flag::COUNT}
 };
 
