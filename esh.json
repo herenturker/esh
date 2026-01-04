@@ -156,11 +156,11 @@
                 }
             },
 
-            "review": {
+            "rew": {
                 "description": "Review the contents of a file.",
-                "usage": "review <file>",
+                "usage": "rew <file>",
                 "flags": {
-                    "--help": "Displays help information about the review command."
+                    "--help": "Displays help information about the rew command."
                 }
             },
 

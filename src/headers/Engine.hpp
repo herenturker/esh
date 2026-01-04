@@ -19,6 +19,7 @@ limitations under the License.
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <windows.h>
 
 #include "Commands.hpp"
 #include "Result.hpp"
@@ -33,9 +34,8 @@ class Engine {
         static void                         executeCLEAR();
         static void                         executeSYSTEMINFO();
         static void                         executeSYSTEMSTATS();
-        static void                         executeLS(const std::wstring &pathStr);
-        static void                         executeLSTree(const std::wstring &pathStr, const std::wstring &prefix);
-        static void                         executeREVIEW(const std::wstring &filename);
+        static void                         executeLS(const std::wstring &pathStr, uint8_t flags, const std::wstring& prefix = L"");
+        static void                         executeREW(const std::wstring &filename);
         
         static bool                         isDirectory(const std::wstring& path);
         static bool                         copyFile(const std::wstring& src, const std::wstring& dst);

@@ -88,6 +88,31 @@ std::wstring process_escapes(const std::wstring &input)
     return out;
 }
 
+static void setColorByAttributes(DWORD attrs)
+{
+    if (attrs & FILE_ATTRIBUTE_DIRECTORY)
+        console::setColor(ConsoleColor::Blue);
+    else if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
+        console::setColor(ConsoleColor::Cyan);
+    else if (attrs & FILE_ATTRIBUTE_HIDDEN)
+        console::setColor(ConsoleColor::Gray);
+    else if (attrs & FILE_ATTRIBUTE_READONLY)
+        console::setColor(ConsoleColor::Yellow);
+    else if (attrs & FILE_ATTRIBUTE_SYSTEM)
+        console::setColor(ConsoleColor::Red);
+    else if (attrs & FILE_ATTRIBUTE_ARCHIVE)
+        console::setColor(ConsoleColor::Green);
+    else if (attrs & FILE_ATTRIBUTE_TEMPORARY)
+        console::setColor(ConsoleColor::Orange);
+    else if (attrs & FILE_ATTRIBUTE_COMPRESSED)
+        console::setColor(ConsoleColor::Purple);
+    else if (attrs & FILE_ATTRIBUTE_ENCRYPTED)
+        console::setColor(ConsoleColor::Pink);
+    else
+        console::setColor(ConsoleColor::Default);
+}
+
+
 // ------------------- COMMAND DISPATCHER -------------------
 
 void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args)
@@ -225,32 +250,28 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
 
     case CommandType::LS:
     {
-        // List directory contents
-
-        if (flags & static_cast<uint8_t>(Flag::RECURSIVE))
-        {
-            std::wstring path = args.empty() ? L"." : args[0];
-            executeLSTree(path, L"");
-            break;
-        }
-
         std::wstring path = args.empty() ? L"." : args[0];
-        executeLS(path);
+
+        executeLS(
+            path,
+            flags
+        );
+
         break;
     }
 
-    case CommandType::REVIEW:
+    case CommandType::REW:
     {
         // Review the contents of a file
         if (args.empty())
         {
             console::setColor(ConsoleColor::Red);
-            std::wcerr << L"Usage: review <file>" << std::endl;
+            std::wcerr << L"Usage: rew <file>" << std::endl;
             console::reset();
             break;
         }
 
-        executeREVIEW(args[0]);
+        executeREW(args[0]);
         break;
     }
 
@@ -761,108 +782,92 @@ void Engine::executeSYSTEMSTATS()
     }
 }
 
-void Engine::executeLS(const std::wstring &pathStr)
+// LS COMMAND
+
+static void printLsEntry(const WIN32_FIND_DATAW& f, const std::wstring& prefix, uint8_t flags)
 {
-    std::wstring path(pathStr.begin(), pathStr.end());
-    std::wstring searchPath = path + L"\\*";
+    DWORD attrs = f.dwFileAttributes;
 
-    WIN32_FIND_DATAW ffd;
-    HANDLE hFind = FindFirstFileW(searchPath.c_str(), &ffd);
+    setColorByAttributes(attrs);
 
-    if (hFind == INVALID_HANDLE_VALUE)
+    LARGE_INTEGER size;
+    size.LowPart  = f.nFileSizeLow;
+    size.HighPart = f.nFileSizeHigh;
+
+    if (flags & static_cast<uint8_t>(Flag::VERBOSE))
     {
-        std::wcerr << L"ls: cannot access '" << path << L"'\n";
-        return;
-    }
-
-    std::vector<WIN32_FIND_DATAW> files;
-    do
-    {
-        files.push_back(ffd);
-    } while (FindNextFileW(hFind, &ffd) != 0);
-    FindClose(hFind);
-
-    for (const auto &f : files)
-    {
-        std::wstring name = f.cFileName;
-        if (name == L"." || name == L"..")
-            continue;
-
-        DWORD attrs = f.dwFileAttributes;
-
-        if (attrs & FILE_ATTRIBUTE_DIRECTORY)
-            console::setColor(ConsoleColor::Blue);
-        else if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
-            console::setColor(ConsoleColor::Cyan);
-        else if (attrs & FILE_ATTRIBUTE_HIDDEN)
-            console::setColor(ConsoleColor::Gray);
-        else
-            console::setColor(ConsoleColor::Default);
-
-        LARGE_INTEGER filesize;
-        filesize.LowPart = f.nFileSizeLow;
-        filesize.HighPart = f.nFileSizeHigh;
-
+        console::write(prefix);
         console::write(attrs & FILE_ATTRIBUTE_DIRECTORY ? L"d " : L"- ");
-        console::write(std::to_wstring(filesize.QuadPart) + L" ");
-        console::writeln(name);
-
-
-        console::reset();
+        console::write(std::to_wstring(size.QuadPart) + L" ");
+        console::writeln(f.cFileName);
     }
+    else
+    {
+        console::write(prefix);
+        console::writeln(f.cFileName);
+    }
+
+    console::reset();
 }
 
-void Engine::executeLSTree(const std::wstring &pathStr, const std::wstring &prefix = L"")
+void Engine::executeLS(const std::wstring& pathStr, uint8_t flags, const std::wstring& prefix)
 {
-    std::wstring path(pathStr.begin(), pathStr.end());
-    std::wstring searchPath = path + L"\\*";
+    std::wstring searchPath = pathStr + L"\\*";
 
     WIN32_FIND_DATAW ffd;
     HANDLE hFind = FindFirstFileW(searchPath.c_str(), &ffd);
-    if (hFind == INVALID_HANDLE_VALUE)
-        return;
 
-    std::vector<WIN32_FIND_DATAW> files;
+    if (hFind == INVALID_HANDLE_VALUE)
+    {
+        std::wcerr << L"ls: cannot access '" << pathStr << L"'\n";
+        return;
+    }
+
+    std::vector<WIN32_FIND_DATAW> entries;
+
     do
     {
-        files.push_back(ffd);
-    } while (FindNextFileW(hFind, &ffd) != 0);
+        entries.push_back(ffd);
+    }
+    while (FindNextFileW(hFind, &ffd));
+
     FindClose(hFind);
 
-    for (size_t i = 0; i < files.size(); ++i)
+    for (size_t i = 0; i < entries.size(); ++i)
     {
-        const auto &f = files[i];
+        const auto& f = entries[i];
         std::wstring name = f.cFileName;
+
         if (name == L"." || name == L"..")
             continue;
 
-        bool isLast = (i == files.size() - 1);
-        std::wstring connector = isLast ? L"|___" : L"|---";
+        if (!(flags & static_cast<uint8_t>(Flag::ALL)) &&
+            (f.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
+            continue;
 
-        DWORD attrs = f.dwFileAttributes;
-        if (attrs & FILE_ATTRIBUTE_DIRECTORY)
-            console::setColor(ConsoleColor::Blue);
-        else if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
-            console::setColor(ConsoleColor::Cyan);
-        else if (attrs & FILE_ATTRIBUTE_HIDDEN)
-            console::setColor(ConsoleColor::Gray);
-        else
-            console::setColor(ConsoleColor::Default);
+        bool isLast = (i == entries.size() - 1);
 
-        console::write(prefix);
-        console::write(connector);
-        console::writeln(name);
-        console::reset();
-
-        if ((attrs & FILE_ATTRIBUTE_DIRECTORY) && name[0] != L'.')
+        std::wstring treePrefix = prefix;
+        if (flags & static_cast<uint8_t>(Flag::RECURSIVE))
         {
-            std::wstring newPrefix = prefix + (isLast ? L"    " : L"|   ");
-            executeLSTree(pathStr + L"\\" + name, newPrefix);
+            treePrefix += isLast ? L"|___" : L"|---";
+        }
+
+        printLsEntry(f, treePrefix, flags);
+
+        if ((flags & static_cast<uint8_t>(Flag::RECURSIVE)) &&
+            (f.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+        {
+            std::wstring newPrefix = prefix;
+            newPrefix += isLast ? L"    " : L"|   ";
+
+            executeLS(pathStr + L"\\" + name, flags, newPrefix);
         }
     }
 }
 
-void Engine::executeREVIEW(const std::wstring &filename)
+// REW COMMAND
+void Engine::executeREW(const std::wstring &filename)
 {
     std::wstring wFilename = filename;
 
@@ -878,9 +883,9 @@ void Engine::executeREVIEW(const std::wstring &filename)
     if (hFile == INVALID_HANDLE_VALUE)
     {
         console::setColor(ConsoleColor::Red);
-        makeLastError(L"review");
-        console::write(L"review: cannot open file '" + wFilename + L"'\n");
-        makeLastError(L"review");
+        makeLastError(L"rew");
+        console::write(L"rew: cannot open file '" + wFilename + L"'\n");
+        makeLastError(L"rew");
         console::reset();
         return;
     }
@@ -898,6 +903,7 @@ void Engine::executeREVIEW(const std::wstring &filename)
     CloseHandle(hFile);
 }
 
+// ECHO COMMAND
 BoolResult Engine::executeECHO(const std::vector<std::wstring> &args)
 {
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);

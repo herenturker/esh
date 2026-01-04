@@ -37,7 +37,7 @@ limitations under the License.
 #define COMMAND_CP                          0X0F 
 #define COMMAND_SYSTEMINFO                  0X10
 #define COMMAND_SYSTEMSTATS                 0X11
-#define COMMAND_REVIEW                      0X12
+#define COMMAND_REW                         0X12
 #define COMMAND_ECHO                        0X13
 // -------------------------------------------------
 
@@ -73,7 +73,7 @@ enum class CommandType : uint8_t {
     CP =                COMMAND_CP,
     SYSTEMINFO =        COMMAND_SYSTEMINFO,
     SYSTEMSTATS =       COMMAND_SYSTEMSTATS,
-    REVIEW =            COMMAND_REVIEW,
+    REW =               COMMAND_REW,
     ECHO =              COMMAND_ECHO
 };
 
@@ -106,7 +106,7 @@ static inline const std::unordered_map<std::wstring, CommandType> commandMap = {
     {L"cp", CommandType::CP},
     {L"systeminfo", CommandType::SYSTEMINFO},
     {L"systemstats", CommandType::SYSTEMSTATS},
-    {L"review", CommandType::REVIEW},
+    {L"rew", CommandType::REW},
     {L"echo", CommandType::ECHO}
 };
 
