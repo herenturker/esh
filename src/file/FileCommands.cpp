@@ -17,6 +17,7 @@ limitations under the License.
 #include <vector>
 #include <string>
 #include <iostream>
+#include <deque>
 
 #include <windows.h>
 
@@ -182,6 +183,44 @@ namespace FileIO
             // Remove a file
             printBoolResult(executeRM(args.empty() ? L"" : args[0]), L"File deleted.");
             break;
+
+        case CommandType::TAIL:
+        {
+            // Get contents from a file using line count
+            if (args.empty() || !(flags & FLAG_COUNT) || args.size() < 2)
+            {
+                console::setColor(ConsoleColor::Red);
+                std::wcerr << L"Usage: tail <file> -n <line count>" << std::endl;
+                console::reset();
+                break;
+            }
+
+            size_t lineCount = 0;
+            try
+            {
+                lineCount = static_cast<size_t>(std::stoull(args[1])); // string → size_t
+            }
+            catch (const std::exception &e)
+            {
+                console::setColor(ConsoleColor::Red);
+                std::wcerr << L"Invalid line count: " << args[1] << std::endl;
+                console::reset();
+                break;
+            }
+
+            auto res = executeTAIL(args[0], lineCount);
+            if (res.ok())
+            {
+                console::writeln(res.value);
+            }
+            else
+            {
+                console::setColor(ConsoleColor::Red);
+                std::wcerr << res.error.message << std::endl;
+                console::reset();
+            }
+            break;
+        }
 
         default:
             console::setColor(ConsoleColor::Red);
@@ -457,22 +496,29 @@ namespace FileIO
             return {L"", makeLastError(L"head")};
 
         BYTE buffer[4096];
-        DWORD bytesRead;
-        bool done = false;
-        size_t currentLine = 0;
+        DWORD bytesRead = 0;
+
         std::wstring result;
+        size_t currentLine = 0;
+        bool done = false;
 
-        while (!done && ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, nullptr) && bytesRead > 0)
+        while (!done &&
+               ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, nullptr) &&
+               bytesRead > 0)
         {
-            for (DWORD i = 0; i < bytesRead; ++i)
+            std::string chunk(
+                reinterpret_cast<const char *>(buffer),
+                bytesRead);
+
+            std::wstring wchunk = unicode::utf8_to_utf16(chunk);
+
+            for (wchar_t ch : wchunk)
             {
-                wchar_t c = buffer[i];
+                result.push_back(ch);
 
-                result += c;
-
-                if (c == L'\n')
+                if (ch == L'\n')
                 {
-                    currentLine++;
+                    ++currentLine;
                     if (currentLine >= lineCount)
                     {
                         done = true;
@@ -538,8 +584,7 @@ namespace FileIO
     }
 
     // MV COMMAND
-    BoolResult FileCommands::executeMV(const std::wstring &src,
-                                       const std::wstring &dst)
+    BoolResult FileCommands::executeMV(const std::wstring &src, const std::wstring &dst)
     {
         std::wstring wSrc = src;
         std::wstring wDst = dst;
@@ -562,8 +607,7 @@ namespace FileIO
     }
 
     // CP COMMAND
-    BoolResult FileCommands::executeCP(const std::wstring &src,
-                                       const std::wstring &dst)
+    BoolResult FileCommands::executeCP(const std::wstring &src, const std::wstring &dst)
     {
         std::wstring wSrc = src;
         std::wstring wDst = dst;
@@ -588,4 +632,72 @@ namespace FileIO
 
         return {true, {}};
     }
+
+    // TAIL COMMAND
+    Result<std::wstring> FileCommands::executeTAIL(const std::wstring &filename, size_t lineCount)
+    {
+        HANDLE hFile = CreateFileW(
+            filename.c_str(),
+            GENERIC_READ,
+            FILE_SHARE_READ,
+            nullptr,
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL,
+            nullptr);
+
+        if (hFile == INVALID_HANDLE_VALUE)
+            return {L"", makeLastError(L"tail")};
+
+        BYTE buffer[4096];
+        DWORD bytesRead = 0;
+
+        std::deque<std::wstring> lineBuffer;
+        std::wstring currentLine;
+
+        while (ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, nullptr) &&
+               bytesRead > 0)
+        {
+            std::string chunk(
+                reinterpret_cast<const char *>(buffer),
+                bytesRead);
+
+            std::wstring wchunk = unicode::utf8_to_utf16(chunk);
+
+            for (wchar_t ch : wchunk)
+            {
+                if (ch == L'\n')
+                {
+                    lineBuffer.push_back(currentLine);
+
+                    if (lineBuffer.size() > lineCount)
+                        lineBuffer.pop_front();
+
+                    currentLine.clear();
+                }
+                else if (ch != L'\r')
+                {
+                    currentLine.push_back(ch);
+                }
+            }
+        }
+
+        if (!currentLine.empty())
+        {
+            lineBuffer.push_back(currentLine);
+            if (lineBuffer.size() > lineCount)
+                lineBuffer.pop_front();
+        }
+
+        CloseHandle(hFile);
+
+        std::wstring result;
+        for (const auto &line : lineBuffer)
+        {
+            result += line;
+            result += L'\n';
+        }
+
+        return {result, {}};
+    }
+
 }

@@ -32,7 +32,6 @@ namespace FileIO {
 
         private:
             // COMMAND IMPLEMENTATION           Function prototypes
-
             static void                         executeLS(const std::wstring &pathStr, uint8_t flags, const std::wstring& prefix = L"");
             static void                         executeREW(const std::wstring &filename);
             

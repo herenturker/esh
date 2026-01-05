@@ -27,7 +27,7 @@ limitations under the License.
 #define COMMAND_WHOAMI                      0X05
 #define COMMAND_DATETIME                    0X06
 #define COMMAND_HOSTNAME                    0X07
-// #define COMMAND_RESERVED2                   0X08 // Fill here
+#define COMMAND_SET                         0X08
 #define COMMAND_TOUCH                       0X09
 #define COMMAND_RM                          0X0A
 #define COMMAND_MKDIR                       0X0B
@@ -41,12 +41,12 @@ limitations under the License.
 #define COMMAND_ECHO                        0X13
 #define COMMAND_STATS                       0X14
 #define COMMAND_HEAD                        0X15
+
 #define COMMAND_TAIL                        0X16
 #define COMMAND_ATTRIB                      0X17
 #define COMMAND_PS                          0X18
 #define COMMAND_KILL                        0X19
 #define COMMAND_ENV                         0X1A
-#define COMMAND_SET                         0X1B
 // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 // ________________________________________________________________
@@ -83,7 +83,6 @@ enum class CommandType : uint8_t {
     WHOAMI =            COMMAND_WHOAMI,
     DATETIME =          COMMAND_DATETIME,
     HOSTNAME =          COMMAND_HOSTNAME,
-    // 
     TOUCH =             COMMAND_TOUCH,
     RM =                COMMAND_RM,
     MKDIR =             COMMAND_MKDIR,
@@ -98,6 +97,7 @@ enum class CommandType : uint8_t {
     ECHO =              COMMAND_ECHO,
     STATS =             COMMAND_STATS,
     HEAD =              COMMAND_HEAD,
+
     TAIL =              COMMAND_TAIL,
     ATTRIB =            COMMAND_ATTRIB,
     PS =                COMMAND_PS,
