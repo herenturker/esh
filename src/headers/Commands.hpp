@@ -27,7 +27,7 @@ limitations under the License.
 #define COMMAND_WHOAMI                      0X05
 #define COMMAND_DATETIME                    0X06
 #define COMMAND_HOSTNAME                    0X07
-#define COMMAND_SET                         0X08
+#define COMMAND_PS                          0X08
 #define COMMAND_TOUCH                       0X09
 #define COMMAND_RM                          0X0A
 #define COMMAND_MKDIR                       0X0B
@@ -41,12 +41,8 @@ limitations under the License.
 #define COMMAND_ECHO                        0X13
 #define COMMAND_STATS                       0X14
 #define COMMAND_HEAD                        0X15
-
 #define COMMAND_TAIL                        0X16
-#define COMMAND_ATTRIB                      0X17
-#define COMMAND_PS                          0X18
-#define COMMAND_KILL                        0X19
-#define COMMAND_ENV                         0X1A
+#define COMMAND_KILL                        0X17
 // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 // ________________________________________________________________
@@ -97,13 +93,9 @@ enum class CommandType : uint8_t {
     ECHO =              COMMAND_ECHO,
     STATS =             COMMAND_STATS,
     HEAD =              COMMAND_HEAD,
-
     TAIL =              COMMAND_TAIL,
-    ATTRIB =            COMMAND_ATTRIB,
     PS =                COMMAND_PS,
-    KILL =              COMMAND_KILL,
-    ENV =               COMMAND_ENV,
-    SET =               COMMAND_SET
+    KILL =              COMMAND_KILL
 };
 
 // DEFINE FLAGS
@@ -150,11 +142,8 @@ static inline const std::unordered_map<std::wstring, CommandType> commandMap = {
     {L"stats", CommandType::STATS},
     {L"head", CommandType::HEAD},
     {L"tail", CommandType::TAIL},
-    {L"attrib", CommandType::ATTRIB},
     {L"ps", CommandType::PS},
-    {L"kill", CommandType::KILL},
-    {L"env", CommandType::ENV},
-    {L"set", CommandType::SET}
+    {L"kill", CommandType::KILL}
 };
 
 // MAP FLAG STRINGS TO FLAG TYPES
@@ -177,7 +166,6 @@ inline CommandGroup getCommandGroup(CommandType cmd)
         case CommandType::STATS:
         case CommandType::HEAD:
         case CommandType::TAIL:
-        case CommandType::ATTRIB:
         case CommandType::TOUCH:
         case CommandType::RM:
         case CommandType::CP:
@@ -193,8 +181,6 @@ inline CommandGroup getCommandGroup(CommandType cmd)
             return CommandGroup::PROCESS;
 
         // -------- ENVIRONMENT COMMANDS --------
-        case CommandType::ENV:
-        case CommandType::SET:
         case CommandType::CD:
         case CommandType::PWD:
         case CommandType::WHOAMI:
@@ -206,7 +192,6 @@ inline CommandGroup getCommandGroup(CommandType cmd)
         case CommandType::EXIT:
         case CommandType::CLEAR:
         case CommandType::ECHO:
-
             return CommandGroup::SHELL;
 
         // -------- SYSTEM COMMANDS --------

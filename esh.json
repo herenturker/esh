@@ -191,14 +191,6 @@
                 }
             },
 
-            "attrib": {
-                "description": "Displays or changes file attributes.",
-                "usage": "attrib <file> [attributes]",
-                "flags": {
-                    "--help": "Displays help information about the attrib command."
-                }
-            },
-
             "ps": {
                 "description": "Displays currently running processes.",
                 "usage": "ps",
@@ -212,22 +204,6 @@
                 "usage": "kill <process_id>",
                 "flags": {
                     "--help": "Displays help information about the kill command."
-                }
-            },
-
-            "env": {
-                "description": "Displays environment variables.",
-                "usage": "env",
-                "flags": {
-                    "--help": "Displays help information about the env command."
-                }
-            },
-
-            "set": {
-                "description": "Sets an environment variable.",
-                "usage": "set <variable>=<value>",
-                "flags": {
-                    "--help": "Displays help information about the set command."
                 }
             }
 

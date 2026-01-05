@@ -122,6 +122,7 @@ namespace ShellCmds {
             {0, 0},
             &written);
 
+        std::wcout << L"\x1b[3J\x1b[H" << std::flush;
     }
 
     // ECHO COMMAND

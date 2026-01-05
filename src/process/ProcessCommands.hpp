@@ -20,10 +20,10 @@ limitations under the License.
 #include <string>
 #include <cstdint>
 
+#include <windows.h>
+
 #include "../headers/Result.hpp"
 #include "../headers/Commands.hpp"
-
-/*
 
 namespace Process {
 
@@ -34,9 +34,9 @@ namespace Process {
 
         private:
             // COMMAND IMPLEMENTATION           Function prototypes
-            static BoolResult                   executePS(); // will add
-            static BoolResult                   executeKILL(uint32_t pid); // will add
+            static BoolResult                   executePS();
+            static BoolResult                   executeKILL(DWORD pid);
     };
 }
 
-*/
+

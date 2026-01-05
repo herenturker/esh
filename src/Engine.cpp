@@ -41,12 +41,10 @@ void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::
             FileIO::FileCommands::execute(command, flags, args);
             break;
 
-        /*/
         case CommandGroup::PROCESS:
             Process::ProcessCommands::execute(command, flags, args);
             break;
-        */
-
+        
         case CommandGroup::ENVIRONMENT:
             Environment::EnvironmentCommands::execute(command, flags, args);
             break;
