@@ -18,42 +18,36 @@ limitations under the License.
 
 #include <string>
 
-#include <windows.h>
+#include "HistoryBuffer.hpp"
 
 namespace History
 {
-    class Manager;
-}
-
-namespace Console
-{
-    class Input
+    class Manager
     {
     public:
-        explicit Input(History::Manager& history);
+        Manager() = default;
 
-        void setPromptStart();
-        std::wstring readLine();
+        // call when program starts
+        void initialize();
+
+        // add new command
+        void add(const std::wstring& command);
+
+        // navigate
+        std::optional<std::wstring> previous();
+        std::optional<std::wstring> next();
+
+        void resetNavigation();
+
+        void shutdown();
+
+        ~Manager()
+        {
+            shutdown();
+        }
 
     private:
-        void handleKeyEvent(const KEY_EVENT_RECORD& key);
-
-        void insertChar(wchar_t ch);
-        void backspace();
-
-        void historyUp();
-        void historyDown();
-
-        void redrawLine();
-
-    private:
-        History::Manager& m_history;
-
-        std::wstring m_buffer;
-        size_t m_cursor = 0;
-
-        SHORT m_promptStartX = 0;
-        HANDLE m_stdin  = nullptr;
-        HANDLE m_stdout = nullptr;
+        std::wstring m_historyFile;
+        Buffer m_buffer;
     };
 }

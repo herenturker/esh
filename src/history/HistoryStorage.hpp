@@ -15,14 +15,13 @@ limitations under the License.
 */
 
 #pragma once
+#include <vector>
+#include <string>
 
-#include <filesystem>
-
-namespace Platform
+namespace HistoryStorage
 {
-    // AppData initializer for shell program. 
-    void init();
-
-    // AppData\Roaming\esh
-    std::filesystem::path getBasePath();
+    std::vector<std::wstring> load();
+    void save(const std::vector<std::wstring>& entries);
 }
+
+

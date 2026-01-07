@@ -24,7 +24,8 @@ limitations under the License.
 
 namespace Platform
 {
-    /* Create an AppData\Roaming\esh directory is there is not. */
+    /* Create an AppData\Roaming\esh directory if there is not. */
+    
     static std::filesystem::path queryRoamingAppData()
     {
         PWSTR rawPath = nullptr;

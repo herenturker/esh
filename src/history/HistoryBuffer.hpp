@@ -13,3 +13,38 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+#pragma once
+
+#include <vector>
+#include <optional>
+#include <string>
+
+namespace History
+{
+    class Buffer
+    {
+        public:
+            // Add command to history
+            void push(const std::wstring& command);
+
+            // Fetch previous command. (up arrow)
+            std::optional<std::wstring> previous();
+
+            // Fetch next command. (down arrow)
+            std::optional<std::wstring> next();
+
+            // Reset history position
+            void resetNavigation();
+
+            const std::vector<std::wstring>& entries() const;
+
+        private:
+            std::vector<std::wstring> m_entries;
+
+            // navigation cursor
+            // size() == "the newest + 1" location
+            size_t m_cursor = 0;
+
+    };
+}

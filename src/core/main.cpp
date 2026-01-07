@@ -27,6 +27,8 @@ limitations under the License.
 #include "../headers/Unicode.hpp"
 #include "../env/EnvironmentCommands.hpp"
 #include "../platform/AppDataPath.hpp"
+#include "../history/HistoryManager.hpp"
+#include "../ConsoleOperations/ConsoleInput.hpp"
 
 int wmain()
 {
@@ -63,25 +65,16 @@ int wmain()
         return EXIT_FAILURE;
     }
 
-    std::wstring raw_input;
+    History::Manager history;
+    history.initialize();
+
+    Console::Input input(history);
 
     while (true)
     {
-        std::vector<std::wstring> args;
-
         auto who  = Environment::EnvironmentCommands::executeWHOAMI();
         auto host = Environment::EnvironmentCommands::executeHOSTNAME();
         auto pwd  = Environment::EnvironmentCommands::executePWD();
-
-        if (!who.ok() || !host.ok() || !pwd.ok())
-        {
-            console::setColor(ConsoleColor::Red);
-            if (!who.ok())  std::wcerr << who.error.message << L"\n";
-            if (!host.ok()) std::wcerr << host.error.message << L"\n";
-            if (!pwd.ok())  std::wcerr << pwd.error.message << L"\n";
-            console::reset();
-            continue;
-        }
 
         console::setColor(ConsoleColor::Blue);
         console::write(who.value);
@@ -95,11 +88,13 @@ int wmain()
         console::reset();
 
         console::write(L" $ ");
+        input.setPromptStart();
 
-        std::getline(std::wcin, raw_input);
-        console::write(L"\n");
+        std::wstring raw_input = input.readLine();
 
+        history.add(raw_input);
         Shell::handleRawInput(raw_input);
+
         console::writeln(L"");
     }
 
