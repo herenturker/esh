@@ -16,11 +16,14 @@ file(GLOB_RECURSE SOURCES
     src/process/*.cpp
     src/shell/*.cpp 
     src/system/*.cpp
+    src/platform/*.cpp
+    src/history/*.cpp
+    src/consoleOperations/*.cpp
 )
 
 add_executable(esh ${SOURCES} resources.rc app.rc)
 
-target_include_directories(esh PRIVATE src/headers src/external src/env src/file src/process src/shell src/system)
+target_include_directories(esh PRIVATE src/headers src/external src/env src/file src/process src/shell src/system src/platform src/history src/consoleOperations)
 
 if (MSVC)
     target_compile_definitions(esh PRIVATE _CRT_SECURE_NO_WARNINGS)

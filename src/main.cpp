@@ -21,14 +21,17 @@ limitations under the License.
 #include <fcntl.h>
 
 #include "headers/Shell.hpp"
-#include "env/EnvironmentCommands.hpp"
 #include "headers/Console.hpp"
 #include "headers/Result.hpp"
 #include "headers/Error.hpp"
 #include "headers/Unicode.hpp"
+#include "env/EnvironmentCommands.hpp"
+#include "platform/AppDataPath.hpp"
 
 int wmain()
 {
+    Platform::init(); // Initialize AppData for esh
+
     _setmode(_fileno(stdin), _O_WTEXT);
     _setmode(_fileno(stdout), _O_WTEXT);
     _setmode(_fileno(stderr), _O_WTEXT);
