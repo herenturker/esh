@@ -19,15 +19,14 @@ limitations under the License.
 #include <vector>
 #include <string>
 
-#include "headers/Engine.hpp"
-#include "headers/Commands.hpp"
-#include "headers/Console.hpp"
-
-#include "file/FileCommands.hpp"
-#include "shell/ShellCommands.hpp"
-#include "env/EnvironmentCommands.hpp"
-#include "process/ProcessCommands.hpp"
-#include "system/SystemCommands.hpp"
+#include "../headers/Engine.hpp"
+#include "../headers/Commands.hpp"
+#include "../headers/Console.hpp"
+#include "../file/FileCommands.hpp"
+#include "../shell/ShellCommands.hpp"
+#include "../env/EnvironmentCommands.hpp"
+#include "../process/ProcessCommands.hpp"
+#include "../system/SystemCommands.hpp"
 
 
 // ------------------- COMMAND DISPATCHER -------------------

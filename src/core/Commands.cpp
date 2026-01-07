@@ -17,9 +17,9 @@ limitations under the License.
 #include <stdexcept>
 #include <iostream>
 
-#include "headers/Commands.hpp"
-#include "headers/Shell.hpp"
-#include "external/json.hpp"
+#include "../headers/Commands.hpp"
+#include "../headers/Shell.hpp"
+#include "../external/json.hpp"
 
 using json = nlohmann::json;
 

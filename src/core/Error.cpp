@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "headers/Error.hpp"
-#include "headers/Unicode.hpp"
+#include "../headers/Error.hpp"
+#include "../headers/Unicode.hpp"
 
 Error makeLastError(const std::wstring& prefix)
 {

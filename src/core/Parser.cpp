@@ -17,8 +17,8 @@ limitations under the License.
 #include <stdint.h>
 #include <string>
 
-#include "headers/Parser.hpp"
-#include "headers/Engine.hpp"
+#include "../headers/Parser.hpp"
+#include "../headers/Engine.hpp"
 
 void Parser::parseTokens(const std::vector<Lexer::Token> &tokens)
 {

@@ -19,9 +19,9 @@ limitations under the License.
 #include <stdexcept>
 #include <iostream>
 
-#include "headers/Shell.hpp"
-#include "headers/Lexer.hpp"
-#include "headers/Parser.hpp"
+#include "../headers/Shell.hpp"
+#include "../headers/Lexer.hpp"
+#include "../headers/Parser.hpp"
 
 void Shell::handleRawInput(std::wstring& raw_input) {
 

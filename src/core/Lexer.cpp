@@ -19,8 +19,8 @@ limitations under the License.
 #include <cctype>
 #include <iostream>
 
-#include "headers/Lexer.hpp"
-#include "headers/Commands.hpp"
+#include "../headers/Lexer.hpp"
+#include "../headers/Commands.hpp"
 
 std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input)
 {

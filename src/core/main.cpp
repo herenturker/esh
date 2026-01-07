@@ -20,13 +20,13 @@ limitations under the License.
 #include <io.h>
 #include <fcntl.h>
 
-#include "headers/Shell.hpp"
-#include "headers/Console.hpp"
-#include "headers/Result.hpp"
-#include "headers/Error.hpp"
-#include "headers/Unicode.hpp"
-#include "env/EnvironmentCommands.hpp"
-#include "platform/AppDataPath.hpp"
+#include "../headers/Shell.hpp"
+#include "../headers/Console.hpp"
+#include "../headers/Result.hpp"
+#include "../headers/Error.hpp"
+#include "../headers/Unicode.hpp"
+#include "../env/EnvironmentCommands.hpp"
+#include "../platform/AppDataPath.hpp"
 
 int wmain()
 {

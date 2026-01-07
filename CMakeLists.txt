@@ -10,7 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 file(GLOB_RECURSE SOURCES
-    src/*.cpp
+    src/core/*.cpp
     src/env/*.cpp
     src/file/*.cpp
     src/process/*.cpp
