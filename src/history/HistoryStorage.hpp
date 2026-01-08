@@ -14,7 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\history\HistoryStorage.hpp
+// PURPOSE: Header file for 'src\history\HistoryStorage.cpp'. Loads and saves command history.
+
 #pragma once
+
+// INCLUDE LIBRARIES
+
 #include <vector>
 #include <string>
 

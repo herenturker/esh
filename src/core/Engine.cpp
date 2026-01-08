@@ -14,6 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\core\Engine.cpp
+// PURPOSE: Gets the commands, flags and arguments from 'Parser.cpp' and executes them.
+
+// INCLUDE LIBRARIES
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -32,7 +36,7 @@ limitations under the License.
 // ------------------- COMMAND DISPATCHER -------------------
 void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::wstring>& args)
 {
-    auto group = getCommandGroup(command);
+    auto group = getCommandGroup(command); // Classifies the command given.
 
     switch (group)
     {

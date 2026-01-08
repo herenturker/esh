@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\core\main.cpp
+// PURPOSE: Everything needed to run esh.exe is here. 
+// 'main.cpp' gets an input from user and gives the input to lexer.
+
+// INCLUDE LIBRARIES
 #include <iostream>
 #include <string>
 
@@ -34,6 +39,7 @@ int wmain()
 {
     Platform::init(); // Initialize AppData for esh
 
+    // get unicode inputs as default.
     _setmode(_fileno(stdin), _O_WTEXT);
     _setmode(_fileno(stdout), _O_WTEXT);
     _setmode(_fileno(stderr), _O_WTEXT);
@@ -56,7 +62,7 @@ int wmain()
 
     try
     {
-        std::string json = Shell::load_resource_json(101);
+        std::string json = Shell::load_resource_json(101); // load esh.json. ID 101 is defined in resources.rc
         (void)json; // explicitly unused for now
     }
     catch (const std::exception &e)
@@ -65,6 +71,7 @@ int wmain()
         return EXIT_FAILURE;
     }
 
+    // command history
     History::Manager history;
     history.initialize();
 
@@ -87,8 +94,8 @@ int wmain()
         console::write(pwd.value);
         console::reset();
 
-        console::write(L" $ ");
-        input.setPromptStart();
+        console::write(L" $ "); // user@HOSTNAME current\working\directory $
+        input.setPromptStart(); // set where the history buffer must be written
 
         std::wstring raw_input = input.readLine();
 

@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\shell\ShellCommands.cpp
+// PURPOSE: Executes commands related to shell.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <vector>
 #include <string>
@@ -29,7 +34,7 @@ limitations under the License.
 #include "../system/SystemCommands.hpp"
 #include "ShellCommands.hpp"
 
-namespace ShellCmds {
+namespace ShellCmds { // DO NOT CHANGE the name to 'Shell'. It creates errors (because I tried before).
     
     void ShellCommands::execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args)
     {

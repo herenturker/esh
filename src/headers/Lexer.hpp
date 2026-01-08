@@ -14,7 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\headers\Lexer.hpp
+// PURPOSE: Header file for 'src\core\Lexer.cpp'. Performs lexical analysis.
+
 #pragma once
+
+// INCLUDE LIBRARIES
+
 #include <string>
 #include <vector>
 

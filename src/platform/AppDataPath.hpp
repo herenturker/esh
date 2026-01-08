@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\platform\AppDataPath.hpp
+// PURPOSE: Header file for 'src\platform\AppDataPath.cpp'. Creates AppData\Roaming\esh for storing esh-related stuff.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <filesystem>
 

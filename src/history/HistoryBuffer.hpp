@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\history\HistoryBuffer.hpp
+// PURPOSE: Header file for 'src\history\HistoryBuffer.cpp'. Performs operations related to history buffer.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <vector>
 #include <optional>

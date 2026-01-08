@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\headers\Shell.hpp
+// PURPOSE: Header file for 'src\core\Shell.cpp'. Handles input and loads 'esh.json'
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <string>
 

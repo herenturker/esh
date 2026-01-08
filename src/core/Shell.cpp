@@ -14,10 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <windows.h>
+// FILE: src\core\Shell.cpp
+// PURPOSE: Loads 'esh.json' file, sends input to 'Lexer.cpp' and then sends the result to 'Parser.cpp'
+
+// INCLUDE LIBRARIES
 #include <string>
 #include <stdexcept>
 #include <iostream>
+
+#include <windows.h>
 
 #include "../headers/Shell.hpp"
 #include "../headers/Lexer.hpp"

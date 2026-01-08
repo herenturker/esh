@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\headers\Engine.hpp
+// PURPOSE: Header file for 'src\core\Engine.cpp'. Executes commands, flags and arguments given.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <cstdint>
 #include <string>

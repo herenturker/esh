@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\file\FileCommands.hpp
+// PURPOSE: Header file for 'src\file\FileCommands.cpp'. Executes commands related to file operations and IO.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <vector>
 #include <string>

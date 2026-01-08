@@ -14,9 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\headers\Result.hpp
+// PURPOSE: Provides a 'Result' for function results.
+
 #pragma once
 
+// INCLUDE LIBRARIES
+
 #include <string>
+
 #include "Error.hpp"
 
 template<typename T>

@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\history\HistoryStorage.cpp
+// PURPOSE: Loads and saves command history.
+
+// INCLUDE LIBRARIES
+
 #include <windows.h>
 
 #include "HistoryStorage.hpp"

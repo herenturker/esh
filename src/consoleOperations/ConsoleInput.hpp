@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\consoleOperations\ConsoleInput.hpp
+// PURPOSE: Header file for 'src\consoleOperations\ConsoleInput.cpp'. Performs operations related to console inputs and history.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <string>
 

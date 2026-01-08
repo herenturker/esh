@@ -14,10 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\headers\Parser.hpp
+// PURPOSE: Header file for 'src\core\Parser.cpp'. Parses tokens.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <string>
 #include <vector>
+
 #include "Lexer.hpp"
 #include "Commands.hpp"
 

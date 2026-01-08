@@ -14,6 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\headers\Helper.hpp
+// PURPOSE: Helper functions for the engine.
+
+#pragma once
+
+// INCLUDE LIBRARIES
+
 #include <string>
 #include <sstream>
 
@@ -32,7 +39,7 @@ namespace helper {
                 : path.substr(pos + 1);
     }
 
-    inline std::wstring makeBar(double percent, int width = 30)
+    inline std::wstring makeBar(double percent, int width = 30) // for instance: [/////////////           ] %60
     {
         int filled = static_cast<int>((percent / 100.0) * width);
         std::wstring bar = L"[";
@@ -82,20 +89,28 @@ namespace helper {
     {
         if (attrs & FILE_ATTRIBUTE_DIRECTORY)
             console::setColor(ConsoleColor::Blue);
+
         else if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
             console::setColor(ConsoleColor::Cyan);
+
         else if (attrs & FILE_ATTRIBUTE_HIDDEN)
             console::setColor(ConsoleColor::Gray);
+
         else if (attrs & FILE_ATTRIBUTE_READONLY)
             console::setColor(ConsoleColor::Yellow);
+
         else if (attrs & FILE_ATTRIBUTE_SYSTEM)
             console::setColor(ConsoleColor::Red);
+
         else if (attrs & FILE_ATTRIBUTE_ARCHIVE)
             console::setColor(ConsoleColor::Green);
+
         else if (attrs & FILE_ATTRIBUTE_TEMPORARY)
             console::setColor(ConsoleColor::Orange);
+
         else if (attrs & FILE_ATTRIBUTE_COMPRESSED)
             console::setColor(ConsoleColor::Purple);
+
         else if (attrs & FILE_ATTRIBUTE_ENCRYPTED)
             console::setColor(ConsoleColor::Pink);
         else
@@ -128,22 +143,31 @@ namespace helper {
 
         if (attrs & FILE_ATTRIBUTE_DIRECTORY)
             result += L"Directory ";
+
         if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
             result += L"Reparse Point ";
+
         if (attrs & FILE_ATTRIBUTE_HIDDEN)
             result += L"Hidden ";
+
         if (attrs & FILE_ATTRIBUTE_READONLY)
             result += L"Read-Only ";
+
         if (attrs & FILE_ATTRIBUTE_SYSTEM)
             result += L"System ";
+
         if (attrs & FILE_ATTRIBUTE_ARCHIVE)
             result += L"Archive ";
+
         if (attrs & FILE_ATTRIBUTE_TEMPORARY)
             result += L"Temporary ";
+
         if (attrs & FILE_ATTRIBUTE_COMPRESSED)
             result += L"Compressed ";
+
         if (attrs & FILE_ATTRIBUTE_ENCRYPTED)
             result += L"Encrypted ";
+
         if (attrs & FILE_ATTRIBUTE_NORMAL)
             result += L"Normal ";
 

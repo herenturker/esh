@@ -14,14 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\headers\Console.hpp
+// PURPOSE: Sets console colors and writes on the console.
+// DO NOT CONFUSE with 'consoleOperations'.
+
 #pragma once
 
-#include <windows.h>
+// INCLUDE LIBRARIES
+
 #include <string>
 
-enum class ConsoleColor : WORD
+#include <windows.h>
+
+enum class ConsoleColor : WORD // Color adjustments
 {
-    Default = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+    Default = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE, // White
     Red = FOREGROUND_RED | FOREGROUND_INTENSITY,
     Green = FOREGROUND_GREEN | FOREGROUND_INTENSITY,
     Yellow = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY,

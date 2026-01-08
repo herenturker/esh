@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\shell\ShellCommands.hpp
+// PURPOSE: Header file for 'src\system\ShellCommands.cpp'. Executes commands related to shell.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <vector>
 #include <string>

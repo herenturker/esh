@@ -14,9 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\headers\Error.hpp
+// PURPOSE: Header file for 'src\core\Error.cpp'. Creates error messages in case of a failure.
+
 #pragma once
 
+// INCLUDE LIBRARIES
+
 #include <string>
+
 #include <windows.h>
 
 struct Error {

@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\headers\Unicode.cpp
+// PURPOSE: Header file for 'src\core\Unicode.cpp'. Converts the given string to UTF16 or UTF8.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <string>
 
@@ -23,4 +28,3 @@ namespace unicode
     std::wstring utf8_to_utf16(const std::string& utf8);
     std::string  utf16_to_utf8(const std::wstring& utf16);
 }
-

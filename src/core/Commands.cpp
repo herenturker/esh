@@ -14,6 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\core\Commands.cpp
+// PURPOSE: Identifies the token given if it is builtin in esh.exe as a command or not.
+
+// INCLUDE LIBRARIES
 #include <stdexcept>
 #include <iostream>
 

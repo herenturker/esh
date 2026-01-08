@@ -14,6 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\core\Unicode.cpp
+// PURPOSE: Converts the given string to UTF16 or UTF8.
+
+// INCLUDE LIBRARIES
+
+#include <string>
+
 #include <windows.h>
 
 #include "../headers/Unicode.hpp"

@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\consoleOperations\ConsoleInput.cpp
+// PURPOSE: Performs operations related to console inputs and history.
+
+// INCLUDE LIBRARIES
+
 #include "ConsoleInput.hpp"
 #include "../history/HistoryManager.hpp"
 

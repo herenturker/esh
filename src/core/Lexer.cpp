@@ -14,6 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\core\Lexer.cpp
+// PURPOSE: Identifies and tokenizes the input
+
+// INCLUDE LIBRARIES
 #include <string>
 #include <algorithm>
 #include <cctype>
@@ -24,7 +28,6 @@ limitations under the License.
 
 std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input)
 {
-
     std::vector<Token> tokens;
 
     std::size_t pos = 0;
@@ -37,6 +40,7 @@ std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input)
         {
             ++pos;
         }
+
         if (pos >= len)
             break;
 
@@ -46,13 +50,13 @@ std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input)
             ++pos;
         }
 
-        std::wstring token = input.substr(start, pos - start);
+        std::wstring token = input.substr(start, pos - start); // Gets the token without blank char.
         TokenType type = identifyTokenType(token);
 
         tokens.push_back({type, token});
     }
 
-    tokens.push_back({TOKEN_EOF, L""});
+    tokens.push_back({TOKEN_EOF, L""}); // End of input
 
     return tokens;
 }

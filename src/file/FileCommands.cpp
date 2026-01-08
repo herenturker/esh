@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\file\FileCommands.cpp
+// PURPOSE: Executes commands related to file operations and IO.
+
+// INCLUDE LIBRARIES
+
 #include <vector>
 #include <string>
 #include <iostream>

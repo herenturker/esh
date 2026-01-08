@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\history\HistoryManager.cpp
+// PURPOSE: Performs and manages history buffer operations.
+
+// INCLUDE LIBRARIES
+
 #include "HistoryManager.hpp"
 #include "HistoryStorage.hpp"
 

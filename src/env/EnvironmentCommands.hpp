@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\env\EnvironmentCommands.hpp
+// PURPOSE: Header file for 'src\env\EnvironmentCommands.cpp'. Executes commands related to environment.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <vector>
 #include <string>

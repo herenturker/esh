@@ -98,14 +98,6 @@
                 }
             },
 
-            "cls": {
-                "description": "Clears the terminal screen (Windows alias).",
-                "usage": "cls",
-                "flags": {
-                    "--help": "Displays help information about the cls command."
-                }
-            },
-
             "mv": {
                 "description": "Moves or renames a file or directory.",
                 "usage": "mv <source> <destination>",

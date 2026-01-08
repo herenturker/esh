@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\process\ProcessCommands.hpp
+// PURPOSE: Header file for 'src\process\ProcessCommands.cpp'. Executes commands related to processes.
+
 #pragma once
+
+// INCLUDE LIBRARIES
 
 #include <vector>
 #include <string>

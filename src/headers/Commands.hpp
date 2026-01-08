@@ -14,6 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\headers\Commands.hpp
+// PURPOSE: Header file for 'src\core\Commands.cpp'. Commands' and flags' definitons are made here.
+// DO NOT FORGET to check 'esh.json'.
+
 #pragma once
 
 // --------- DEFINE COMMAND CONSTANTS ---------------
@@ -32,7 +36,7 @@ limitations under the License.
 #define COMMAND_RM                          0X0A
 #define COMMAND_MKDIR                       0X0B
 #define COMMAND_RMDIR                       0X0C
-#define COMMAND_CLEAR                       0X0D // SAME AS CLS
+#define COMMAND_CLEAR                       0X0D
 #define COMMAND_MV                          0X0E
 #define COMMAND_CP                          0X0F 
 #define COMMAND_SYSTEMINFO                  0X10
@@ -57,6 +61,8 @@ limitations under the License.
 #define FLAG_HELP                          0X10 // --help
 #define FLAG_COUNT                         0X20 // -n (used for line counts)
 // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+// INCLUDE LIBRARIES
 
 #include <string>
 #include <unordered_map>
@@ -84,7 +90,6 @@ enum class CommandType : uint8_t {
     MKDIR =             COMMAND_MKDIR,
     RMDIR =             COMMAND_RMDIR,
     CLEAR =             COMMAND_CLEAR,
-    CLS =               COMMAND_CLEAR, // SAME AS CLEAR
     MV =                COMMAND_MV,
     CP =                COMMAND_CP,
     SYSTEMINFO =        COMMAND_SYSTEMINFO,
@@ -132,7 +137,6 @@ static inline const std::unordered_map<std::wstring, CommandType> commandMap = {
     {L"mkdir", CommandType::MKDIR},
     {L"rmdir", CommandType::RMDIR},
     {L"clear", CommandType::CLEAR},
-    {L"cls", CommandType::CLEAR},
     {L"mv", CommandType::MV},
     {L"cp", CommandType::CP},
     {L"systeminfo", CommandType::SYSTEMINFO},

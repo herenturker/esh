@@ -14,6 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// FILE: src\core\Parser.cpp
+// PURPOSE: Parses the tokens given from 'Lexer.cpp'.
+
+// INCLUDE LIBRARIES
 #include <stdint.h>
 #include <string>
 
