@@ -30,7 +30,7 @@ limitations under the License.
 namespace Platform
 {
     /* Create an AppData\Roaming\esh directory if there is not. */
-    
+
     static std::filesystem::path queryRoamingAppData()
     {
         PWSTR rawPath = nullptr;
@@ -39,8 +39,7 @@ namespace Platform
             FOLDERID_RoamingAppData,
             0,
             nullptr,
-            &rawPath
-        );
+            &rawPath);
 
         if (FAILED(hr))
             throw std::runtime_error("Failed to get Roaming AppData path");
@@ -61,7 +60,7 @@ namespace Platform
 
     void init()
     {
-        const auto& path = getBasePath();
+        const auto &path = getBasePath();
 
         if (!std::filesystem::exists(path))
         {

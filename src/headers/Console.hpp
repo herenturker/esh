@@ -55,7 +55,7 @@ namespace console
         setColor(ConsoleColor::Default);
     }
 
-    inline void write(const std::wstring& text)
+    inline void write(const std::wstring &text)
     {
         DWORD written;
         WriteConsoleW(
@@ -63,14 +63,12 @@ namespace console
             text.c_str(),
             static_cast<DWORD>(text.size()),
             &written,
-            nullptr
-        );
+            nullptr);
     }
 
-    inline void writeln(const std::wstring& text)
+    inline void writeln(const std::wstring &text)
     {
         write(text);
         write(L"\n");
     }
-
 }

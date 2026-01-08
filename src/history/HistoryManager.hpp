@@ -36,7 +36,7 @@ namespace History
         void initialize();
 
         // add new command
-        void add(const std::wstring& command);
+        void add(const std::wstring &command);
 
         // navigate
         std::optional<std::wstring> previous();

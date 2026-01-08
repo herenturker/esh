@@ -32,37 +32,38 @@ limitations under the License.
 #include "../headers/Helper.hpp"
 #include "EnvironmentCommands.hpp"
 
-namespace Environment {
+namespace Environment
+{
 
     void EnvironmentCommands::execute(CommandType cmd,
-                                    uint8_t /*flags*/,
-                                    const std::vector<std::wstring>& /*args*/)
+                                      uint8_t /*flags*/,
+                                      const std::vector<std::wstring> & /*args*/)
     {
         Result<std::wstring> res;
 
         switch (cmd)
         {
-            case CommandType::PWD:
-                res = executePWD();
-                break;
+        case CommandType::PWD:
+            res = executePWD();
+            break;
 
-            case CommandType::WHOAMI:
-                res = executeWHOAMI();
-                break;
+        case CommandType::WHOAMI:
+            res = executeWHOAMI();
+            break;
 
-            case CommandType::HOSTNAME:
-                res = executeHOSTNAME();
-                break;
+        case CommandType::HOSTNAME:
+            res = executeHOSTNAME();
+            break;
 
-            case CommandType::DATETIME:
-                res = executeDATETIME();
-                break;
+        case CommandType::DATETIME:
+            res = executeDATETIME();
+            break;
 
-            default:
-                console::setColor(ConsoleColor::Red);
-                std::wcerr << L"Unsupported environment command" << std::endl;
-                console::reset();
-                return;
+        default:
+            console::setColor(ConsoleColor::Red);
+            std::wcerr << L"Unsupported environment command" << std::endl;
+            console::reset();
+            return;
         }
 
         if (!res.ok())
@@ -75,8 +76,6 @@ namespace Environment {
 
         console::write(res.value);
     }
-
-
 
     // CD COMMAND
     BoolResult EnvironmentCommands::executeCD(const std::wstring &path)
@@ -136,9 +135,9 @@ namespace Environment {
 
         wchar_t buffer[64];
         swprintf(buffer, sizeof(buffer) / sizeof(wchar_t),
-                L"%04d-%02d-%02d %02d:%02d:%02d",
-                st.wYear, st.wMonth, st.wDay,
-                st.wHour, st.wMinute, st.wSecond);
+                 L"%04d-%02d-%02d %02d:%02d:%02d",
+                 st.wYear, st.wMonth, st.wDay,
+                 st.wHour, st.wMinute, st.wSecond);
 
         return {buffer, {}};
     }

@@ -37,9 +37,9 @@ limitations under the License.
 #include "../shell/ShellCommands.hpp"
 #include "SystemCommands.hpp"
 
+namespace System
+{
 
-namespace System {
-    
     void SystemCommands::execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args)
     {
         // Helper lambda to print boolean command results
@@ -61,21 +61,21 @@ namespace System {
 
         switch (cmd)
         {
-            case CommandType::SYSTEMINFO:
-                // Display system information
-                executeSYSTEMINFO();
-                break;
+        case CommandType::SYSTEMINFO:
+            // Display system information
+            executeSYSTEMINFO();
+            break;
 
-            case CommandType::SYSTEMSTATS:
-                // Display real-time system statistics
-                executeSYSTEMSTATS();
-                break;
+        case CommandType::SYSTEMSTATS:
+            // Display real-time system statistics
+            executeSYSTEMSTATS();
+            break;
 
-            default:
-                console::setColor(ConsoleColor::Red);
-                std::wcerr << L"SystemCommands: Unsupported command" << std::endl;
-                console::reset();
-                break;
+        default:
+            console::setColor(ConsoleColor::Red);
+            std::wcerr << L"SystemCommands: Unsupported command" << std::endl;
+            console::reset();
+            break;
         }
     }
 
@@ -93,10 +93,10 @@ namespace System {
             double gb = mb / 1024.0;
             double tb = gb / 1024.0;
             std::wcout << L"Bytes: " << bytes
-                    << L", KB: " << kb
-                    << L", MB: " << mb
-                    << L", GB: " << gb
-                    << L", TB: " << tb << std::endl;
+                       << L", KB: " << kb
+                       << L", MB: " << mb
+                       << L", GB: " << gb
+                       << L", TB: " << tb << std::endl;
         };
 
         std::wcout << L"----- System Information -----" << std::endl;
@@ -192,8 +192,8 @@ namespace System {
             PdhEnumObjectsW(nullptr, nullptr, nullptr, 0, PERF_DETAIL_WIZARD, TRUE);
 
             PdhAddEnglishCounterW(query,
-                                L"\\Network Interface(*)\\Bytes Total/sec",
-                                0, &counters.emplace_back());
+                                  L"\\Network Interface(*)\\Bytes Total/sec",
+                                  0, &counters.emplace_back());
 
             PdhCollectQueryData(query);
             init = true;

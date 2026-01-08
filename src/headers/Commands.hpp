@@ -20,47 +20,69 @@ limitations under the License.
 
 #pragma once
 
-// --------- DEFINE COMMAND CONSTANTS ---------------
+// --------- DEFINE COMMAND CONSTANTS ----------------
 // Command Types                         Hex Values  |
-// --------------------------------------------------
-#define COMMAND_RESERVED                    0X00
-#define COMMAND_LS                          0X01
-#define COMMAND_PWD                         0X02
-#define COMMAND_EXIT                        0X03
-#define COMMAND_CD                          0X04
-#define COMMAND_WHOAMI                      0X05
-#define COMMAND_DATETIME                    0X06
-#define COMMAND_HOSTNAME                    0X07
-#define COMMAND_PS                          0X08
-#define COMMAND_TOUCH                       0X09
-#define COMMAND_RM                          0X0A
-#define COMMAND_MKDIR                       0X0B
-#define COMMAND_RMDIR                       0X0C
-#define COMMAND_CLEAR                       0X0D
-#define COMMAND_MV                          0X0E
-#define COMMAND_CP                          0X0F 
-#define COMMAND_SYSTEMINFO                  0X10
-#define COMMAND_SYSTEMSTATS                 0X11
-#define COMMAND_REW                         0X12
-#define COMMAND_ECHO                        0X13
-#define COMMAND_STATS                       0X14
-#define COMMAND_HEAD                        0X15
-#define COMMAND_TAIL                        0X16
-#define COMMAND_KILL                        0X17
+// ---------------------------------------------------
+#define COMMAND_RESERVED                    0x00
+#define COMMAND_LS                          0x01
+#define COMMAND_PWD                         0x02
+#define COMMAND_EXIT                        0x03
+#define COMMAND_CD                          0x04
+#define COMMAND_WHOAMI                      0x05
+#define COMMAND_DATETIME                    0x06
+#define COMMAND_HOSTNAME                    0x07
+#define COMMAND_PS                          0x08
+#define COMMAND_TOUCH                       0x09
+#define COMMAND_RM                          0x0A
+#define COMMAND_MKDIR                       0x0B
+#define COMMAND_RMDIR                       0x0C
+#define COMMAND_CLEAR                       0x0D
+#define COMMAND_MV                          0x0E
+#define COMMAND_CP                          0x0F
+#define COMMAND_SYSTEMINFO                  0x10
+#define COMMAND_SYSTEMSTATS                 0x11
+#define COMMAND_REW                         0x12
+#define COMMAND_ECHO                        0x13
+#define COMMAND_STATS                       0x14
+#define COMMAND_HEAD                        0x15
+#define COMMAND_TAIL                        0x16
+#define COMMAND_KILL                        0x17
+
 // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-// ________________________________________________________________
 
-// --------- DEFINE FLAG CONSTANTS ---------------
+
+// ------------- DEFINE FLAG CONSTANTS ---------------
 // Flag Types                            Hex Values  |
-// --------------------------------------------------
-#define FLAG_RECURSIVE                     0X01 // -r
-#define FLAG_VERBOSE                       0X02 // -v
-#define FLAG_FORCE                         0X04 // -f
-#define FLAG_ALL                           0X08 // -a
-#define FLAG_HELP                          0X10 // --help
-#define FLAG_COUNT                         0X20 // -n (used for line counts)
+// ---------------------------------------------------
+#define FLAG_RECURSIVE                      0x01   // -r                           00000001
+#define FLAG_VERBOSE                        0x02   // -v                           00000010
+#define FLAG_FORCE                          0x04   // -f                           00000100
+#define FLAG_ALL                            0x08   // -a                           00001000
+#define FLAG_HELP                           0x10   // --help                       00010000
+#define FLAG_COUNT                          0x20   // -n (used for line counts)    00100000
+
 // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+
+
+// ------------------ DEFINE SYMBOLS  ----------------
+// Symbol Types                           Hex Values |
+// ---------------------------------------------------
+#define SYMBOL_OUTPUT_REDIRECTION_ONE        0x01 // >
+#define SYMBOL_OUTPUT_REDIRECTION_TWO        0x02 // >>
+#define SYMBOL_INPUT_REDIRECTION             0x03 // <
+
+#define SYMBOL_ERROR_REDIRECTION_ONE         0x04 // 2>
+#define SYMBOL_ERROR_REDIRECTION_TWO         0x05 // 2>>
+
+#define SYMBOL_OUTPUT_ERROR_REDIRECTION_ONE  0x06 // &>
+#define SYMBOL_OUTPUT_ERROR_REDIRECTION_TWO  0x07 // &>>
+
+#define SYMBOL_PIPELINE                      0x08 // |
+
+// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
 
 // INCLUDE LIBRARIES
 
@@ -70,51 +92,69 @@ limitations under the License.
 
 #include "Shell.hpp"
 
-class Commands {
-    public:
-        static bool isBuiltInCommand(const std::wstring& command);    
+class Commands
+{
+public:
+    static bool isBuiltInCommand(const std::wstring &command);
 };
 
 // DEFINE COMMAND TYPES
-enum class CommandType : uint8_t {
-    RESERVED =          COMMAND_RESERVED,
-    LS  =               COMMAND_LS,
-    PWD =               COMMAND_PWD,
-    EXIT =              COMMAND_EXIT,
-    CD =                COMMAND_CD,
-    WHOAMI =            COMMAND_WHOAMI,
-    DATETIME =          COMMAND_DATETIME,
-    HOSTNAME =          COMMAND_HOSTNAME,
-    TOUCH =             COMMAND_TOUCH,
-    RM =                COMMAND_RM,
-    MKDIR =             COMMAND_MKDIR,
-    RMDIR =             COMMAND_RMDIR,
-    CLEAR =             COMMAND_CLEAR,
-    MV =                COMMAND_MV,
-    CP =                COMMAND_CP,
-    SYSTEMINFO =        COMMAND_SYSTEMINFO,
-    SYSTEMSTATS =       COMMAND_SYSTEMSTATS,
-    REW =               COMMAND_REW,
-    ECHO =              COMMAND_ECHO,
-    STATS =             COMMAND_STATS,
-    HEAD =              COMMAND_HEAD,
-    TAIL =              COMMAND_TAIL,
-    PS =                COMMAND_PS,
-    KILL =              COMMAND_KILL
+enum class CommandType : uint8_t
+{
+    RESERVED =       COMMAND_RESERVED,
+    LS =             COMMAND_LS,
+    PWD =            COMMAND_PWD,
+    EXIT =           COMMAND_EXIT,
+    CD =             COMMAND_CD,
+    WHOAMI =         COMMAND_WHOAMI,
+    DATETIME =       COMMAND_DATETIME,
+    HOSTNAME =       COMMAND_HOSTNAME,
+    TOUCH =          COMMAND_TOUCH,
+    RM =             COMMAND_RM,
+    MKDIR =          COMMAND_MKDIR,
+    RMDIR =          COMMAND_RMDIR,
+    CLEAR =          COMMAND_CLEAR,
+    MV =             COMMAND_MV,
+    CP =             COMMAND_CP,
+    SYSTEMINFO =     COMMAND_SYSTEMINFO,
+    SYSTEMSTATS =    COMMAND_SYSTEMSTATS,
+    REW =            COMMAND_REW,
+    ECHO =           COMMAND_ECHO,
+    STATS =          COMMAND_STATS,
+    HEAD =           COMMAND_HEAD,
+    TAIL =           COMMAND_TAIL,
+    PS =             COMMAND_PS,
+    KILL =           COMMAND_KILL
 };
 
 // DEFINE FLAGS
-enum class Flag : uint8_t {
-    RECURSIVE   = FLAG_RECURSIVE, // -r 
-    VERBOSE     = FLAG_VERBOSE, // -v 
-    FORCE       = FLAG_FORCE, // -f 
-    ALL         = FLAG_ALL, // -a 
-    HELP        = FLAG_HELP, // --help
-    COUNT       = FLAG_COUNT  // -n (used for line counts)
+enum class Flag : uint8_t
+{
+    RECURSIVE =     FLAG_RECURSIVE, // -r
+    VERBOSE =       FLAG_VERBOSE,     // -v
+    FORCE =         FLAG_FORCE,         // -f
+    ALL =           FLAG_ALL,             // -a
+    HELP =          FLAG_HELP,           // --help
+    COUNT =         FLAG_COUNT          // -n (used for line counts)
 };
 
+// DEFINE SYMBOLS
+
+enum class Symbol : uint8_t
+{
+    OUTPUT_REDIRECTION_ONE =            SYMBOL_OUTPUT_REDIRECTION_ONE,
+    OUTPUT_REDIRECTION_TWO =            SYMBOL_OUTPUT_REDIRECTION_TWO,
+    INPUT_REDIRECTION =                 SYMBOL_INPUT_REDIRECTION,
+    ERROR_REDIRECTION_ONE =             SYMBOL_ERROR_REDIRECTION_ONE,
+    ERROR_REDIRECTION_TWO =             SYMBOL_ERROR_REDIRECTION_TWO,
+    OUTPUT_ERROR_REDIRECTION_ONE =      SYMBOL_OUTPUT_ERROR_REDIRECTION_ONE,
+    OUTPUT_ERROR_REDIRECTION_TWO =      SYMBOL_OUTPUT_ERROR_REDIRECTION_TWO,
+    PIPELINE =                          SYMBOL_PIPELINE
+
+};
 // COMMAND GROUP FOR ENGINE
-enum class CommandGroup : uint8_t {
+enum class CommandGroup : uint8_t
+{
     FILE_IO,
     PROCESS,
     ENVIRONMENT,
@@ -160,51 +200,62 @@ static inline const std::unordered_map<std::wstring, Flag> flagMap = {
     {L"-n", Flag::COUNT}
 };
 
+// MAP SYMBOL STRINGS TO SYMBOL TYPES
+static inline const std::unordered_map<std::wstring, Symbol> symbolMap = {
+    {L">", Symbol::OUTPUT_REDIRECTION_ONE},
+    {L">>", Symbol::OUTPUT_REDIRECTION_TWO},
+    {L"<", Symbol::INPUT_REDIRECTION},
+    {L"2>", Symbol::ERROR_REDIRECTION_ONE},
+    {L"2>>", Symbol::ERROR_REDIRECTION_TWO},
+    {L"&>", Symbol::OUTPUT_ERROR_REDIRECTION_ONE},
+    {L"&>>", Symbol::OUTPUT_ERROR_REDIRECTION_TWO},
+    {L"|", Symbol::PIPELINE}
+};
+
 // Get command group from command given.
 inline CommandGroup getCommandGroup(CommandType cmd)
 {
     switch (cmd)
     {
-        // -------- FILE COMMANDS --------
-        case CommandType::LS:
-        case CommandType::STATS:
-        case CommandType::HEAD:
-        case CommandType::TAIL:
-        case CommandType::TOUCH:
-        case CommandType::RM:
-        case CommandType::CP:
-        case CommandType::MV:
-        case CommandType::MKDIR:
-        case CommandType::RMDIR:
-        case CommandType::REW:
-            return CommandGroup::FILE_IO;
+    // -------- FILE COMMANDS --------
+    case CommandType::LS:
+    case CommandType::STATS:
+    case CommandType::HEAD:
+    case CommandType::TAIL:
+    case CommandType::TOUCH:
+    case CommandType::RM:
+    case CommandType::CP:
+    case CommandType::MV:
+    case CommandType::MKDIR:
+    case CommandType::RMDIR:
+    case CommandType::REW:
+        return CommandGroup::FILE_IO;
 
-        // -------- PROCESS COMMANDS --------
-        case CommandType::PS:
-        case CommandType::KILL:
-            return CommandGroup::PROCESS;
+    // -------- PROCESS COMMANDS --------
+    case CommandType::PS:
+    case CommandType::KILL:
+        return CommandGroup::PROCESS;
 
-        // -------- ENVIRONMENT COMMANDS --------
-        case CommandType::CD:
-        case CommandType::PWD:
-        case CommandType::WHOAMI:
-        case CommandType::DATETIME:
-        case CommandType::HOSTNAME:
-            return CommandGroup::ENVIRONMENT;
+    // -------- ENVIRONMENT COMMANDS --------
+    case CommandType::CD:
+    case CommandType::PWD:
+    case CommandType::WHOAMI:
+    case CommandType::DATETIME:
+    case CommandType::HOSTNAME:
+        return CommandGroup::ENVIRONMENT;
 
-        // -------- SHELL COMMANDS --------
-        case CommandType::EXIT:
-        case CommandType::CLEAR:
-        case CommandType::ECHO:
-            return CommandGroup::SHELL;
+    // -------- SHELL COMMANDS --------
+    case CommandType::EXIT:
+    case CommandType::CLEAR:
+    case CommandType::ECHO:
+        return CommandGroup::SHELL;
 
-        // -------- SYSTEM COMMANDS --------
-        case CommandType::SYSTEMINFO:
-        case CommandType::SYSTEMSTATS:
-            return CommandGroup::SYSTEM;
+    // -------- SYSTEM COMMANDS --------
+    case CommandType::SYSTEMINFO:
+    case CommandType::SYSTEMSTATS:
+        return CommandGroup::SYSTEM;
 
-        default:
-            return CommandGroup::UNKNOWN;
+    default:
+        return CommandGroup::UNKNOWN;
     }
 }
-

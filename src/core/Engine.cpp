@@ -33,39 +33,37 @@ limitations under the License.
 #include "../process/ProcessCommands.hpp"
 #include "../system/SystemCommands.hpp"
 
-
 // ------------------- COMMAND DISPATCHER -------------------
-void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::wstring>& args)
+void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args)
 {
     auto group = getCommandGroup(command); // Classifies the command given.
 
     switch (group)
     {
-        case CommandGroup::FILE_IO:
-            FileIO::FileCommands::execute(command, flags, args);
-            break;
+    case CommandGroup::FILE_IO:
+        FileIO::FileCommands::execute(command, flags, args);
+        break;
 
-        case CommandGroup::PROCESS:
-            Process::ProcessCommands::execute(command, flags, args);
-            break;
-        
-        case CommandGroup::ENVIRONMENT:
-            Environment::EnvironmentCommands::execute(command, flags, args);
-            break;
+    case CommandGroup::PROCESS:
+        Process::ProcessCommands::execute(command, flags, args);
+        break;
 
-        case CommandGroup::SHELL:
-            ShellCmds::ShellCommands::execute(command, flags, args);
-            break;
+    case CommandGroup::ENVIRONMENT:
+        Environment::EnvironmentCommands::execute(command, flags, args);
+        break;
 
-        case CommandGroup::SYSTEM:
-            System::SystemCommands::execute(command, flags, args);
-            break;
+    case CommandGroup::SHELL:
+        ShellCmds::ShellCommands::execute(command, flags, args);
+        break;
 
-        default:
-            console::setColor(ConsoleColor::Red);
-            std::wcerr << L"Unknown or unsupported command" << std::endl;
-            console::reset();
-            break;
+    case CommandGroup::SYSTEM:
+        System::SystemCommands::execute(command, flags, args);
+        break;
+
+    default:
+        console::setColor(ConsoleColor::Red);
+        std::wcerr << L"Unknown or unsupported command" << std::endl;
+        console::reset();
+        break;
     }
 }
-

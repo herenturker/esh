@@ -25,7 +25,7 @@ limitations under the License.
 
 namespace Platform
 {
-    // AppData initializer for shell program. 
+    // AppData initializer for shell program.
     void init();
 
     // AppData\Roaming\esh

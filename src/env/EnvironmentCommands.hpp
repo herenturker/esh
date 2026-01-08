@@ -28,24 +28,21 @@ limitations under the License.
 #include "../headers/Result.hpp"
 #include "../headers/Commands.hpp"
 
-namespace Environment {
+namespace Environment
+{
 
     class EnvironmentCommands
     {
-        public:
-            static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring>& args);
+    public:
+        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
 
-            // COMMAND IMPLEMENTATION           Function prototypes
-            static Result<std::wstring>         executePWD();
-            static Result<std::wstring>         executeWHOAMI();
-            static Result<std::wstring>         executeHOSTNAME();
-            static Result<std::wstring>         executeDATETIME();
+        // COMMAND IMPLEMENTATION           Function prototypes
+        static Result<std::wstring> executePWD();
+        static Result<std::wstring> executeWHOAMI();
+        static Result<std::wstring> executeHOSTNAME();
+        static Result<std::wstring> executeDATETIME();
 
-        private:
-            static BoolResult                   executeENV(); // will add
-            static BoolResult                   executeSET(const std::wstring &var, const std::wstring &value); // will add
-            static BoolResult                   executeCD(const std::wstring &path);
-
-
+    private:
+        static BoolResult executeCD(const std::wstring &path);
     };
 }

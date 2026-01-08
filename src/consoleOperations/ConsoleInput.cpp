@@ -24,10 +24,10 @@ limitations under the License.
 
 namespace Console
 {
-    Input::Input(History::Manager& history)
+    Input::Input(History::Manager &history)
         : m_history(history)
     {
-        m_stdin  = GetStdHandle(STD_INPUT_HANDLE);
+        m_stdin = GetStdHandle(STD_INPUT_HANDLE);
         m_stdout = GetStdHandle(STD_OUTPUT_HANDLE);
     }
 
@@ -54,7 +54,7 @@ namespace Console
             if (record.EventType != KEY_EVENT)
                 continue;
 
-            const auto& key = record.Event.KeyEvent;
+            const auto &key = record.Event.KeyEvent;
             if (!key.bKeyDown)
                 continue;
 
@@ -69,37 +69,37 @@ namespace Console
         return m_buffer;
     }
 
-    void Input::handleKeyEvent(const KEY_EVENT_RECORD& key)
+    void Input::handleKeyEvent(const KEY_EVENT_RECORD &key)
     {
         switch (key.wVirtualKeyCode)
         {
-            case VK_BACK:
-                backspace();
-                break;
+        case VK_BACK:
+            backspace();
+            break;
 
-            case VK_UP:
-                historyUp();
-                break;
+        case VK_UP:
+            historyUp();
+            break;
 
-            case VK_DOWN:
-                historyDown();
-                break;
+        case VK_DOWN:
+            historyDown();
+            break;
 
-            case VK_RETURN:
-                break;
+        case VK_RETURN:
+            break;
 
-            case VK_LEFT:
-                arrowLeft();
-                break;
+        case VK_LEFT:
+            arrowLeft();
+            break;
 
-            case VK_RIGHT:
-                arrowRight();
-                break;
+        case VK_RIGHT:
+            arrowRight();
+            break;
 
-            default:
-                if (key.uChar.UnicodeChar)
-                    insertChar(key.uChar.UnicodeChar);
-                break;
+        default:
+            if (key.uChar.UnicodeChar)
+                insertChar(key.uChar.UnicodeChar);
+            break;
         }
     }
 
@@ -122,13 +122,15 @@ namespace Console
 
     void Input::arrowRight()
     {
-        if (m_cursor < m_buffer.size()) ++m_cursor;
+        if (m_cursor < m_buffer.size())
+            ++m_cursor;
         redrawLine();
     }
 
     void Input::arrowLeft()
     {
-        if (m_cursor > 0) --m_cursor;
+        if (m_cursor > 0)
+            --m_cursor;
         redrawLine();
     }
 
@@ -177,8 +179,7 @@ namespace Console
             clear.c_str(),
             static_cast<DWORD>(clear.size()),
             &written,
-            nullptr
-        );
+            nullptr);
 
         SetConsoleCursorPosition(m_stdout, start);
         WriteConsoleW(
@@ -186,8 +187,7 @@ namespace Console
             m_buffer.c_str(),
             static_cast<DWORD>(m_buffer.size()),
             &written,
-            nullptr
-        );
+            nullptr);
 
         start.X = m_promptStartX + static_cast<SHORT>(m_cursor);
         SetConsoleCursorPosition(m_stdout, start);

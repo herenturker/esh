@@ -25,9 +25,10 @@ limitations under the License.
 
 #include "../headers/Unicode.hpp"
 
-namespace unicode {
+namespace unicode
+{
 
-    std::wstring utf8_to_utf16(const std::string& utf8)
+    std::wstring utf8_to_utf16(const std::string &utf8)
     {
         if (utf8.empty())
             return L"";
@@ -38,8 +39,7 @@ namespace unicode {
             utf8.c_str(),
             -1,
             nullptr,
-            0
-        );
+            0);
 
         if (wideLen == 0)
             return L"";
@@ -52,13 +52,12 @@ namespace unicode {
             utf8.c_str(),
             -1,
             utf16.data(),
-            wideLen
-        );
+            wideLen);
 
         return utf16;
     }
 
-    std::string utf16_to_utf8(const std::wstring& utf16)
+    std::string utf16_to_utf8(const std::wstring &utf16)
     {
         if (utf16.empty())
             return "";
@@ -71,8 +70,7 @@ namespace unicode {
             nullptr,
             0,
             nullptr,
-            nullptr
-        );
+            nullptr);
 
         if (utf8Len == 0)
             return "";
@@ -87,8 +85,7 @@ namespace unicode {
             utf8.data(),
             utf8Len,
             nullptr,
-            nullptr
-        );
+            nullptr);
 
         return utf8;
     }

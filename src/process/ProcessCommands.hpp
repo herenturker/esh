@@ -30,18 +30,17 @@ limitations under the License.
 #include "../headers/Result.hpp"
 #include "../headers/Commands.hpp"
 
-namespace Process {
+namespace Process
+{
 
     class ProcessCommands
     {
-        public:
-            static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring>& args);
+    public:
+        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
 
-        private:
-            // COMMAND IMPLEMENTATION           Function prototypes
-            static BoolResult                   executePS();
-            static BoolResult                   executeKILL(DWORD pid);
+    private:
+        // COMMAND IMPLEMENTATION           Function prototypes
+        static BoolResult executePS();
+        static BoolResult executeKILL(DWORD pid);
     };
 }
-
-

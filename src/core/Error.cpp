@@ -22,7 +22,7 @@ limitations under the License.
 #include "../headers/Error.hpp"
 #include "../headers/Unicode.hpp"
 
-Error makeLastError(const std::wstring& prefix)
+Error makeLastError(const std::wstring &prefix)
 {
     DWORD code = GetLastError();
     if (code == 0)
@@ -32,15 +32,14 @@ Error makeLastError(const std::wstring& prefix)
 
     FormatMessageW(
         FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
         nullptr,
         code,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPWSTR)&buffer,
         0,
-        nullptr
-    );
+        nullptr);
 
     std::wstring message;
 
@@ -53,5 +52,5 @@ Error makeLastError(const std::wstring& prefix)
     if (!prefix.empty())
         message = prefix + L": " + message;
 
-    return { code, message };
+    return {code, message};
 }

@@ -27,7 +27,5 @@ limitations under the License.
 namespace HistoryStorage
 {
     std::vector<std::wstring> load();
-    void save(const std::vector<std::wstring>& entries);
+    void save(const std::vector<std::wstring> &entries);
 }
-
-

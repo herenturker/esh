@@ -28,17 +28,18 @@ limitations under the License.
 #include "../headers/Result.hpp"
 #include "../headers/Commands.hpp"
 
-namespace ShellCmds {
+namespace ShellCmds
+{
 
     class ShellCommands
     {
-        public:
-            static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring>& args);
+    public:
+        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
 
-        private:
-            // COMMAND IMPLEMENTATION           Function prototypes
-            static void                         executeEXIT();
-            static void                         executeCLEAR();
-            static BoolResult                   executeECHO(const std::vector<std::wstring>& args);
+    private:
+        // COMMAND IMPLEMENTATION           Function prototypes
+        static void executeEXIT();
+        static void executeCLEAR();
+        static BoolResult executeECHO(const std::vector<std::wstring> &args);
     };
 }

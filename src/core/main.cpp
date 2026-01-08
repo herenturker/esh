@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 // FILE: src\core\main.cpp
-// PURPOSE: Everything needed to run esh.exe is here. 
+// PURPOSE: Everything needed to run esh.exe is here.
 // 'main.cpp' gets an input from user and gives the input to lexer.
 
 // INCLUDE LIBRARIES
@@ -64,7 +64,7 @@ int wmain()
     try
     {
         std::string json = Shell::load_resource_json(101); // load esh.json. ID 101 is defined in resources.rc
-        (void)json; // explicitly unused for now
+        (void)json;                                        // explicitly unused for now
     }
     catch (const std::exception &e)
     {
@@ -80,9 +80,9 @@ int wmain()
 
     while (true)
     {
-        auto who  = Environment::EnvironmentCommands::executeWHOAMI();
+        auto who = Environment::EnvironmentCommands::executeWHOAMI();
         auto host = Environment::EnvironmentCommands::executeHOSTNAME();
-        auto pwd  = Environment::EnvironmentCommands::executePWD();
+        auto pwd = Environment::EnvironmentCommands::executePWD();
 
         console::setColor(ConsoleColor::Blue);
         console::write(who.value);

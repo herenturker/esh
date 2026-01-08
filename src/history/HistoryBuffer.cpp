@@ -24,7 +24,7 @@ limitations under the License.
 namespace History
 {
 
-    void Buffer::push(const std::wstring& command)
+    void Buffer::push(const std::wstring &command)
     {
         m_entries.push_back(command);
         m_cursor = m_entries.size(); // always reset to end
@@ -56,7 +56,7 @@ namespace History
         m_cursor = m_entries.size();
     }
 
-    const std::vector<std::wstring>& Buffer::entries() const
+    const std::vector<std::wstring> &Buffer::entries() const
     {
         return m_entries;
     }

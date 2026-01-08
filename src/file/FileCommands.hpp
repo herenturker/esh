@@ -28,34 +28,34 @@ limitations under the License.
 #include "../headers/Result.hpp"
 #include "../headers/Commands.hpp"
 
-namespace FileIO {
+namespace FileIO
+{
 
     class FileCommands
     {
-        public:
-            static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring>& args);
+    public:
+        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
 
-        private:
-            // COMMAND IMPLEMENTATION           Function prototypes
-            static void                         executeLS(const std::wstring &pathStr, uint8_t flags, const std::wstring& prefix = L"");
-            static void                         executeREW(const std::wstring &filename);
-            
-            static bool                         isDirectory(const std::wstring& path);
-            static bool                         copyFile(const std::wstring& src, const std::wstring& dst);
-            static bool                         copyDirectory(const std::wstring& src, const std::wstring& dst);
-            static void                         printLsEntry(const WIN32_FIND_DATAW &f, const std::wstring &prefix, uint8_t flags);
+    private:
+        // COMMAND IMPLEMENTATION           Function prototypes
+        static void executeLS(const std::wstring &pathStr, uint8_t flags, const std::wstring &prefix = L"");
+        static void executeREW(const std::wstring &filename);
 
-            static Result<std::wstring>         executeSTATS(const std::wstring &filename);
-            static Result<std::wstring>         executeHEAD(const std::wstring &filename, size_t lineCount);
-            static Result<std::wstring>         executeTAIL(const std::wstring &filename, size_t lineCount);
+        static bool isDirectory(const std::wstring &path);
+        static bool copyFile(const std::wstring &src, const std::wstring &dst);
+        static bool copyDirectory(const std::wstring &src, const std::wstring &dst);
+        static void printLsEntry(const WIN32_FIND_DATAW &f, const std::wstring &prefix, uint8_t flags);
 
-            static BoolResult                   executeTOUCH(const std::wstring &filename);
-            static BoolResult                   executeRM(const std::wstring &path);
-            static BoolResult                   executeMKDIR(const std::wstring &dirname);
-            static BoolResult                   executeRMDIR(const std::wstring &dirname);
-            static BoolResult                   executeMV(const std::wstring& src, const std::wstring& dst);
-            static BoolResult                   executeCP(const std::wstring& src, const std::wstring& dst);
-            static BoolResult                   executeATTRIB(const std::wstring &path, const std::wstring &attributes);
+        static Result<std::wstring> executeSTATS(const std::wstring &filename);
+        static Result<std::wstring> executeHEAD(const std::wstring &filename, size_t lineCount);
+        static Result<std::wstring> executeTAIL(const std::wstring &filename, size_t lineCount);
 
+        static BoolResult executeTOUCH(const std::wstring &filename);
+        static BoolResult executeRM(const std::wstring &path);
+        static BoolResult executeMKDIR(const std::wstring &dirname);
+        static BoolResult executeRMDIR(const std::wstring &dirname);
+        static BoolResult executeMV(const std::wstring &src, const std::wstring &dst);
+        static BoolResult executeCP(const std::wstring &src, const std::wstring &dst);
+        static BoolResult executeATTRIB(const std::wstring &path, const std::wstring &attributes);
     };
 }

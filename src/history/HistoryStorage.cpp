@@ -26,7 +26,7 @@ limitations under the License.
 
 namespace HistoryStorage
 {
-    
+
     std::vector<std::wstring> load()
     {
         std::vector<std::wstring> result;
@@ -40,8 +40,7 @@ namespace HistoryStorage
             nullptr,
             OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL,
-            nullptr
-        );
+            nullptr);
 
         if (hFile == INVALID_HANDLE_VALUE)
             return result;
@@ -70,7 +69,7 @@ namespace HistoryStorage
         return result;
     }
 
-    void save(const std::vector<std::wstring>& entries)
+    void save(const std::vector<std::wstring> &entries)
     {
         std::wstring path = (Platform::getBasePath() / L"history.txt").wstring();
 
@@ -81,13 +80,12 @@ namespace HistoryStorage
             nullptr,
             CREATE_ALWAYS,
             FILE_ATTRIBUTE_NORMAL,
-            nullptr
-        );
+            nullptr);
 
         if (hFile == INVALID_HANDLE_VALUE)
             return;
 
-        for (const auto& e : entries)
+        for (const auto &e : entries)
         {
             DWORD written;
             std::wstring line = e + L"\n";
@@ -96,11 +94,10 @@ namespace HistoryStorage
                 line.c_str(),
                 static_cast<DWORD>(line.size() * sizeof(wchar_t)),
                 &written,
-                nullptr
-            );
+                nullptr);
         }
 
-        FlushFileBuffers(hFile); 
+        FlushFileBuffers(hFile);
         CloseHandle(hFile);
     }
 }

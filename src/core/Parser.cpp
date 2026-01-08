@@ -32,7 +32,7 @@ void Parser::parseTokens(const std::vector<Lexer::Token> &tokens)
     uint8_t flagAccumulator = 0;
     std::vector<std::wstring> args;
 
-    for (const auto& t : tokens)
+    for (const auto &t : tokens)
     {
         if (t.type == Lexer::TOKEN_COMMAND)
             command = static_cast<uint8_t>(Parser::parseCommand(t.lexeme));
@@ -52,8 +52,7 @@ void Parser::parseTokens(const std::vector<Lexer::Token> &tokens)
         Engine::execute(
             static_cast<CommandType>(command),
             flagAccumulator,
-            args
-        );
+            args);
     }
 }
 

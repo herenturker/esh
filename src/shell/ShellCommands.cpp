@@ -33,8 +33,9 @@ limitations under the License.
 #include "../history/HistoryManager.hpp"
 #include "ShellCommands.hpp"
 
-namespace ShellCmds { // DO NOT CHANGE the name to 'Shell'. It creates errors (because I tried before).
-    
+namespace ShellCmds
+{ // DO NOT CHANGE the name to 'Shell'. It creates errors (because I tried before).
+
     void ShellCommands::execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args)
     {
         // Helper lambda to print boolean command results
@@ -56,26 +57,26 @@ namespace ShellCmds { // DO NOT CHANGE the name to 'Shell'. It creates errors (b
 
         switch (cmd)
         {
-            case CommandType::EXIT:
-                // Exit shell immediately
-                executeEXIT();
-                break;
+        case CommandType::EXIT:
+            // Exit shell immediately
+            executeEXIT();
+            break;
 
-            case CommandType::CLEAR:
-                // Clear the esh console screen
-                executeCLEAR();
-                break;
+        case CommandType::CLEAR:
+            // Clear the esh console screen
+            executeCLEAR();
+            break;
 
-            case CommandType::ECHO:
-                // Echo the args
-                executeECHO(args);
-                break;
+        case CommandType::ECHO:
+            // Echo the args
+            executeECHO(args);
+            break;
 
-            default:
-                console::setColor(ConsoleColor::Red);
-                std::wcerr << L"ShellCommands: Unsupported command" << std::endl;
-                console::reset();
-                break;
+        default:
+            console::setColor(ConsoleColor::Red);
+            std::wcerr << L"ShellCommands: Unsupported command" << std::endl;
+            console::reset();
+            break;
         }
     }
 

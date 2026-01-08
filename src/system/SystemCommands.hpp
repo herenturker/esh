@@ -28,22 +28,22 @@ limitations under the License.
 #include "../headers/Result.hpp"
 #include "../headers/Commands.hpp"
 
-namespace System {
+namespace System
+{
 
     class SystemCommands
     {
-        public:
-            static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring>& args);
+    public:
+        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
 
-        private:
-            // COMMAND IMPLEMENTATION           Function prototypes
-            static void                         executeSYSTEMINFO();
-            static void                         executeSYSTEMSTATS();
+    private:
+        // COMMAND IMPLEMENTATION           Function prototypes
+        static void executeSYSTEMINFO();
+        static void executeSYSTEMSTATS();
 
-            static double                       getCPUUsage();
-            static double                       getRAMUsage();
-            static double                       getDiskUsage(const std::wstring& drive);
-            static double                       getNetworkUsage();
-
+        static double getCPUUsage();
+        static double getRAMUsage();
+        static double getDiskUsage(const std::wstring &drive);
+        static double getNetworkUsage();
     };
 }

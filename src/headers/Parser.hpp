@@ -27,12 +27,12 @@ limitations under the License.
 #include "Lexer.hpp"
 #include "Commands.hpp"
 
-class Parser {
-    public:
-        static void parseTokens(const std::vector<Lexer::Token>& tokens);
+class Parser
+{
+public:
+    static void parseTokens(const std::vector<Lexer::Token> &tokens);
 
-        static CommandType parseCommand(const std::wstring& token);
+    static CommandType parseCommand(const std::wstring &token);
 
-        static uint8_t parseFlags(const std::vector<std::wstring>& tokens);
-
+    static uint8_t parseFlags(const std::vector<std::wstring> &tokens);
 };

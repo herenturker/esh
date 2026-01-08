@@ -31,7 +31,7 @@ namespace History
     {
         public:
             // Add command to history
-            void push(const std::wstring& command);
+            void push(const std::wstring &command);
 
             // Fetch previous command. (up arrow)
             std::optional<std::wstring> previous();
@@ -42,7 +42,7 @@ namespace History
             // Reset history position
             void resetNavigation();
 
-            const std::vector<std::wstring>& entries() const;
+            const std::vector<std::wstring> &entries() const;
 
         private:
             std::vector<std::wstring> m_entries;
@@ -50,6 +50,5 @@ namespace History
             // navigation cursor
             // size() == "the newest + 1" location
             size_t m_cursor = 0;
-
     };
 }

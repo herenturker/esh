@@ -23,10 +23,9 @@ limitations under the License.
 
 #include <string>
 
-class Shell {
-    public:
-        static void handleRawInput(std::wstring& raw_input);
-        static std::string load_resource_json(int resource_id);
+class Shell
+{
+public:
+    static void handleRawInput(std::wstring &raw_input);
+    static std::string load_resource_json(int resource_id);
 };
-
-

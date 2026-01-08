@@ -35,8 +35,9 @@ limitations under the License.
 #include "../headers/Console.hpp"
 #include "ProcessCommands.hpp"
 
-namespace Process {
-        
+namespace Process
+{
+
     void ProcessCommands::execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args)
     {
         // Helper lambda to print boolean command results
@@ -58,26 +59,26 @@ namespace Process {
 
         switch (cmd)
         {
-            case CommandType::PS:
-                executePS();
-                break;
+        case CommandType::PS:
+            executePS();
+            break;
 
-            case CommandType::KILL:
-                if (args.empty())
-                {
-                    console::setColor(ConsoleColor::Red);
-                    std::wcerr << L"Usage: kill <pid>" << std::endl;
-                    console::reset();
-                    break;
-                }
-                executeKILL(std::stoul(args[0]));
-                break;
-
-            default:
+        case CommandType::KILL:
+            if (args.empty())
+            {
                 console::setColor(ConsoleColor::Red);
-                std::wcerr << L"ShellCommands: Unsupported command" << std::endl;
+                std::wcerr << L"Usage: kill <pid>" << std::endl;
                 console::reset();
                 break;
+            }
+            executeKILL(std::stoul(args[0]));
+            break;
+
+        default:
+            console::setColor(ConsoleColor::Red);
+            std::wcerr << L"ShellCommands: Unsupported command" << std::endl;
+            console::reset();
+            break;
         }
     }
 
@@ -92,8 +93,7 @@ namespace Process {
 
             HANDLE snapshot = CreateToolhelp32Snapshot(
                 TH32CS_SNAPPROCESS,
-                0
-            );
+                0);
 
             if (snapshot == INVALID_HANDLE_VALUE)
                 return {false, makeLastError(L"ps")};
@@ -109,8 +109,7 @@ namespace Process {
                         << entry.th32ProcessID << L"\t"
                         << entry.th32ParentProcessID << L"\t"
                         << entry.szExeFile << L"\n";
-                }
-                while (Process32NextW(snapshot, &entry));
+                } while (Process32NextW(snapshot, &entry));
             }
             else
             {
@@ -135,38 +134,36 @@ namespace Process {
         return {true, {}};
     }
 
-
     BoolResult ProcessCommands::executeKILL(DWORD pid)
     {
 
         if (pid == 0)
             console::setColor(ConsoleColor::Red);
-            std::wcerr << L"kill: invalid pid\n";
-            console::reset();
-            return { false, { 0, L"kill: invalid pid" } };
+        std::wcerr << L"kill: invalid pid\n";
+        console::reset();
+        return {false, {0, L"kill: invalid pid"}};
 
         if (pid == GetCurrentProcessId())
             std::wcerr << L"kill: refusing to kill self\n";
-            return { false, { 0, L"kill: refusing to kill self" } };
+        return {false, {0, L"kill: refusing to kill self"}};
 
         HANDLE hProcess = ::OpenProcess(
             PROCESS_TERMINATE,
             FALSE,
-            pid
-        );
+            pid);
 
         if (hProcess == nullptr)
-            return { false, makeLastError(L"kill") };
+            return {false, makeLastError(L"kill")};
 
         if (!TerminateProcess(hProcess, 1))
         {
             CloseHandle(hProcess);
-            return { false, makeLastError(L"kill") };
+            return {false, makeLastError(L"kill")};
         }
 
         CloseHandle(hProcess);
 
-        return { true, {} };
+        return {true, {}};
     }
 
 }

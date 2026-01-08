@@ -35,13 +35,13 @@ namespace Console
     class Input
     {
     public:
-        explicit Input(History::Manager& history);
+        explicit Input(History::Manager &history);
 
         void setPromptStart();
         std::wstring readLine();
 
     private:
-        void handleKeyEvent(const KEY_EVENT_RECORD& key);
+        void handleKeyEvent(const KEY_EVENT_RECORD &key);
 
         void insertChar(wchar_t ch);
         void backspace();
@@ -55,13 +55,13 @@ namespace Console
         void redrawLine();
 
     private:
-        History::Manager& m_history;
+        History::Manager &m_history;
 
         std::wstring m_buffer;
         size_t m_cursor = 0;
 
         SHORT m_promptStartX = 0;
-        HANDLE m_stdin  = nullptr;
+        HANDLE m_stdin = nullptr;
         HANDLE m_stdout = nullptr;
     };
 }

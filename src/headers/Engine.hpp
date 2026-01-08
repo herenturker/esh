@@ -27,7 +27,8 @@ limitations under the License.
 
 #include "Commands.hpp"
 
-class Engine {
-    public:
-        static void execute(CommandType command, uint8_t flags, const std::vector<std::wstring>& args);
+class Engine
+{
+public:
+    static void execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args);
 };

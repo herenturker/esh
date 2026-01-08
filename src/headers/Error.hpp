@@ -25,12 +25,12 @@ limitations under the License.
 
 #include <windows.h>
 
-struct Error {
+struct Error
+{
     DWORD code = 0;
     std::wstring message;
 
     bool hasError() const { return code != 0 || !message.empty(); }
 };
 
-Error makeLastError(const std::wstring& prefix = L"");
-
+Error makeLastError(const std::wstring &prefix = L"");

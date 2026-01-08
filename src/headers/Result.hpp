@@ -25,8 +25,9 @@ limitations under the License.
 
 #include "Error.hpp"
 
-template<typename T>
-struct Result {
+template <typename T>
+struct Result
+{
     T value{};
     Error error;
 

@@ -29,14 +29,15 @@ limitations under the License.
 
 #include "Console.hpp"
 
-namespace helper {
+namespace helper
+{
 
     inline std::wstring basename(const std::wstring &path)
     {
         size_t pos = path.find_last_of(L"\\/");
         return (pos == std::wstring::npos)
-                ? path
-                : path.substr(pos + 1);
+                   ? path
+                   : path.substr(pos + 1);
     }
 
     inline std::wstring makeBar(double percent, int width = 30) // for instance: [/////////////           ] %60
@@ -127,12 +128,12 @@ namespace helper {
 
         std::wstringstream ss;
         ss << std::setfill(L'0')
-        << std::setw(4) << st.wYear << L'-'
-        << std::setw(2) << st.wMonth << L'-'
-        << std::setw(2) << st.wDay << L' '
-        << std::setw(2) << st.wHour << L':'
-        << std::setw(2) << st.wMinute << L':'
-        << std::setw(2) << st.wSecond;
+           << std::setw(4) << st.wYear << L'-'
+           << std::setw(2) << st.wMonth << L'-'
+           << std::setw(2) << st.wDay << L' '
+           << std::setw(2) << st.wHour << L':'
+           << std::setw(2) << st.wMinute << L':'
+           << std::setw(2) << st.wSecond;
 
         return ss.str();
     }
