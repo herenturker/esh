@@ -88,6 +88,14 @@ namespace Console
             case VK_RETURN:
                 break;
 
+            case VK_LEFT:
+                arrowLeft();
+                break;
+
+            case VK_RIGHT:
+                arrowRight();
+                break;
+
             default:
                 if (key.uChar.UnicodeChar)
                     insertChar(key.uChar.UnicodeChar);
@@ -109,6 +117,18 @@ namespace Console
 
         m_buffer.erase(m_cursor - 1, 1);
         --m_cursor;
+        redrawLine();
+    }
+
+    void Input::arrowRight()
+    {
+        if (m_cursor < m_buffer.size()) ++m_cursor;
+        redrawLine();
+    }
+
+    void Input::arrowLeft()
+    {
+        if (m_cursor > 0) --m_cursor;
         redrawLine();
     }
 

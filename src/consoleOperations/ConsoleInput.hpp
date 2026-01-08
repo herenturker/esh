@@ -49,6 +49,9 @@ namespace Console
         void historyUp();
         void historyDown();
 
+        void arrowRight();
+        void arrowLeft();
+
         void redrawLine();
 
     private:
