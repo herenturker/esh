@@ -17,8 +17,6 @@ limitations under the License.
 // FILE: src\shell\ShellCommands.cpp
 // PURPOSE: Executes commands related to shell.
 
-#pragma once
-
 // INCLUDE LIBRARIES
 
 #include <vector>
@@ -32,6 +30,7 @@ limitations under the License.
 #include "../headers/Commands.hpp"
 #include "../headers/Helper.hpp"
 #include "../system/SystemCommands.hpp"
+#include "../history/HistoryManager.hpp"
 #include "ShellCommands.hpp"
 
 namespace ShellCmds { // DO NOT CHANGE the name to 'Shell'. It creates errors (because I tried before).
@@ -59,10 +58,8 @@ namespace ShellCmds { // DO NOT CHANGE the name to 'Shell'. It creates errors (b
         {
             case CommandType::EXIT:
                 // Exit shell immediately
-                console::setColor(ConsoleColor::Yellow);
-                console::writeln(L"Exiting esh...");
-                console::reset();
-                ExitProcess(0);
+                executeEXIT();
+                break;
 
             case CommandType::CLEAR:
                 // Clear the esh console screen
@@ -170,5 +167,15 @@ namespace ShellCmds { // DO NOT CHANGE the name to 'Shell'. It creates errors (b
             nullptr);
 
         return {true, {}};
+    }
+
+    void ShellCommands::executeEXIT()
+    {
+        console::setColor(ConsoleColor::Yellow);
+        console::writeln(L"Exiting esh...");
+        console::reset();
+        History::Manager::shutdown();
+
+        exit(EXIT_SUCCESS);
     }
 }

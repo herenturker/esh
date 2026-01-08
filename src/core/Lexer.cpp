@@ -18,6 +18,7 @@ limitations under the License.
 // PURPOSE: Identifies and tokenizes the input
 
 // INCLUDE LIBRARIES
+
 #include <string>
 #include <algorithm>
 #include <cctype>

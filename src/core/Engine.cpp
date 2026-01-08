@@ -18,6 +18,7 @@ limitations under the License.
 // PURPOSE: Gets the commands, flags and arguments from 'Parser.cpp' and executes them.
 
 // INCLUDE LIBRARIES
+
 #include <cstdint>
 #include <iostream>
 #include <vector>

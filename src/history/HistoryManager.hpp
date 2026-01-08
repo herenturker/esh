@@ -44,7 +44,7 @@ namespace History
 
         void resetNavigation();
 
-        void shutdown();
+        static void shutdown();
 
         ~Manager()
         {
@@ -53,6 +53,6 @@ namespace History
 
     private:
         std::wstring m_historyFile;
-        Buffer m_buffer;
+        inline static Buffer m_buffer;
     };
 }

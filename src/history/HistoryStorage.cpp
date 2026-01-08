@@ -31,7 +31,7 @@ namespace HistoryStorage
     {
         std::vector<std::wstring> result;
 
-        std::wstring path = Platform::getBasePath() / L"\\history.txt";
+        std::wstring path = (Platform::getBasePath() / L"history.txt").wstring();
 
         HANDLE hFile = CreateFileW(
             path.c_str(),
@@ -72,7 +72,7 @@ namespace HistoryStorage
 
     void save(const std::vector<std::wstring>& entries)
     {
-        std::wstring path = Platform::getBasePath() / L"\\history.txt";
+        std::wstring path = (Platform::getBasePath() / L"history.txt").wstring();
 
         HANDLE hFile = CreateFileW(
             path.c_str(),
@@ -100,7 +100,7 @@ namespace HistoryStorage
             );
         }
 
+        FlushFileBuffers(hFile); 
         CloseHandle(hFile);
     }
-
 }

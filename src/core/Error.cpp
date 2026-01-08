@@ -18,6 +18,7 @@ limitations under the License.
 // PURPOSE: Creates error messages.
 
 // INCLUDE LIBRARIES
+
 #include "../headers/Error.hpp"
 #include "../headers/Unicode.hpp"
 
