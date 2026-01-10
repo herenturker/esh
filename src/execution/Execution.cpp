@@ -61,7 +61,7 @@ stripRedirectionTokens(const std::vector<Lexer::Token> &tokens)
 
 // FUNCTIONS
 
-void Execution::Executor::executeSimple(const std::vector<Lexer::Token> &tokens)
+void Execution::Executor::executeSimple(const std::vector<Lexer::Token> &tokens, Context& ctx)
 {
     uint8_t command = 0;
     uint8_t flags = 0;
@@ -78,25 +78,38 @@ void Execution::Executor::executeSimple(const std::vector<Lexer::Token> &tokens)
     }
 
     if (command != 0)
-    {
+    { 
         Engine::execute(
             static_cast<CommandType>(command),
             flags,
-            args);
+            args, ctx);
     }
 }
 
-void Execution::Executor::run(const std::vector<Lexer::Token> &tokens)
+void Execution::Executor::run(const std::vector<Lexer::Token> &tokens, Context& ctx)
 {
     const auto redir = hasRedirection(tokens);
 
     if (!hasPipeline(tokens) && !redir.hasRedirection)
     {
-        executeSimple(tokens);
+        ctx.pipelineEnabled = false;
+        ctx.redirectionEnabled = false;
+
+        executeSimple(tokens, ctx);
         return;
+    } 
+    else if (hasPipeline(tokens))
+    {
+        ctx.pipelineEnabled = true;
+        executePipeline(tokens);
+        
+    } 
+    else if (redir.hasRedirection)
+    {
+        ctx.redirectionEnabled = true;
+        // code here
     }
 
-    executePipeline(tokens);
 }
 
 bool Execution::Executor::hasPipeline(const std::vector<Lexer::Token> &tokens)

@@ -35,28 +35,25 @@ namespace FileIO
     class FileCommands
     {
     public:
-        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
+        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context&);
 
     private:
         // COMMAND IMPLEMENTATION           Function prototypes
-        static void executeLS(const std::wstring &pathStr, uint8_t flags, const std::wstring &prefix = L"");
-        static void executeREW(const std::wstring &filename);
-
+        static void executeLS(const std::wstring &pathStr, uint8_t flags, const std::wstring &prefix, Execution::Executor::Context&);
+        static void executeREW(const std::wstring &filename, Execution::Executor::Context&);
+        static void executeSTATS(const std::wstring &filename, Execution::Executor::Context&);
+        
         static bool isDirectory(const std::wstring &path);
         static bool copyFile(const std::wstring &src, const std::wstring &dst);
         static bool copyDirectory(const std::wstring &src, const std::wstring &dst);
-        static void printLsEntry(const WIN32_FIND_DATAW &f, const std::wstring &prefix, uint8_t flags);
 
-        static Result<std::wstring> executeSTATS(const std::wstring &filename);
-        static Result<std::wstring> executeHEAD(const std::wstring &filename, size_t lineCount);
-        static Result<std::wstring> executeTAIL(const std::wstring &filename, size_t lineCount);
-
+        static BoolResult executeHEAD(const std::wstring &filename, size_t lineCount, Execution::Executor::Context&);
+        static BoolResult executeTAIL(const std::wstring &filename, size_t lineCount, Execution::Executor::Context&);
         static BoolResult executeTOUCH(const std::wstring &filename);
         static BoolResult executeRM(const std::wstring &path);
         static BoolResult executeMKDIR(const std::wstring &dirname);
         static BoolResult executeRMDIR(const std::wstring &dirname);
         static BoolResult executeMV(const std::wstring &src, const std::wstring &dst);
         static BoolResult executeCP(const std::wstring &src, const std::wstring &dst);
-        static BoolResult executeATTRIB(const std::wstring &path, const std::wstring &attributes);
     };
 }

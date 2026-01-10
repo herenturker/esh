@@ -36,8 +36,8 @@ namespace Environment
 {
 
     void EnvironmentCommands::execute(CommandType cmd,
-                                      uint8_t /*flags*/,
-                                      const std::vector<std::wstring> & /*args*/)
+                                      uint8_t flags,
+                                      const std::vector<std::wstring>& args)
     {
         Result<std::wstring> res;
 
@@ -57,6 +57,10 @@ namespace Environment
 
         case CommandType::DATETIME:
             res = executeDATETIME();
+            break;
+        
+        case CommandType::CD:
+            executeCD(args[0]);
             break;
 
         default:

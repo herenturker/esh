@@ -25,9 +25,9 @@ limitations under the License.
 #include "../headers/Parser.hpp"
 #include "../execution/Execution.hpp"
 
-void Parser::parseTokens(const std::vector<Lexer::Token>& tokens)
+void Parser::parseTokens(const std::vector<Lexer::Token>& tokens, Execution::Executor::Context& ctx)
 {
-    Execution::Executor::run(tokens);
+    Execution::Executor::run(tokens, ctx);
 }
 
 CommandType Parser::parseCommand(const std::wstring &token)

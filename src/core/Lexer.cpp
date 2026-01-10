@@ -26,8 +26,9 @@ limitations under the License.
 
 #include "../headers/Lexer.hpp"
 #include "../headers/Commands.hpp"
+#include "../execution/Execution.hpp"
 
-std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input)
+std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input, Execution::Executor::Context& ctx)
 {
     std::vector<Token> tokens;
 
@@ -52,7 +53,7 @@ std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input)
         }
 
         std::wstring token = input.substr(start, pos - start); // Gets the token without blank char.
-        TokenType type = identifyTokenType(token);
+        TokenType type = identifyTokenType(token, ctx);
 
         tokens.push_back({type, token});
     }
@@ -62,7 +63,7 @@ std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input)
     return tokens;
 }
 
-Lexer::TokenType Lexer::identifyTokenType(const std::wstring &token)
+Lexer::TokenType Lexer::identifyTokenType(const std::wstring &token, Execution::Executor::Context& ctx)
 {
 
     // Numeric (supports negative integers)
@@ -92,30 +93,60 @@ Lexer::TokenType Lexer::identifyTokenType(const std::wstring &token)
     }
 
     if (token == L"|")
+    {
+        ctx.pipelineEnabled = true;
         return TOKEN_PIPELINE;
+    }
+        
 
     if (token == L"<")
+    {
+        ctx.redirectionEnabled = true;
         return TOKEN_INPUT_REDIRECTION;
+    }
+        
 
     if (token == L">>")
+    {
+        ctx.redirectionEnabled = true;
         return TOKEN_OUTPUT_REDIRECTION_TWO;
+    }
+        
 
     if (token == L">")
+    {
+        ctx.redirectionEnabled = true;
         return TOKEN_OUTPUT_REDIRECTION_ONE;
+    }
+        
 
     if (token == L"2>>")
+    {
+        ctx.redirectionEnabled = true;
         return TOKEN_ERROR_REDIRECTION_TWO;
+    }
+        
 
     if (token == L"2>")
+    {
+        ctx.redirectionEnabled = true;
         return TOKEN_ERROR_REDIRECTION_ONE;
+    }
+        
 
     if (token == L"&>>")
+    {
+        ctx.redirectionEnabled = true;
         return TOKEN_OUTPUT_ERROR_REDIRECTION_TWO;
+    }
+        
 
     if (token == L"&>")
+    {   
+        ctx.redirectionEnabled = true;
         return TOKEN_OUTPUT_ERROR_REDIRECTION_ONE;
-
-
+    }
+        
     if (Commands::isBuiltInCommand(token))
     {
         return TOKEN_COMMAND;

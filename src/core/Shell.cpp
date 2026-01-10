@@ -28,12 +28,13 @@ limitations under the License.
 #include "../headers/Shell.hpp"
 #include "../headers/Lexer.hpp"
 #include "../headers/Parser.hpp"
+#include "../execution/Execution.hpp"
 
-void Shell::handleRawInput(std::wstring &raw_input)
+void Shell::handleRawInput(std::wstring &raw_input, Execution::Executor::Context& ctx)
 {
 
     auto tokens = Lexer::tokenizeInput(raw_input);
-    Parser::parseTokens(tokens);
+    Parser::parseTokens(tokens, ctx);
 }
 
 std::string Shell::load_resource_json(int resource_id)

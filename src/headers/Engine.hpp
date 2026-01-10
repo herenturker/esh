@@ -26,17 +26,20 @@ limitations under the License.
 #include <vector>
 
 #include "Commands.hpp"
+#include "../execution/Execution.hpp"
 
 class Engine
 {
 public:
-    static void execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args);
+    static void execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context&);
 
+    /*
     struct CommandOutput
     {
         std::wstring stdoutText;
         std::wstring stderrText;
         bool success = true;
     };
+    */
 
 };

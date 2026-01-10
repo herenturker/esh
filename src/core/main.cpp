@@ -34,7 +34,8 @@ limitations under the License.
 #include "../env/EnvironmentCommands.hpp"
 #include "../platform/AppDataPath.hpp"
 #include "../history/HistoryManager.hpp"
-#include "../ConsoleOperations/ConsoleInput.hpp"
+#include "../consoleOperations/ConsoleInput.hpp"
+#include "../execution/Execution.hpp"
 
 int wmain()
 {
@@ -44,22 +45,6 @@ int wmain()
     _setmode(_fileno(stdin), _O_WTEXT);
     _setmode(_fileno(stdout), _O_WTEXT);
     _setmode(_fileno(stderr), _O_WTEXT);
-
-    // Generic helper to print Result<std::wstring> or error
-    auto printOrError =
-        [](const Result<std::wstring> &res) -> bool
-    {
-        if (!res.ok())
-        {
-            console::setColor(ConsoleColor::Red);
-            std::wcerr << res.error.message << L"\n";
-            console::reset();
-            return false;
-        }
-
-        console::write(res.value);
-        return true;
-    };
 
     try
     {
@@ -80,6 +65,10 @@ int wmain()
 
     while (true)
     {
+        Execution::Executor::Context ctx;
+        ctx.pipelineEnabled = false;
+        ctx.redirectionEnabled = false;
+        
         auto who = Environment::EnvironmentCommands::executeWHOAMI();
         auto host = Environment::EnvironmentCommands::executeHOSTNAME();
         auto pwd = Environment::EnvironmentCommands::executePWD();
@@ -101,7 +90,7 @@ int wmain()
         std::wstring raw_input = input.readLine();
 
         history.add(raw_input);
-        Shell::handleRawInput(raw_input);
+        Shell::handleRawInput(raw_input, ctx);
 
         console::writeln(L"");
     }

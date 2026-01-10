@@ -32,16 +32,17 @@ limitations under the License.
 #include "../env/EnvironmentCommands.hpp"
 #include "../process/ProcessCommands.hpp"
 #include "../system/SystemCommands.hpp"
+#include "../execution/Execution.hpp"
 
 // ------------------- COMMAND DISPATCHER -------------------
-void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args)
+void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context& ctx)
 {
     auto group = getCommandGroup(command); // Classifies the command given.
 
     switch (group)
     {
     case CommandGroup::FILE_IO:
-        FileIO::FileCommands::execute(command, flags, args);
+        FileIO::FileCommands::execute(command, flags, args, ctx);
         break;
 
     case CommandGroup::PROCESS:

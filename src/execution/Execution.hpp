@@ -33,9 +33,6 @@ namespace Execution
     class Executor
     {
     public:
-        // Entry point from Parser
-        static void run(const std::vector<Lexer::Token>& tokens);
-
         struct Redirection {
             bool hasRedirection;
             std::wstring redirectionString;
@@ -62,14 +59,20 @@ namespace Execution
             HANDLE stdinHandle  = INVALID_HANDLE_VALUE;
             HANDLE stdoutHandle = INVALID_HANDLE_VALUE;
             HANDLE stderrHandle = INVALID_HANDLE_VALUE;
+
+            bool pipelineEnabled = false;
+            bool redirectionEnabled = false;
         };
+
+        // Entry point from Parser
+        static void run(const std::vector<Lexer::Token>& tokens, Context& ctx);
 
         // Detection
         static bool hasPipeline(const std::vector<Lexer::Token>& tokens);
         static Redirection hasRedirection(const std::vector<Lexer::Token>& tokens);
 
         // Execution paths
-        static void executeSimple(const std::vector<Lexer::Token>& tokens);
+        static void executeSimple(const std::vector<Lexer::Token>& tokens, Context& ctx);
         static void executePipeline(const std::vector<Lexer::Token>& tokens);
 
         static std::vector<std::vector<Lexer::Token>> splitByPipeline(const std::vector<Lexer::Token>& tokens);
