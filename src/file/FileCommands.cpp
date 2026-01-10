@@ -312,7 +312,6 @@ namespace FileIO
         if (hFile == INVALID_HANDLE_VALUE)
         {
             console::setColor(ConsoleColor::Red);
-            makeLastError(L"rew");
             console::write(L"rew: cannot open file '" + wFilename + L"'\n");
             makeLastError(L"rew");
             console::reset();
@@ -372,7 +371,7 @@ namespace FileIO
             std::wstring treePrefix = prefix;
             if (flags & static_cast<uint8_t>(Flag::RECURSIVE))
             {
-                treePrefix += isLast ? L"|___" : L"|---";
+                treePrefix += isLast ? L"└─" : L"├─";
             }
 
             printLsEntry(f, treePrefix, flags);

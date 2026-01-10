@@ -66,7 +66,7 @@ Lexer::TokenType Lexer::identifyTokenType(const std::wstring &token)
 {
 
     // Numeric (supports negative integers)
-    if (token[0] == '-' && token.size() > 1)
+    if (token[0] == L'-' && token.size() > 1)
     {
         if (std::all_of(token.begin() + 1, token.end(),
                         [](unsigned char c)
@@ -83,6 +83,38 @@ Lexer::TokenType Lexer::identifyTokenType(const std::wstring &token)
     {
         return TOKEN_NUMBER;
     }
+
+    if (token.size() >= 2 &&
+        token.front() == L'"' &&
+        token.back()  == L'"')
+    {
+        return TOKEN_STRING;
+    }
+
+    if (token == L"|")
+        return TOKEN_PIPELINE;
+
+    if (token == L"<")
+        return TOKEN_INPUT_REDIRECTION;
+
+    if (token == L">>")
+        return TOKEN_OUTPUT_REDIRECTION_TWO;
+
+    if (token == L">")
+        return TOKEN_OUTPUT_REDIRECTION_ONE;
+
+    if (token == L"2>>")
+        return TOKEN_ERROR_REDIRECTION_TWO;
+
+    if (token == L"2>")
+        return TOKEN_ERROR_REDIRECTION_ONE;
+
+    if (token == L"&>>")
+        return TOKEN_OUTPUT_ERROR_REDIRECTION_TWO;
+
+    if (token == L"&>")
+        return TOKEN_OUTPUT_ERROR_REDIRECTION_ONE;
+
 
     if (Commands::isBuiltInCommand(token))
     {

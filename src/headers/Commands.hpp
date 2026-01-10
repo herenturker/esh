@@ -130,12 +130,12 @@ enum class CommandType : uint8_t
 // DEFINE FLAGS
 enum class Flag : uint8_t
 {
-    RECURSIVE =     FLAG_RECURSIVE, // -r
-    VERBOSE =       FLAG_VERBOSE,     // -v
-    FORCE =         FLAG_FORCE,         // -f
-    ALL =           FLAG_ALL,             // -a
-    HELP =          FLAG_HELP,           // --help
-    COUNT =         FLAG_COUNT          // -n (used for line counts)
+    RECURSIVE =     FLAG_RECURSIVE,
+    VERBOSE =       FLAG_VERBOSE,
+    FORCE =         FLAG_FORCE,
+    ALL =           FLAG_ALL,
+    HELP =          FLAG_HELP,
+    COUNT =         FLAG_COUNT 
 };
 
 // DEFINE SYMBOLS

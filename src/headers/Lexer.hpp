@@ -61,15 +61,16 @@ public:
         TOKEN_AT_SIGN,      /** @ */
         TOKEN_CARET,        /** ^ */
         TOKEN_AMPERSAND,    /** & */
-        TOKEN_PIPE,         /** | */
         TOKEN_TILDE,        /** ~ */
         TOKEN_EQUAL,        /** = */
 
-        TOKEN_LESS_THAN,    /** < */
-        TOKEN_GREATER_THAN, /** > */
-        TOKEN_DOUBLE_LESS, /** << */
-        TOKEN_DOUBLE_GREATER, /** >> */
-
+        /**
+        TOKEN_LESS_THAN,   // <
+        TOKEN_GREATER_THAN, // > 
+        TOKEN_DOUBLE_LESS, // << 
+        TOKEN_DOUBLE_GREATER, // >> 
+        */
+        
         TOKEN_OUTPUT_REDIRECTION_ONE,        /** >   */
         TOKEN_OUTPUT_REDIRECTION_TWO,        /** >>  */
         TOKEN_INPUT_REDIRECTION,             /** <   */

@@ -19,6 +19,7 @@ file(GLOB_RECURSE SOURCES
     src/platform/*.cpp
     src/history/*.cpp
     src/consoleOperations/*.cpp
+    src/execution/*.cpp
 )
 
 add_executable(esh ${SOURCES} resources.rc app.rc)
@@ -34,6 +35,7 @@ target_include_directories(esh PRIVATE
     src/platform 
     src/history 
     src/consoleOperations
+    src/execution
 )
 
 if (MSVC)

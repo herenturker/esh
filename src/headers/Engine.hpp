@@ -31,4 +31,12 @@ class Engine
 {
 public:
     static void execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args);
+
+    struct CommandOutput
+    {
+        std::wstring stdoutText;
+        std::wstring stderrText;
+        bool success = true;
+    };
+
 };
