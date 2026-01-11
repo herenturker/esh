@@ -26,7 +26,15 @@ limitations under the License.
 
 namespace HistoryStorage
 {
-
+    /**
+     * @brief Loads the command history from disk.
+     *
+     * Reads the history file from the application's base path and
+     * returns each line as a separate entry in a vector.
+     *
+     * @return std::vector<std::wstring> Vector containing all history entries.
+     *         Returns an empty vector if the file does not exist or is empty.
+     */
     std::vector<std::wstring> load()
     {
         std::vector<std::wstring> result;
@@ -69,6 +77,15 @@ namespace HistoryStorage
         return result;
     }
 
+    /**
+     * @brief Saves the command history to disk.
+     *
+     * Writes all provided entries into the history file, one per line.
+     * Existing history is overwritten.
+     *
+     * @param entries Vector of strings representing the history to save.
+     * 
+     */
     void save(const std::vector<std::wstring> &entries)
     {
         std::wstring path = (Platform::getBasePath() / L"history.txt").wstring();

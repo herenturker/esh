@@ -36,6 +36,9 @@ limitations under the License.
 
 // HELPER FUNCTIONS
 
+/// @brief Writes a string to the given handle, considering console vs. file output.
+/// @param h The Windows HANDLE (stdout, stderr, or file handle).
+/// @param text The text to write.
 static void writeOut(HANDLE h, const std::wstring &text)
 {
     DWORD mode;
@@ -51,7 +54,11 @@ static void writeOut(HANDLE h, const std::wstring &text)
     }
 }
 
-
+/// @brief Formats a single file entry for `ls`.
+/// @param f WIN32_FIND_DATAW structure containing file info.
+/// @param prefix String prefix (used for tree-like recursive output).
+/// @param flags Flags affecting output (e.g., verbose, recursive).
+/// @return Formatted string representing the file entry.
 static std::wstring formatLsEntry(
     const WIN32_FIND_DATAW &f,
     const std::wstring &prefix,
@@ -75,6 +82,13 @@ static std::wstring formatLsEntry(
 namespace FileIO
 {
 
+    /**
+     * @brief Executes a file command (ls, rew, stats, head, tail, mkdir, rmdir, touch, rm, mv, cp).
+     * @param cmd The command type to execute.
+     * @param flags Bitwise flags modifying command behavior.
+     * @param args Command arguments (file/directory names, counts, etc.).
+     * @param ctx Execution context containing handles, pipeline state, redirection state.
+     */
     void FileCommands::execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context &ctx)
     {
         switch (cmd)
@@ -105,7 +119,7 @@ namespace FileIO
             {
                 writeOut(ctx.stderrHandle, L"Usage: stats <file>\n");
                 if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
-                    console::write(L"Usage: stats <file>\n");                
+                    console::write(L"Usage: stats <file>\n");
                 break;
             }
             executeSTATS(args[0], ctx);
@@ -176,7 +190,7 @@ namespace FileIO
                 if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
                     console::writeln(res.error.message);
             }
-                
+
             break;
         }
 
@@ -189,7 +203,7 @@ namespace FileIO
                 if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
                     console::writeln(res.error.message);
             }
-                
+
             break;
         }
 
@@ -202,7 +216,7 @@ namespace FileIO
                 if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
                     console::writeln(res.error.message);
             }
-                
+
             break;
         }
 
@@ -215,7 +229,7 @@ namespace FileIO
                 if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
                     console::writeln(res.error.message);
             }
-                
+
             break;
         }
 
@@ -228,7 +242,7 @@ namespace FileIO
                 if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
                     console::writeln(res.error.message);
             }
-                
+
             break;
         }
 
@@ -249,7 +263,7 @@ namespace FileIO
                 if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
                     console::writeln(res.error.message);
             }
-                
+
             break;
         }
 
@@ -270,7 +284,7 @@ namespace FileIO
                 if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
                     console::writeln(res.error.message);
             }
-                
+
             break;
         }
 
@@ -282,7 +296,9 @@ namespace FileIO
         }
     }
 
-    // Check if the file is a directory.
+    /// @brief Checks if a given path is a directory.
+    /// @param path Path to check.
+    /// @return true if the path exists and is a directory, false otherwise.
     bool FileCommands::isDirectory(const std::wstring &path)
     {
         DWORD attr = GetFileAttributesW(path.c_str());
@@ -292,13 +308,19 @@ namespace FileIO
         return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
     }
 
-    // Copy File Function
+    /// @brief Copies a single file from source to destination.
+    /// @param src Source file path.
+    /// @param dst Destination file path.
+    /// @return true if the copy succeeds, false otherwise.
     bool FileCommands::copyFile(const std::wstring &src, const std::wstring &dst)
     {
         return CopyFileW(src.c_str(), dst.c_str(), FALSE) != 0; // overwrite allowed
     }
 
-    // Copy Directory Function
+    /// @brief Recursively copies a directory from source to destination.
+    /// @param src Source directory.
+    /// @param dst Destination directory.
+    /// @return true if successful, false otherwise.
     bool FileCommands::copyDirectory(const std::wstring &src, const std::wstring &dst)
     {
         CreateDirectoryW(dst.c_str(), nullptr);
@@ -342,7 +364,9 @@ namespace FileIO
         return true;
     }
 
-    // REW COMMAND
+    /// @brief Reads and writes the contents of a file (rew command).
+    /// @param filename Path to the file.
+    /// @param ctx Execution context.
     void FileCommands::executeREW(const std::wstring &filename, Execution::Executor::Context &ctx)
     {
         HANDLE hFile = CreateFileW(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
@@ -370,16 +394,21 @@ namespace FileIO
             }
         }
 
-        if (!outBuffer.empty()){
+        if (!outBuffer.empty())
+        {
             writeOut(ctx.stdoutHandle, outBuffer);
             if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
                 console::writeln(outBuffer);
         }
-            
+
         CloseHandle(hFile);
     }
 
-    // LS COMMAND
+    /// @brief Lists the contents of a directory (ls command).
+    /// @param pathStr Path to list (default is ".").
+    /// @param flags Flags affecting output (e.g., recursive, all, verbose).
+    /// @param prefix Prefix used for tree-like recursive display.
+    /// @param ctx Execution context.
     void FileCommands::executeLS(
         const std::wstring &pathStr,
         uint8_t flags,
@@ -402,7 +431,8 @@ namespace FileIO
         }
 
         std::vector<WIN32_FIND_DATAW> entries;
-        do {
+        do
+        {
             entries.push_back(ffd);
         } while (FindNextFileW(hFind, &ffd));
 
@@ -413,9 +443,11 @@ namespace FileIO
         {
             std::wstring name = e.cFileName;
 
-            if (name == L"." || name == L"..") continue;
+            if (name == L"." || name == L"..")
+                continue;
             if (!(flags & static_cast<uint8_t>(Flag::ALL)) &&
-                (e.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)) continue;
+                (e.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
+                continue;
 
             visible.push_back(e);
         }
@@ -446,7 +478,6 @@ namespace FileIO
 
                 executeLS(path + L"\\" + name, flags, newPrefix, ctx);
             }
-
         }
 
         if (!outBuffer.empty())
@@ -458,7 +489,9 @@ namespace FileIO
         }
     }
 
-    // STATS COMMAND
+    /// @brief Prints file statistics (lines, words, bytes, size, timestamps, attributes).
+    /// @param filename File path.
+    /// @param ctx Execution context.
     void FileCommands::executeSTATS(const std::wstring &filename, Execution::Executor::Context &ctx)
     {
         HANDLE hFile = CreateFileW(
@@ -543,7 +576,8 @@ namespace FileIO
         out += L"Last Write Time    : " +
                helper::FileTimeToWString(info.ftLastWriteTime) + L"\n";
 
-        if (!out.empty()) {
+        if (!out.empty())
+        {
             writeOut(ctx.stdoutHandle, out);
 
             if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
@@ -551,7 +585,11 @@ namespace FileIO
         }
     }
 
-    // HEAD COMMAND
+    /// @brief Outputs the first N lines of a file (head command).
+    /// @param filename File path.
+    /// @param lineCount Number of lines to display.
+    /// @param ctx Execution context.
+    /// @return BoolResult indicating success or failure.
     BoolResult FileCommands::executeHEAD(const std::wstring &filename, size_t lineCount, Execution::Executor::Context &ctx)
     {
         HANDLE hFile = CreateFileW(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
@@ -602,7 +640,8 @@ namespace FileIO
         if (!currentLineStr.empty())
             outBuffer += currentLineStr;
 
-        if (!outBuffer.empty()) {
+        if (!outBuffer.empty())
+        {
             writeOut(ctx.stdoutHandle, outBuffer);
 
             if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
@@ -613,8 +652,9 @@ namespace FileIO
         return {true, {}};
     }
 
-
-    // TOUCH COMMAND
+    /// @brief Creates a new empty file (touch command).
+    /// @param filename File path.
+    /// @return BoolResult indicating success or failure.
     BoolResult FileCommands::executeTOUCH(const std::wstring &filename)
     {
         std::wstring wFilename = filename;
@@ -635,7 +675,9 @@ namespace FileIO
         return {true, {}};
     }
 
-    // RM COMMAND
+    /// @brief Deletes a file (rm command).
+    /// @param path File path.
+    /// @return BoolResult indicating success or failure.
     BoolResult FileCommands::executeRM(const std::wstring &path)
     {
         if (!DeleteFileW(path.c_str()))
@@ -644,7 +686,9 @@ namespace FileIO
         return {true, {}};
     }
 
-    // MKDIR COMMAND
+    /// @brief Creates a new directory (mkdir command).
+    /// @param dirname Directory path.
+    /// @return BoolResult indicating success or failure.
     BoolResult FileCommands::executeMKDIR(const std::wstring &dirname)
     {
         if (!CreateDirectoryW(
@@ -655,7 +699,9 @@ namespace FileIO
         return {true, {}};
     }
 
-    // RMDIR COMMAND
+    /// @brief Removes an empty directory (rmdir command).
+    /// @param dirname Directory path.
+    /// @return BoolResult indicating success or failure.
     BoolResult FileCommands::executeRMDIR(const std::wstring &dirname)
     {
         if (!RemoveDirectoryW(
@@ -665,7 +711,10 @@ namespace FileIO
         return {true, {}};
     }
 
-    // MV COMMAND
+    /// @brief Moves a file or directory to a new location (mv command).
+    /// @param src Source path.
+    /// @param dst Destination path.
+    /// @return BoolResult indicating success or failure.
     BoolResult FileCommands::executeMV(const std::wstring &src, const std::wstring &dst)
     {
         std::wstring wSrc = src;
@@ -688,7 +737,10 @@ namespace FileIO
         return {true, {}};
     }
 
-    // CP COMMAND
+    /// @brief Copies a file or directory (cp command).
+    /// @param src Source path.
+    /// @param dst Destination path.
+    /// @return BoolResult indicating success or failure.
     BoolResult FileCommands::executeCP(const std::wstring &src, const std::wstring &dst)
     {
         std::wstring wSrc = src;
@@ -715,7 +767,11 @@ namespace FileIO
         return {true, {}};
     }
 
-    // TAIL COMMAND
+    /// @brief Outputs the last N lines of a file (tail command).
+    /// @param filename File path.
+    /// @param lineCount Number of lines to display.
+    /// @param ctx Execution context.
+    /// @return BoolResult indicating success or failure.
     BoolResult FileCommands::executeTAIL(const std::wstring &filename, size_t lineCount, Execution::Executor::Context &ctx)
     {
         HANDLE hFile = CreateFileW(
@@ -733,7 +789,7 @@ namespace FileIO
 
             if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
                 console::writeln(L"tail: cannot open file\n");
-            
+
             return {false, makeLastError(L"tail")};
         }
 
@@ -787,8 +843,8 @@ namespace FileIO
             }
         }
 
-        
-        if (!outBuffer.empty()) {
+        if (!outBuffer.empty())
+        {
             writeOut(ctx.stdoutHandle, outBuffer);
 
             if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)

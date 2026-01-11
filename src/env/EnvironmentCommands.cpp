@@ -35,9 +35,20 @@ limitations under the License.
 namespace Environment
 {
 
+    /**
+     * @brief Dispatches and executes environment-related commands.
+     *
+     * Routes the given command to its corresponding implementation
+     * (e.g. pwd, whoami, hostname, datetime, cd). Handles error reporting
+     * and output writing to the console.
+     *
+     * @param cmd   Parsed command type.
+     * @param flags Command flags (currently unused).
+     * @param args  Command arguments.
+     */
     void EnvironmentCommands::execute(CommandType cmd,
                                       uint8_t flags,
-                                      const std::vector<std::wstring>& args)
+                                      const std::vector<std::wstring> &args)
     {
         Result<std::wstring> res;
 
@@ -58,7 +69,7 @@ namespace Environment
         case CommandType::DATETIME:
             res = executeDATETIME();
             break;
-        
+
         case CommandType::CD:
             executeCD(args[0]);
             break;
@@ -81,7 +92,14 @@ namespace Environment
         console::write(res.value);
     }
 
-    // CD COMMAND
+    /**
+     * @brief Changes the current working directory.
+     *
+     * Attempts to set the process working directory to the given path.
+     *
+     * @param path Target directory path.
+     * @return BoolResult indicating success or failure with error details.
+     */
     BoolResult EnvironmentCommands::executeCD(const std::wstring &path)
     {
         if (path.empty())
@@ -93,7 +111,14 @@ namespace Environment
         return {true, {}};
     }
 
-    // PWD COMMAND
+    /**
+     * @brief Retrieves the current working directory.
+     *
+     * Uses the Windows API to query the absolute path of the
+     * process working directory.
+     *
+     * @return Result containing the directory path or an error.
+     */
     Result<std::wstring> EnvironmentCommands::executePWD()
     {
         DWORD length = GetCurrentDirectoryW(0, nullptr);
@@ -106,7 +131,14 @@ namespace Environment
         return {std::wstring(buffer.data()), {}};
     }
 
-    // WHOAMI COMMAND
+    /**
+     * @brief Retrieves the name of the current user.
+     *
+     * Queries the operating system for the username under which
+     * the process is running.
+     *
+     * @return Result containing the username or an error.
+     */
     Result<std::wstring> EnvironmentCommands::executeWHOAMI()
     {
         DWORD length = 0;
@@ -119,7 +151,13 @@ namespace Environment
         return {std::wstring(buffer.data()), {}};
     }
 
-    // HOSTNAME COMMAND
+    /**
+     * @brief Retrieves the hostname of the current machine.
+     *
+     * Uses the system API to obtain the computer name.
+     *
+     * @return Result containing the hostname or an error.
+     */
     Result<std::wstring> EnvironmentCommands::executeHOSTNAME()
     {
         wchar_t buffer[MAX_COMPUTERNAME_LENGTH + 1];
@@ -131,7 +169,14 @@ namespace Environment
         return {std::wstring(buffer, size), {}};
     }
 
-    // DATETIME COMMAND
+    /**
+     * @brief Retrieves the current local date and time.
+     *
+     * Formats the system local time as a human-readable string
+     * in the form YYYY-MM-DD HH:MM:SS.
+     *
+     * @return Result containing the formatted date-time string.
+     */
     Result<std::wstring> EnvironmentCommands::executeDATETIME()
     {
         SYSTEMTIME st;

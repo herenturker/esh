@@ -31,33 +31,75 @@ limitations under the License.
 #include "../headers/Parser.hpp"
 #include "../execution/Execution.hpp"
 
-void Shell::handleRawInput(std::wstring &raw_input, Execution::Executor::Context& ctx)
+/**
+ * @brief Processes raw shell input through the lexical and parsing stages.
+ *
+ * This function serves as the entry point between user-provided raw input
+ * and the execution pipeline. It performs no execution itself; instead,
+ * it orchestrates the transformation of the input through:
+ *
+ *  - Tokenization (lexical analysis)
+ *  - Parsing and semantic interpretation
+ *
+ * All resulting execution state is stored within the provided execution
+ * context.
+ *
+ * @param raw_input The raw command line input provided by the user.
+ * @param ctx       Execution context that accumulates parsing and execution state.
+ */
+void Shell::handleRawInput(std::wstring &raw_input, Execution::Executor::Context &ctx)
 {
-
+    // Perform lexical analysis on the raw input
     auto tokens = Token::tokenizeInput(raw_input, ctx);
+
+    // Parse tokens and populate execution context
     Parser::parseTokens(tokens, ctx);
 }
 
+/**
+ * @brief Loads an embedded JSON resource from the executable.
+ *
+ * This function retrieves a raw data resource (RT_RCDATA) that has been
+ * embedded into the executable at build time (e.g. via resources.rc),
+ * and returns its contents as a std::string.
+ *
+ * The resource is accessed directly from the module image in memory,
+ * avoiding any filesystem dependency.
+ *
+ * @param resource_id Numeric resource identifier of the embedded JSON.
+ * @return std::string Contents of the resource as a binary-safe string.
+ *
+ * @throws std::runtime_error If the resource cannot be found or loaded.
+ */
 std::string Shell::load_resource_json(int resource_id)
 {
+    // Obtain handle to the current executable module
     HMODULE hModule = GetModuleHandle(nullptr);
 
-    HRSRC hRes = FindResource(hModule,
-                              MAKEINTRESOURCE(resource_id),
-                              RT_RCDATA);
+    // Locate the raw data resource by its numeric ID
+    HRSRC hRes = FindResource(
+        hModule,
+        MAKEINTRESOURCE(resource_id),
+        RT_RCDATA);
     if (!hRes)
     {
         throw std::runtime_error("FindResource failed");
     }
 
+    // Load the resource into memory
     HGLOBAL hData = LoadResource(hModule, hRes);
     if (!hData)
     {
         throw std::runtime_error("LoadResource failed");
     }
 
+    // Determine the size of the resource in bytes
     DWORD size = SizeofResource(hModule, hRes);
-    const char *data = static_cast<const char *>(LockResource(hData));
 
+    // Obtain a pointer to the resource's raw byte data
+    const char *data =
+        static_cast<const char *>(LockResource(hData));
+
+    // Construct a binary-safe string from the resource data
     return std::string(data, size);
 }

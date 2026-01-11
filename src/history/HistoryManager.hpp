@@ -27,23 +27,61 @@ limitations under the License.
 
 namespace History
 {
+    /**
+     * @brief Manages shell command history and navigation.
+     *
+     * Uses an internal Buffer to store commands and provides methods
+     * to navigate previous/next entries, add new commands, and persist
+     * the history to disk.
+     */
     class Manager
     {
     public:
         Manager() = default;
 
-        // call when program starts
+        /**
+         * @brief Initializes the history manager.
+         *
+         * Loads existing history from disk and prepares the buffer
+         * for navigation.
+         */
         void initialize();
 
-        // add new command
+        /**
+         * @brief Adds a new command to the history.
+         *
+         * Ignores empty commands.
+         *
+         * @param command Command string to add.
+         */
         void add(const std::wstring &command);
 
-        // navigate
+        /**
+         * @brief Returns the previous command in history, if available.
+         *
+         * Moves the navigation cursor backward.
+         *
+         * @return std::optional<std::wstring> Previous command or empty if none.
+         */
         std::optional<std::wstring> previous();
+
+        /**
+         * @brief Returns the next command in history, if available.
+         *
+         * Moves the navigation cursor forward.
+         *
+         * @return std::optional<std::wstring> Next command or empty if none.
+         */
         std::optional<std::wstring> next();
 
+        /**
+         * @brief Resets navigation cursor to after the last command.
+         */
         void resetNavigation();
 
+        /**
+         * @brief Shuts down the manager and persists history to disk.
+         */
         static void shutdown();
 
         ~Manager()
@@ -53,6 +91,6 @@ namespace History
 
     private:
         std::wstring m_historyFile;
-        inline static Buffer m_buffer;
+        inline static Buffer m_buffer; /**< Internal buffer holding command history */
     };
 }

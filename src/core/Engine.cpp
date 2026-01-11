@@ -34,8 +34,22 @@ limitations under the License.
 #include "../system/SystemCommands.hpp"
 #include "../execution/Execution.hpp"
 
-// ------------------- COMMAND DISPATCHER -------------------
-void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context& ctx)
+/**
+ * @brief Dispatches and executes a parsed command.
+ *
+ * Determines the command group associated with the given CommandType and
+ * forwards execution to the corresponding command handler module
+ * (file I/O, process, environment, shell, or system).
+ *
+ * The execution context is propagated to command handlers that require
+ * access to I/O handles, pipeline state, or redirection state.
+ *
+ * @param command Parsed command identifier.
+ * @param flags   Bitmask representing parsed command-line flags.
+ * @param args    Vector of command arguments.
+ * @param ctx     Execution context carrying redirection and pipeline state.
+ */
+void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context &ctx)
 {
     auto group = getCommandGroup(command); // Classifies the command given.
 

@@ -61,7 +61,16 @@ stripRedirectionTokens(const std::vector<Lexer::Token> &tokens)
 
 // FUNCTIONS
 
-void Execution::Executor::executeSimple(const std::vector<Lexer::Token> &tokens, Context& ctx)
+/**
+ * @brief Executes a simple command without pipelines or redirections.
+ *
+ * Converts a token vector into command type, flags, and arguments,
+ * then forwards them to the Engine for execution.
+ *
+ * @param tokens Tokenized user input.
+ * @param ctx    Execution context, including redirection/pipeline state.
+ */
+void Execution::Executor::executeSimple(const std::vector<Lexer::Token> &tokens, Context &ctx)
 {
     uint8_t command = 0;
     uint8_t flags = 0;
@@ -78,7 +87,7 @@ void Execution::Executor::executeSimple(const std::vector<Lexer::Token> &tokens,
     }
 
     if (command != 0)
-    { 
+    {
         Engine::execute(
             static_cast<CommandType>(command),
             flags,
@@ -86,7 +95,16 @@ void Execution::Executor::executeSimple(const std::vector<Lexer::Token> &tokens,
     }
 }
 
-void Execution::Executor::run(const std::vector<Lexer::Token> &tokens, Context& ctx)
+/**
+ * @brief Runs a command, handling pipelines and redirections if present.
+ *
+ * This is the main execution entry point. It detects if a pipeline
+ * or I/O redirection exists and dispatches accordingly.
+ *
+ * @param tokens Tokenized user input.
+ * @param ctx    Execution context with standard handles and flags.
+ */
+void Execution::Executor::run(const std::vector<Lexer::Token> &tokens, Context &ctx)
 {
     const auto redir = hasRedirection(tokens);
 
@@ -97,13 +115,12 @@ void Execution::Executor::run(const std::vector<Lexer::Token> &tokens, Context& 
 
         executeSimple(tokens, ctx);
         return;
-    } 
+    }
     else if (hasPipeline(tokens))
     {
         ctx.pipelineEnabled = true;
         executePipeline(tokens);
-        
-    } 
+    }
     else if (redir.hasRedirection)
     {
         ctx.redirectionEnabled = true;
@@ -111,7 +128,7 @@ void Execution::Executor::run(const std::vector<Lexer::Token> &tokens, Context& 
         auto redirInfo = parseRedirections(tokens);
         auto cleanTokens = stripRedirectionTokens(tokens);
 
-        HANDLE oldIn  = ctx.stdinHandle;
+        HANDLE oldIn = ctx.stdinHandle;
         HANDLE oldOut = ctx.stdoutHandle;
         HANDLE oldErr = ctx.stderrHandle;
 
@@ -124,21 +141,27 @@ void Execution::Executor::run(const std::vector<Lexer::Token> &tokens, Context& 
 
         executeSimple(cleanTokens, ctx);
 
-        ctx.stdinHandle  = oldIn;
+        ctx.stdinHandle = oldIn;
         ctx.stdoutHandle = oldOut;
         ctx.stderrHandle = oldErr;
 
-        if (redirInfo.stdinHandle)  CloseHandle(redirInfo.stdinHandle);
+        if (redirInfo.stdinHandle)
+            CloseHandle(redirInfo.stdinHandle);
 
         if (redirInfo.stdoutHandle && redirInfo.stdoutHandle != redirInfo.stderrHandle)
             CloseHandle(redirInfo.stdoutHandle);
-            
+
         if (redirInfo.stderrHandle)
             CloseHandle(redirInfo.stderrHandle);
     }
-
 }
 
+/**
+ * @brief Determines if the token list contains a pipeline operator '|'.
+ *
+ * @param tokens Tokenized input.
+ * @return true if a pipeline is detected, false otherwise.
+ */
 bool Execution::Executor::hasPipeline(const std::vector<Lexer::Token> &tokens)
 {
 
@@ -153,6 +176,12 @@ bool Execution::Executor::hasPipeline(const std::vector<Lexer::Token> &tokens)
     return false;
 }
 
+/**
+ * @brief Checks for redirection tokens in the input.
+ *
+ * @param tokens Tokenized input.
+ * @return Redirection struct containing flag and operator string.
+ */
 Execution::Executor::Redirection Execution::Executor::hasRedirection(const std::vector<Lexer::Token> &tokens)
 {
     for (const auto &t : tokens)
@@ -171,8 +200,13 @@ Execution::Executor::Redirection Execution::Executor::hasRedirection(const std::
     return {false, L""};
 }
 
-std::vector<std::vector<Lexer::Token>>
-Execution::Executor::splitByPipeline(const std::vector<Lexer::Token> &tokens)
+/**
+ * @brief Splits a token list into multiple commands separated by '|'.
+ *
+ * @param tokens Tokenized input.
+ * @return Vector of token vectors, each representing a command.
+ */
+std::vector<std::vector<Lexer::Token>> Execution::Executor::splitByPipeline(const std::vector<Lexer::Token> &tokens)
 {
     std::vector<std::vector<Lexer::Token>> result;
     result.emplace_back();
@@ -192,6 +226,13 @@ Execution::Executor::splitByPipeline(const std::vector<Lexer::Token> &tokens)
     return result;
 }
 
+/**
+ * @brief Executes a sequence of piped commands.
+ *
+ * Creates pipes between processes and handles I/O redirection for each.
+ *
+ * @param tokens Tokenized input containing pipelines and optional redirections.
+ */
 void Execution::Executor::executePipeline(const std::vector<Lexer::Token> &tokens)
 {
     auto commands = splitByPipeline(tokens);
@@ -294,6 +335,12 @@ void Execution::Executor::executePipeline(const std::vector<Lexer::Token> &token
     }
 }
 
+/**
+ * @brief Returns the type of redirection a token represents.
+ *
+ * @param t Token to inspect.
+ * @return RedirectType enum corresponding to STDIN, STDOUT, STDERR, or NONE.
+ */
 Execution::Executor::RedirectType Execution::Executor::getRedirectType(const Lexer::Token &t)
 {
     switch (t.type)
@@ -318,6 +365,12 @@ Execution::Executor::RedirectType Execution::Executor::getRedirectType(const Lex
     }
 }
 
+/**
+ * @brief Determines if a redirection token indicates append mode.
+ *
+ * @param t Token to inspect.
+ * @return true if the redirection appends, false otherwise.
+ */
 bool Execution::Executor::isAppendRedirection(const Lexer::Token &t)
 {
     return t.type == Lexer::TOKEN_OUTPUT_REDIRECTION_TWO ||
@@ -325,6 +378,13 @@ bool Execution::Executor::isAppendRedirection(const Lexer::Token &t)
            t.type == Lexer::TOKEN_OUTPUT_ERROR_REDIRECTION_TWO;
 }
 
+/**
+ * @brief Opens a file handle for writing or appending.
+ *
+ * @param path   File path.
+ * @param append Whether to append or overwrite.
+ * @return HANDLE to the file, or nullptr on failure.
+ */
 HANDLE Execution::Executor::openFileForWrite(const std::wstring &path, bool append)
 {
     SECURITY_ATTRIBUTES sa{};
@@ -348,6 +408,12 @@ HANDLE Execution::Executor::openFileForWrite(const std::wstring &path, bool appe
     return (h == INVALID_HANDLE_VALUE) ? nullptr : h;
 }
 
+/**
+ * @brief Opens a file handle for reading.
+ *
+ * @param path File path.
+ * @return HANDLE to the file, or nullptr on failure.
+ */
 HANDLE Execution::Executor::openFileForRead(const std::wstring &path)
 {
     SECURITY_ATTRIBUTES sa{};
@@ -367,6 +433,15 @@ HANDLE Execution::Executor::openFileForRead(const std::wstring &path)
     return (h == INVALID_HANDLE_VALUE) ? nullptr : h;
 }
 
+/**
+ * @brief Parses tokenized input and extracts redirection handles.
+ *
+ * Generates a RedirectionInfo struct containing handles for STDIN,
+ * STDOUT, and STDERR according to the redirection tokens in the input.
+ *
+ * @param tokens Tokenized input.
+ * @return RedirectionInfo with opened handles.
+ */
 Execution::Executor::RedirectionInfo Execution::Executor::parseRedirections(const std::vector<Lexer::Token> &tokens)
 {
     Execution::Executor::RedirectionInfo info;

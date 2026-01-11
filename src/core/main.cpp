@@ -57,7 +57,7 @@ int wmain()
         return EXIT_FAILURE;
     }
 
-    // command history
+    // initialize command history
     History::Manager history;
     history.initialize();
 
@@ -65,8 +65,8 @@ int wmain()
 
     while (true)
     {
-        Execution::Executor::Context ctx;
-        ctx.pipelineEnabled = false;
+        Execution::Executor::Context ctx; // One ctx along the program. 
+        ctx.pipelineEnabled = false; // we do not have any pipeline or redirection yet.
         ctx.redirectionEnabled = false;
         
         auto who = Environment::EnvironmentCommands::executeWHOAMI();
@@ -85,9 +85,10 @@ int wmain()
         console::reset();
 
         console::write(L" $ "); // user@HOSTNAME current\working\directory $
+
         input.setPromptStart(); // set where the history buffer must be written
 
-        std::wstring raw_input = input.readLine();
+        std::wstring raw_input = input.readLine(); // get the input
 
         history.add(raw_input);
         Shell::handleRawInput(raw_input, ctx);

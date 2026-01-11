@@ -31,18 +31,82 @@ limitations under the License.
 namespace Environment
 {
 
+    /**
+     * @brief Dispatches and executes environment-related commands.
+     *
+     * Determines which environment command is requested and forwards
+     * execution to the corresponding implementation. Handles command
+     * arguments and flags at a high level.
+     *
+     * @param cmd   Parsed command type.
+     * @param flags Command flags (reserved for future use).
+     * @param args  Command arguments.
+     */
     class EnvironmentCommands
     {
     public:
+    
+        /**
+         * @brief Executes an environment command.
+         *
+         * Acts as the main entry point for all environment-related
+         * commands such as pwd, whoami, hostname, datetime, and cd.
+         *
+         * @param cmd   Command type to execute.
+         * @param flags Command flags.
+         * @param args  Arguments passed to the command.
+         */
         static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
 
-        // COMMAND IMPLEMENTATION           Function prototypes
+        /**
+         * @brief Returns the current working directory.
+         *
+         * Queries the operating system for the absolute path of the
+         * current process working directory.
+         *
+         * @return Result containing the directory path or an error.
+         */
         static Result<std::wstring> executePWD();
+
+        /**
+         * @brief Returns the name of the current user.
+         *
+         * Retrieves the username associated with the current
+         * process security context.
+         *
+         * @return Result containing the username or an error.
+         */
         static Result<std::wstring> executeWHOAMI();
+
+        /**
+         * @brief Returns the hostname of the system.
+         *
+         * Obtains the local machine name from the operating system.
+         *
+         * @return Result containing the hostname or an error.
+         */
         static Result<std::wstring> executeHOSTNAME();
+
+        /**
+         * @brief Returns the current local date and time.
+         *
+         * Formats the local system time into a human-readable
+         * string representation.
+         *
+         * @return Result containing the formatted date-time string.
+         */
         static Result<std::wstring> executeDATETIME();
 
     private:
+        /**
+         * @brief Changes the current working directory.
+         *
+         * Attempts to set the process working directory to the
+         * specified path.
+         *
+         * @param path Target directory path.
+         * @return BoolResult indicating success or failure with error details.
+         */
         static BoolResult executeCD(const std::wstring &path);
     };
 }

@@ -27,7 +27,20 @@ limitations under the License.
 #include "../headers/Token.hpp"
 #include "../headers/Commands.hpp"
 
-std::vector<Lexer::Token> Token::tokenizeInput(const std::wstring &input, Execution::Executor::Context& ctx)
+/**
+ * @brief Splits raw input into a sequence of lexical tokens.
+ *
+ * This function performs a whitespace-based tokenization of the input
+ * string and classifies each token according to shell syntax rules.
+ * It does not perform quoting, escaping, or expansion.
+ *
+ * An explicit EOF token is appended at the end of the token stream.
+ *
+ * @param input Raw input string provided by the user.
+ * @param ctx   Execution context updated during token classification.
+ * @return Vector of lexical tokens.
+ */
+std::vector<Lexer::Token> Token::tokenizeInput(const std::wstring &input, Execution::Executor::Context &ctx)
 {
     std::vector<Lexer::Token> tokens;
 
@@ -62,7 +75,18 @@ std::vector<Lexer::Token> Token::tokenizeInput(const std::wstring &input, Execut
     return tokens;
 }
 
-Lexer::TokenType Token::identifyTokenType(const std::wstring &token, Execution::Executor::Context& ctx)
+/**
+ * @brief Determines the lexical type of a token.
+ *
+ * This function classifies a token based on its textual form and may
+ * update the execution context if the token represents a pipeline or
+ * redirection operator.
+ *
+ * @param token Token text.
+ * @param ctx   Execution context modified for pipeline/redirection state.
+ * @return Token type.
+ */
+Lexer::TokenType Token::identifyTokenType(const std::wstring &token, Execution::Executor::Context &ctx)
 {
 
     // Numeric (supports negative integers)
@@ -86,7 +110,7 @@ Lexer::TokenType Token::identifyTokenType(const std::wstring &token, Execution::
 
     if (token.size() >= 2 &&
         token.front() == L'"' &&
-        token.back()  == L'"')
+        token.back() == L'"')
     {
         return Lexer::TOKEN_STRING;
     }
@@ -96,56 +120,49 @@ Lexer::TokenType Token::identifyTokenType(const std::wstring &token, Execution::
         ctx.pipelineEnabled = true;
         return Lexer::TOKEN_PIPELINE;
     }
-        
 
     if (token == L"<")
     {
         ctx.redirectionEnabled = true;
         return Lexer::TOKEN_INPUT_REDIRECTION;
     }
-        
 
     if (token == L">>")
     {
         ctx.redirectionEnabled = true;
         return Lexer::TOKEN_OUTPUT_REDIRECTION_TWO;
     }
-        
 
     if (token == L">")
     {
         ctx.redirectionEnabled = true;
         return Lexer::TOKEN_OUTPUT_REDIRECTION_ONE;
     }
-        
 
     if (token == L"2>>")
     {
         ctx.redirectionEnabled = true;
         return Lexer::TOKEN_ERROR_REDIRECTION_TWO;
     }
-        
 
     if (token == L"2>")
     {
         ctx.redirectionEnabled = true;
         return Lexer::TOKEN_ERROR_REDIRECTION_ONE;
     }
-        
 
     if (token == L"&>>")
     {
         ctx.redirectionEnabled = true;
         return Lexer::TOKEN_OUTPUT_ERROR_REDIRECTION_TWO;
     }
-        
 
     if (token == L"&>")
-    {   
+    {
         ctx.redirectionEnabled = true;
         return Lexer::TOKEN_OUTPUT_ERROR_REDIRECTION_ONE;
     }
-        
+
     if (Commands::isBuiltInCommand(token))
     {
         return Lexer::TOKEN_COMMAND;

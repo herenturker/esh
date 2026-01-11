@@ -42,22 +42,6 @@ namespace System
 
     void SystemCommands::execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args)
     {
-        // Helper lambda to print boolean command results
-        auto printBoolResult =
-            [](const BoolResult &res, const std::wstring &successMsg)
-        {
-            if (res.ok())
-            {
-                console::setColor(ConsoleColor::Green);
-                console::writeln(successMsg);
-            }
-            else
-            {
-                console::setColor(ConsoleColor::Red);
-                std::wcerr << res.error.message << std::endl;
-            }
-            console::reset();
-        };
 
         switch (cmd)
         {

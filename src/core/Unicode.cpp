@@ -28,6 +28,18 @@ limitations under the License.
 namespace unicode
 {
 
+    /**
+     * @brief Converts a UTF-8 encoded string to UTF-16.
+     *
+     * Uses the Windows API (MultiByteToWideChar) to convert a UTF-8 encoded
+     * narrow string into a UTF-16 wide string.
+     *
+     * If the input string is empty or the conversion fails, an empty
+     * wide string is returned.
+     *
+     * @param utf8 Input string encoded in UTF-8.
+     * @return Converted UTF-16 wide string, or an empty string on failure.
+     */
     std::wstring utf8_to_utf16(const std::string &utf8)
     {
         if (utf8.empty())
@@ -57,6 +69,18 @@ namespace unicode
         return utf16;
     }
 
+    /**
+     * @brief Converts a UTF-16 encoded string to UTF-8.
+     *
+     * Uses the Windows API (WideCharToMultiByte) to convert a UTF-16 wide
+     * string into a UTF-8 encoded narrow string.
+     *
+     * If the input string is empty or the conversion fails, an empty
+     * string is returned.
+     *
+     * @param utf16 Input string encoded in UTF-16.
+     * @return Converted UTF-8 string, or an empty string on failure.
+     */
     std::string utf16_to_utf8(const std::wstring &utf16)
     {
         if (utf16.empty())

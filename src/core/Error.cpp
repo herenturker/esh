@@ -22,6 +22,21 @@ limitations under the License.
 #include "../headers/Error.hpp"
 #include "../headers/Unicode.hpp"
 
+/**
+ * @brief Constructs an Error object from the last Windows error code.
+ *
+ * Retrieves the error code returned by GetLastError() and converts it into
+ * a human-readable wide-string message using the Windows FormatMessage API.
+ *
+ * If no error has occurred (error code is zero), an empty Error object is
+ * returned.
+ *
+ * An optional prefix can be prepended to the generated error message to
+ * provide additional context (e.g., the failing operation name).
+ *
+ * @param prefix Optional message prefix to be prepended to the system error text.
+ * @return Error object containing the error code and formatted message.
+ */
 Error makeLastError(const std::wstring &prefix)
 {
     DWORD code = GetLastError();

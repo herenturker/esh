@@ -25,11 +25,32 @@ limitations under the License.
 #include "../headers/Parser.hpp"
 #include "../execution/Execution.hpp"
 
+/**
+ * @brief Parses a sequence of lexer tokens and dispatches execution.
+ *
+ * Acts as the bridge between parsing and execution layers. This function
+ * forwards the fully tokenized input to the executor, which is responsible
+ * for handling pipelines, redirections, and command execution.
+ *
+ * @param tokens The list of tokens produced by the lexer.
+ * @param ctx Execution context carrying runtime state and I/O handles.
+ */
 void Parser::parseTokens(const std::vector<Lexer::Token>& tokens, Execution::Executor::Context& ctx)
 {
     Execution::Executor::run(tokens, ctx);
 }
 
+/**
+ * @brief Resolves a command token to its corresponding command type.
+ *
+ * Looks up the given command string in the internal command map and returns
+ * the associated CommandType enum value.
+ *
+ * If the command is not found, a reserved command value is returned.
+ *
+ * @param token The command token as a wide string.
+ * @return The resolved CommandType, or a reserved value if not found.
+ */
 CommandType Parser::parseCommand(const std::wstring &token)
 {
     auto it = commandMap.find(token);
@@ -38,6 +59,17 @@ CommandType Parser::parseCommand(const std::wstring &token)
     return static_cast<CommandType>(0x00); // RESERVED
 }
 
+/**
+ * @brief Parses command-line flags into a bitmask.
+ *
+ * Iterates over the provided flag tokens and accumulates their corresponding
+ * flag values into a single bitmask using bitwise OR operations.
+ *
+ * Unknown flags are silently ignored.
+ *
+ * @param tokens A list of flag tokens.
+ * @return An 8-bit bitmask representing the parsed flags.
+ */
 uint8_t Parser::parseFlags(const std::vector<std::wstring> &tokens)
 {
     uint8_t result = 0;

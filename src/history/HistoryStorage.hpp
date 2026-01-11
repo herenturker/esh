@@ -26,6 +26,24 @@ limitations under the License.
 
 namespace HistoryStorage
 {
+    /**
+     * @brief Loads the shell command history from disk.
+     *
+     * Reads the history file from the application's base path and
+     * returns each line as a separate entry in a vector.
+     *
+     * @return std::vector<std::wstring> Vector of all history entries.
+     *         Returns an empty vector if the file does not exist or is empty.
+     */
     std::vector<std::wstring> load();
+
+    /**
+     * @brief Saves the shell command history to disk.
+     *
+     * Writes all provided entries into the history file, one per line.
+     * Any existing history in the file is overwritten.
+     *
+     * @param entries Vector of strings representing the history to save.
+     */
     void save(const std::vector<std::wstring> &entries);
 }

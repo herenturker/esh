@@ -28,18 +28,48 @@ limitations under the License.
 #include "../headers/Result.hpp"
 #include "../headers/Commands.hpp"
 
+/**
+ * @brief Namespace containing shell-related commands.
+ */
 namespace ShellCmds
 {
-
+    /**
+     * @brief Implements basic shell commands for the custom shell.
+     *
+     * Supported commands:
+     *  - EXIT: Exit the shell.
+     *  - CLEAR: Clear the shell console.
+     *  - ECHO: Print arguments to the console.
+     */
     class ShellCommands
     {
     public:
+        /**
+         * @brief Executes a shell command with optional flags and arguments.
+         * 
+         * @param cmd Command type to execute (EXIT, CLEAR, ECHO).
+         * @param flags Bitwise flags affecting command behavior.
+         * @param args Vector of string arguments for the command.
+         */
         static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
 
     private:
-        // COMMAND IMPLEMENTATION           Function prototypes
+        /**
+         * @brief Exits the shell immediately.
+         */
         static void executeEXIT();
+
+        /**
+         * @brief Clears the shell console screen.
+         */
         static void executeCLEAR();
+
+        /**
+         * @brief Prints the provided arguments to the console.
+         * 
+         * @param args Vector of strings to print.
+         * @return BoolResult indicating success or failure.
+         */
         static BoolResult executeECHO(const std::vector<std::wstring> &args);
     };
 }
