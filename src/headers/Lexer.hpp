@@ -15,20 +15,18 @@ limitations under the License.
 */
 
 // FILE: src\headers\Lexer.hpp
-// PURPOSE: Header file for 'src\core\Lexer.cpp'. Performs lexical analysis.
+// PURPOSE: Contains tokens.
 
 #pragma once
 
 // INCLUDE LIBRARIES
+
 #include <string>
 #include <vector>
-
-// #include "../execution/Execution.hpp"
 
 class Lexer
 {
 public:
-
 
     /**
      * @brief Represents different types of tokens that can be identified during lexical analysis.
@@ -89,19 +87,4 @@ public:
         std::wstring lexeme;
     };
 
-    /**
-     * @brief Tokenizes the input string into a sequence of tokens.
-     * @param input The raw input string.
-     * @param ctx   Execution context (tracks pipeline/redirection state).
-     * @return A vector of tokens.
-     */
-    static std::vector<Token> tokenizeInput(const std::wstring &input, Execution::Executor::Context& ctx);
-
-    /**
-     * @brief Identifies the type of a given token string.
-     * @param token The token string.
-     * @param ctx   Execution context (updated if pipeline/redirection detected).
-     * @return The token type.
-     */
-    static TokenType identifyTokenType(const std::wstring &token, Execution::Executor::Context& ctx);
 };

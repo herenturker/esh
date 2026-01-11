@@ -384,7 +384,9 @@ namespace FileIO
     // LS COMMAND
     void FileCommands::executeLS(const std::wstring &pathStr, uint8_t flags, const std::wstring &prefix, Execution::Executor::Context &ctx)
     {
-        std::wstring searchPath = pathStr + L"\\*";
+        std::wstring path = pathStr.empty() ? L"." : pathStr;
+
+        std::wstring searchPath = path + L"\\*";
 
         WIN32_FIND_DATAW ffd;
         HANDLE hFind = FindFirstFileW(searchPath.c_str(), &ffd);
@@ -431,8 +433,7 @@ namespace FileIO
                 std::wstring newPrefix = treePrefix + (isLast ? L"    " : L"|   ");
 
                 std::wstring subDirBuffer;
-                auto oldWriteOut = writeOut;
-                executeLS(pathStr + L"\\" + name, flags, newPrefix, ctx);
+                executeLS(path + L"\\" + name, flags, newPrefix, ctx);
             }
         }
 
@@ -444,7 +445,6 @@ namespace FileIO
         }
     
     }
-
 
     // STATS COMMAND
     void FileCommands::executeSTATS(const std::wstring &filename, Execution::Executor::Context &ctx)

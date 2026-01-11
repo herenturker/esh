@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// FILE: src\core\Lexer.cpp
-// PURPOSE: Identifies and tokenizes the input
+// FILE: src\core\Token.cpp
+// PURPOSE: Performs operations related to tokens. Created for handling circular dependency problem.
 
 // INCLUDE LIBRARIES
 
@@ -24,13 +24,12 @@ limitations under the License.
 #include <cctype>
 #include <iostream>
 
-#include "../headers/Lexer.hpp"
+#include "../headers/Token.hpp"
 #include "../headers/Commands.hpp"
-#include "../execution/Execution.hpp"
 
-std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input, Execution::Executor::Context& ctx)
+std::vector<Lexer::Token> Token::tokenizeInput(const std::wstring &input, Execution::Executor::Context& ctx)
 {
-    std::vector<Token> tokens;
+    std::vector<Lexer::Token> tokens;
 
     std::size_t pos = 0;
     const std::size_t len = input.length();
@@ -53,17 +52,17 @@ std::vector<Lexer::Token> Lexer::tokenizeInput(const std::wstring &input, Execut
         }
 
         std::wstring token = input.substr(start, pos - start); // Gets the token without blank char.
-        TokenType type = identifyTokenType(token, ctx);
+        Lexer::TokenType type = Token::identifyTokenType(token, ctx);
 
         tokens.push_back({type, token});
     }
 
-    tokens.push_back({TOKEN_EOF, L""}); // End of input
+    tokens.push_back({Lexer::TOKEN_EOF, L""}); // End of input
 
     return tokens;
 }
 
-Lexer::TokenType Lexer::identifyTokenType(const std::wstring &token, Execution::Executor::Context& ctx)
+Lexer::TokenType Token::identifyTokenType(const std::wstring &token, Execution::Executor::Context& ctx)
 {
 
     // Numeric (supports negative integers)
@@ -73,84 +72,84 @@ Lexer::TokenType Lexer::identifyTokenType(const std::wstring &token, Execution::
                         [](unsigned char c)
                         { return std::isdigit(c); }))
         {
-            return TOKEN_NUMBER;
+            return Lexer::TOKEN_NUMBER;
         }
-        return TOKEN_FLAG;
+        return Lexer::TOKEN_FLAG;
     }
 
     if (std::all_of(token.begin(), token.end(),
                     [](unsigned char c)
                     { return std::isdigit(c); }))
     {
-        return TOKEN_NUMBER;
+        return Lexer::TOKEN_NUMBER;
     }
 
     if (token.size() >= 2 &&
         token.front() == L'"' &&
         token.back()  == L'"')
     {
-        return TOKEN_STRING;
+        return Lexer::TOKEN_STRING;
     }
 
     if (token == L"|")
     {
         ctx.pipelineEnabled = true;
-        return TOKEN_PIPELINE;
+        return Lexer::TOKEN_PIPELINE;
     }
         
 
     if (token == L"<")
     {
         ctx.redirectionEnabled = true;
-        return TOKEN_INPUT_REDIRECTION;
+        return Lexer::TOKEN_INPUT_REDIRECTION;
     }
         
 
     if (token == L">>")
     {
         ctx.redirectionEnabled = true;
-        return TOKEN_OUTPUT_REDIRECTION_TWO;
+        return Lexer::TOKEN_OUTPUT_REDIRECTION_TWO;
     }
         
 
     if (token == L">")
     {
         ctx.redirectionEnabled = true;
-        return TOKEN_OUTPUT_REDIRECTION_ONE;
+        return Lexer::TOKEN_OUTPUT_REDIRECTION_ONE;
     }
         
 
     if (token == L"2>>")
     {
         ctx.redirectionEnabled = true;
-        return TOKEN_ERROR_REDIRECTION_TWO;
+        return Lexer::TOKEN_ERROR_REDIRECTION_TWO;
     }
         
 
     if (token == L"2>")
     {
         ctx.redirectionEnabled = true;
-        return TOKEN_ERROR_REDIRECTION_ONE;
+        return Lexer::TOKEN_ERROR_REDIRECTION_ONE;
     }
         
 
     if (token == L"&>>")
     {
         ctx.redirectionEnabled = true;
-        return TOKEN_OUTPUT_ERROR_REDIRECTION_TWO;
+        return Lexer::TOKEN_OUTPUT_ERROR_REDIRECTION_TWO;
     }
         
 
     if (token == L"&>")
     {   
         ctx.redirectionEnabled = true;
-        return TOKEN_OUTPUT_ERROR_REDIRECTION_ONE;
+        return Lexer::TOKEN_OUTPUT_ERROR_REDIRECTION_ONE;
     }
         
     if (Commands::isBuiltInCommand(token))
     {
-        return TOKEN_COMMAND;
+        return Lexer::TOKEN_COMMAND;
     }
 
-    return TOKEN_EXECUTEE;
+    return Lexer::TOKEN_EXECUTEE;
 }
