@@ -363,7 +363,6 @@ namespace FileIO
             std::string chunk(buffer, bytesRead);
             outBuffer += unicode::utf8_to_utf16(chunk);
 
-            // Buffer belli bir boyuta gelirse yaz
             if (outBuffer.size() > 16384) // 16 KB
             {
                 writeOut(ctx.stdoutHandle, outBuffer);
@@ -380,12 +379,14 @@ namespace FileIO
         CloseHandle(hFile);
     }
 
-
     // LS COMMAND
-    void FileCommands::executeLS(const std::wstring &pathStr, uint8_t flags, const std::wstring &prefix, Execution::Executor::Context &ctx)
+    void FileCommands::executeLS(
+        const std::wstring &pathStr,
+        uint8_t flags,
+        const std::wstring &prefix,
+        Execution::Executor::Context &ctx)
     {
         std::wstring path = pathStr.empty() ? L"." : pathStr;
-
         std::wstring searchPath = path + L"\\*";
 
         WIN32_FIND_DATAW ffd;
@@ -393,57 +394,68 @@ namespace FileIO
 
         if (hFind == INVALID_HANDLE_VALUE)
         {
-            writeOut(ctx.stderrHandle, L"ls: cannot access '" + pathStr + L"'\n");
+            writeOut(ctx.stderrHandle, L"ls: cannot access '" + path + L"'\n");
 
-            if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
-                console::writeln(L"ls: cannot access '" + pathStr + L"'\n");
+            if (!ctx.pipelineEnabled && !ctx.redirectionEnabled)
+                console::writeln(L"ls: cannot access '" + path + L"'\n");
             return;
         }
 
         std::vector<WIN32_FIND_DATAW> entries;
-        do { 
-            entries.push_back(ffd); 
+        do {
+            entries.push_back(ffd);
         } while (FindNextFileW(hFind, &ffd));
 
         FindClose(hFind);
 
-        std::wstring outBuffer;
-
-        for (size_t i = 0; i < entries.size(); ++i)
+        std::vector<WIN32_FIND_DATAW> visible;
+        for (const auto &e : entries)
         {
-            const auto &f = entries[i];
-            std::wstring name = f.cFileName;
+            std::wstring name = e.cFileName;
 
             if (name == L"." || name == L"..") continue;
-            if (!(flags & static_cast<uint8_t>(Flag::ALL)) && (f.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)) continue;
+            if (!(flags & static_cast<uint8_t>(Flag::ALL)) &&
+                (e.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)) continue;
 
-            bool isLast = (i == entries.size() - 1);
+            visible.push_back(e);
+        }
+
+        std::wstring outBuffer;
+
+        for (size_t i = 0; i < visible.size(); ++i)
+        {
+            const auto &f = visible[i];
+            std::wstring name = f.cFileName;
+
+            bool isLast = (i == visible.size() - 1);
+
             std::wstring treePrefix = prefix;
-
             if (flags & static_cast<uint8_t>(Flag::RECURSIVE))
-                treePrefix += isLast ? L"└─" : L"├─";
+                treePrefix += isLast ? L"|___" : L"|---";
 
             outBuffer += formatLsEntry(f, treePrefix, flags);
 
-            // Recursive for directories
-            if ((flags & static_cast<uint8_t>(Flag::RECURSIVE)) && (f.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+            if ((flags & static_cast<uint8_t>(Flag::RECURSIVE)) &&
+                (f.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
             {
-                if (f.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) continue;
+                if (f.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
+                    continue;
 
-                std::wstring newPrefix = treePrefix + (isLast ? L"    " : L"|   ");
+                std::wstring newPrefix = prefix;
+                newPrefix += isLast ? L"    " : L"|   ";
 
-                std::wstring subDirBuffer;
                 executeLS(path + L"\\" + name, flags, newPrefix, ctx);
             }
+
         }
 
-        if (!outBuffer.empty()) {
+        if (!outBuffer.empty())
+        {
             writeOut(ctx.stdoutHandle, outBuffer);
 
-            if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
+            if (!ctx.pipelineEnabled && !ctx.redirectionEnabled)
                 console::writeln(outBuffer);
         }
-    
     }
 
     // STATS COMMAND

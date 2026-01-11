@@ -107,7 +107,34 @@ void Execution::Executor::run(const std::vector<Lexer::Token> &tokens, Context& 
     else if (redir.hasRedirection)
     {
         ctx.redirectionEnabled = true;
-        // code here
+
+        auto redirInfo = parseRedirections(tokens);
+        auto cleanTokens = stripRedirectionTokens(tokens);
+
+        HANDLE oldIn  = ctx.stdinHandle;
+        HANDLE oldOut = ctx.stdoutHandle;
+        HANDLE oldErr = ctx.stderrHandle;
+
+        if (redirInfo.stdinHandle)
+            ctx.stdinHandle = redirInfo.stdinHandle;
+        if (redirInfo.stdoutHandle)
+            ctx.stdoutHandle = redirInfo.stdoutHandle;
+        if (redirInfo.stderrHandle)
+            ctx.stderrHandle = redirInfo.stderrHandle;
+
+        executeSimple(cleanTokens, ctx);
+
+        ctx.stdinHandle  = oldIn;
+        ctx.stdoutHandle = oldOut;
+        ctx.stderrHandle = oldErr;
+
+        if (redirInfo.stdinHandle)  CloseHandle(redirInfo.stdinHandle);
+
+        if (redirInfo.stdoutHandle && redirInfo.stdoutHandle != redirInfo.stderrHandle)
+            CloseHandle(redirInfo.stdoutHandle);
+            
+        if (redirInfo.stderrHandle)
+            CloseHandle(redirInfo.stderrHandle);
     }
 
 }

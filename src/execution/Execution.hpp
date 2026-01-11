@@ -74,6 +74,7 @@ namespace Execution
         // Execution paths
         static void executeSimple(const std::vector<Lexer::Token>& tokens, Context& ctx);
         static void executePipeline(const std::vector<Lexer::Token>& tokens);
+        static void executeRedirection(const std::vector<Lexer::Token>& tokens);
 
         static std::vector<std::vector<Lexer::Token>> splitByPipeline(const std::vector<Lexer::Token>& tokens);
 
