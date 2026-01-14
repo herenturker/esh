@@ -82,7 +82,7 @@ void Engine::execute(CommandType command, uint16_t flags, const std::vector<std:
         System::SystemCommands::execute(command, flags, args);
         break;
 
-    default:
+    case CommandGroup::UNKNOWN:
         console::setColor(ConsoleColor::Red);
         std::wcerr << L"Unknown or unsupported command" << std::endl;
         console::reset();
