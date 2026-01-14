@@ -128,7 +128,7 @@ enum class CommandType : uint8_t
 };
 
 // DEFINE FLAGS
-enum class Flag : uint8_t
+enum class Flag : uint16_t
 {
     RECURSIVE =     FLAG_RECURSIVE,
     VERBOSE =       FLAG_VERBOSE,

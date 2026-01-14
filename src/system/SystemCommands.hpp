@@ -43,7 +43,7 @@ namespace System
          * @param flags Bitwise flags affecting command behavior.
          * @param args Vector of string arguments for the command (currently unused for SYSTEM commands).
          */
-        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
+        static void execute(CommandType cmd, uint16_t flags, const std::vector<std::wstring> &args);
 
     private:
         /**

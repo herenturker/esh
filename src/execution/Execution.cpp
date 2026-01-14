@@ -42,8 +42,7 @@ static std::wstring buildCommandLine(const std::vector<Lexer::Token> &tokens)
     return result;
 }
 
-static std::vector<Lexer::Token>
-stripRedirectionTokens(const std::vector<Lexer::Token> &tokens)
+static std::vector<Lexer::Token> stripRedirectionTokens(const std::vector<Lexer::Token> &tokens)
 {
     std::vector<Lexer::Token> clean;
 
@@ -134,8 +133,10 @@ void Execution::Executor::run(const std::vector<Lexer::Token> &tokens, Context &
 
         if (redirInfo.stdinHandle)
             ctx.stdinHandle = redirInfo.stdinHandle;
+
         if (redirInfo.stdoutHandle)
             ctx.stdoutHandle = redirInfo.stdoutHandle;
+
         if (redirInfo.stderrHandle)
             ctx.stderrHandle = redirInfo.stderrHandle;
 
@@ -249,7 +250,7 @@ void Execution::Executor::executePipeline(const std::vector<Lexer::Token> &token
         sa.lpSecurityDescriptor = nullptr;
         sa.bInheritHandle = TRUE;
 
-        if (i < commands.size() - 1)
+        if (i < commands.size() - 1) // don't need pipeline for the last command
         {
             CreatePipe(&readPipe, &writePipe, &sa, 0);
         }
@@ -458,20 +459,26 @@ Execution::Executor::RedirectionInfo Execution::Executor::parseRedirections(cons
         switch (type)
         {
         case Execution::Executor::RedirectType::STDIN:
+
             if (info.stdinHandle)
                 CloseHandle(info.stdinHandle);
+
             info.stdinHandle = Execution::Executor::openFileForRead(target);
             break;
 
         case Execution::Executor::RedirectType::STDOUT:
+
             if (info.stdoutHandle)
                 CloseHandle(info.stdoutHandle);
+
             info.stdoutHandle = Execution::Executor::openFileForWrite(target, append);
             break;
 
         case Execution::Executor::RedirectType::STDERR:
+
             if (info.stderrHandle)
                 CloseHandle(info.stderrHandle);
+
             info.stderrHandle = Execution::Executor::openFileForWrite(target, append);
             break;
 
@@ -482,6 +489,7 @@ Execution::Executor::RedirectionInfo Execution::Executor::parseRedirections(cons
                 CloseHandle(info.stdoutHandle);
             if (info.stderrHandle)
                 CloseHandle(info.stderrHandle);
+                
             info.stdoutHandle = h;
             info.stderrHandle = h;
             break;

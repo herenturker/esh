@@ -62,13 +62,13 @@ static void writeOut(HANDLE h, const std::wstring &text)
 static std::wstring formatLsEntry(
     const WIN32_FIND_DATAW &f,
     const std::wstring &prefix,
-    uint8_t flags)
+    uint16_t flags)
 {
     LARGE_INTEGER size;
     size.LowPart = f.nFileSizeLow;
     size.HighPart = f.nFileSizeHigh;
 
-    if (flags & static_cast<uint8_t>(Flag::VERBOSE))
+    if (flags & static_cast<uint16_t>(Flag::VERBOSE))
     {
         return prefix +
                (f.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ? L"d " : L"- ") +
@@ -78,6 +78,8 @@ static std::wstring formatLsEntry(
 
     return prefix + f.cFileName + L"\n";
 }
+
+// ---------------------------------------------------------------------------------------------------------------------------------
 
 namespace FileIO
 {
@@ -89,10 +91,11 @@ namespace FileIO
      * @param args Command arguments (file/directory names, counts, etc.).
      * @param ctx Execution context containing handles, pipeline state, redirection state.
      */
-    void FileCommands::execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context &ctx)
+    void FileCommands::execute(CommandType cmd, uint16_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context &ctx)
     {
         switch (cmd)
         {
+        // LS
         case CommandType::LS:
         {
             std::wstring path = args.empty() ? L"." : args[0];
@@ -100,6 +103,7 @@ namespace FileIO
             break;
         }
 
+        // REW
         case CommandType::REW:
         {
             if (args.empty())
@@ -113,6 +117,7 @@ namespace FileIO
             break;
         }
 
+        // STATS
         case CommandType::STATS:
         {
             if (args.empty())
@@ -126,12 +131,13 @@ namespace FileIO
             break;
         }
 
+        // HEAD
         case CommandType::HEAD:
         {
-            if (args.size() < 2 || !(flags & FLAG_COUNT))
+            if (!(flags & FLAG_COUNT) || (!ctx.pipelineEnabled && args.size() < 2))
             {
                 writeOut(ctx.stderrHandle, L"Usage: head <file> -n <count>\n");
-                if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
+                if (!ctx.pipelineEnabled && !ctx.redirectionEnabled)
                     console::write(L"Usage: head <file> -n <count>\n");
                 break;
             }
@@ -144,28 +150,31 @@ namespace FileIO
             catch (...)
             {
                 writeOut(ctx.stderrHandle, L"Invalid line count\n");
-                if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
+                if (!ctx.pipelineEnabled && !ctx.redirectionEnabled)
                     console::write(L"Invalid line count\n");
                 break;
             }
 
-            auto res = executeHEAD(args[0], count, ctx);
+            std::wstring filename = ctx.pipelineEnabled ? L"" : args[0];
+
+            auto res = executeHEAD(filename, count, ctx);
             if (!res.ok())
             {
                 writeOut(ctx.stderrHandle, res.error.message);
-                if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
+                if (!ctx.pipelineEnabled && !ctx.redirectionEnabled)
                     console::writeln(res.error.message);
             }
 
             break;
         }
 
+        // TAIL
         case CommandType::TAIL:
         {
-            if (args.size() < 2 || !(flags & FLAG_COUNT))
+            if (!(flags & FLAG_COUNT) || (!ctx.pipelineEnabled && args.size() < 2))
             {
                 writeOut(ctx.stderrHandle, L"Usage: tail <file> -n <count>\n");
-                if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
+                if (!ctx.pipelineEnabled && !ctx.redirectionEnabled)
                     console::write(L"Usage: tail <file> -n <count>\n");
                 break;
             }
@@ -178,22 +187,25 @@ namespace FileIO
             catch (...)
             {
                 writeOut(ctx.stderrHandle, L"Invalid line count\n");
-                if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
+                if (!ctx.pipelineEnabled && !ctx.redirectionEnabled)
                     console::write(L"Invalid line count\n");
                 break;
             }
 
-            auto res = executeTAIL(args[0], count, ctx);
+            std::wstring filename = ctx.pipelineEnabled ? L"" : args[0];
+
+            auto res = executeTAIL(filename, count, ctx);
             if (!res.ok())
             {
                 writeOut(ctx.stderrHandle, res.error.message);
-                if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
+                if (!ctx.pipelineEnabled && !ctx.redirectionEnabled)
                     console::writeln(res.error.message);
             }
 
             break;
         }
 
+        // MKDIR
         case CommandType::MKDIR:
         {
             auto res = executeMKDIR(args.empty() ? L"" : args[0]);
@@ -207,6 +219,7 @@ namespace FileIO
             break;
         }
 
+        // RMDIR
         case CommandType::RMDIR:
         {
             auto res = executeRMDIR(args.empty() ? L"" : args[0]);
@@ -220,6 +233,7 @@ namespace FileIO
             break;
         }
 
+        // TOUCH
         case CommandType::TOUCH:
         {
             auto res = executeTOUCH(args.empty() ? L"" : args[0]);
@@ -233,6 +247,7 @@ namespace FileIO
             break;
         }
 
+        // RM
         case CommandType::RM:
         {
             auto res = executeRM(args.empty() ? L"" : args[0]);
@@ -246,6 +261,7 @@ namespace FileIO
             break;
         }
 
+        // MV
         case CommandType::MV:
         {
             if (args.size() < 2)
@@ -267,6 +283,7 @@ namespace FileIO
             break;
         }
 
+        // CP
         case CommandType::CP:
         {
             if (args.size() < 2)
@@ -411,7 +428,7 @@ namespace FileIO
     /// @param ctx Execution context.
     void FileCommands::executeLS(
         const std::wstring &pathStr,
-        uint8_t flags,
+        uint16_t flags,
         const std::wstring &prefix,
         Execution::Executor::Context &ctx)
     {
@@ -445,7 +462,7 @@ namespace FileIO
 
             if (name == L"." || name == L"..")
                 continue;
-            if (!(flags & static_cast<uint8_t>(Flag::ALL)) &&
+            if (!(flags & static_cast<uint16_t>(Flag::ALL)) &&
                 (e.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
                 continue;
 
@@ -462,12 +479,12 @@ namespace FileIO
             bool isLast = (i == visible.size() - 1);
 
             std::wstring treePrefix = prefix;
-            if (flags & static_cast<uint8_t>(Flag::RECURSIVE))
+            if (flags & static_cast<uint16_t>(Flag::RECURSIVE))
                 treePrefix += isLast ? L"|___" : L"|---";
 
             outBuffer += formatLsEntry(f, treePrefix, flags);
 
-            if ((flags & static_cast<uint8_t>(Flag::RECURSIVE)) &&
+            if ((flags & static_cast<uint16_t>(Flag::RECURSIVE)) &&
                 (f.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
             {
                 if (f.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
@@ -592,12 +609,31 @@ namespace FileIO
     /// @return BoolResult indicating success or failure.
     BoolResult FileCommands::executeHEAD(const std::wstring &filename, size_t lineCount, Execution::Executor::Context &ctx)
     {
-        HANDLE hFile = CreateFileW(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        HANDLE hFile = INVALID_HANDLE_VALUE;
+
+        if (filename.empty() && ctx.pipelineEnabled)
+        {
+            hFile = ctx.stdinHandle;   // READ FROM PIPE
+        }
+        else
+        {
+            hFile = CreateFileW(
+                filename.c_str(),
+                GENERIC_READ,
+                FILE_SHARE_READ,
+                nullptr,
+                OPEN_EXISTING,
+                FILE_ATTRIBUTE_NORMAL,
+                nullptr);
+        }
+
         if (hFile == INVALID_HANDLE_VALUE)
         {
             writeOut(ctx.stderrHandle, L"head: cannot open file\n");
+
             if (ctx.pipelineEnabled == false && ctx.redirectionEnabled == false)
                 console::writeln(L"head: cannot open file\n");
+
             return {false, makeLastError(L"head")};
         }
 
@@ -648,7 +684,8 @@ namespace FileIO
                 console::writeln(outBuffer);
         }
 
-        CloseHandle(hFile);
+        if (!(filename.empty() && ctx.pipelineEnabled))
+            CloseHandle(hFile);
         return {true, {}};
     }
 
@@ -774,14 +811,23 @@ namespace FileIO
     /// @return BoolResult indicating success or failure.
     BoolResult FileCommands::executeTAIL(const std::wstring &filename, size_t lineCount, Execution::Executor::Context &ctx)
     {
-        HANDLE hFile = CreateFileW(
-            filename.c_str(),
-            GENERIC_READ,
-            FILE_SHARE_READ,
-            nullptr,
-            OPEN_EXISTING,
-            FILE_ATTRIBUTE_NORMAL,
-            nullptr);
+        HANDLE hFile = INVALID_HANDLE_VALUE;
+
+        if (filename.empty() && ctx.pipelineEnabled)
+        {
+            hFile = ctx.stdinHandle;
+        }
+        else
+        {
+            hFile = CreateFileW(
+                filename.c_str(),
+                GENERIC_READ,
+                FILE_SHARE_READ,
+                nullptr,
+                OPEN_EXISTING,
+                FILE_ATTRIBUTE_NORMAL,
+                nullptr);
+        }
 
         if (hFile == INVALID_HANDLE_VALUE)
         {
@@ -828,7 +874,8 @@ namespace FileIO
                 lineBuffer.pop_front();
         }
 
-        CloseHandle(hFile);
+        if (!(filename.empty() && ctx.pipelineEnabled))
+            CloseHandle(hFile);
 
         std::wstring outBuffer;
         for (const auto &line : lineBuffer)

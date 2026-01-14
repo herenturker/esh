@@ -36,7 +36,7 @@ namespace Process
     class ProcessCommands
     {
     public:
-        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
+        static void execute(CommandType cmd, uint16_t flags, const std::vector<std::wstring> &args);
 
     private:
         // COMMAND IMPLEMENTATION           Function prototypes

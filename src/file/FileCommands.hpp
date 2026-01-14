@@ -45,6 +45,7 @@ namespace FileIO
     class FileCommands
     {
     public:
+    
         /**
          * @brief Executes a file command with the given arguments.
          *
@@ -53,7 +54,7 @@ namespace FileIO
          * @param args Arguments for the command (file/directory names, counts, etc.).
          * @param ctx Execution context containing handles, pipeline state, and redirection state.
          */
-        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context &ctx);
+        static void execute(CommandType cmd, uint16_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context &ctx);
 
     private:
         // --------------------
@@ -68,7 +69,7 @@ namespace FileIO
          * @param prefix Prefix for recursive tree-like output.
          * @param ctx Execution context.
          */
-        static void executeLS(const std::wstring &pathStr, uint8_t flags, const std::wstring &prefix, Execution::Executor::Context &ctx);
+        static void executeLS(const std::wstring &pathStr, uint16_t flags, const std::wstring &prefix, Execution::Executor::Context &ctx);
 
         /**
          * @brief Reads and writes the contents of a file.
@@ -168,5 +169,6 @@ namespace FileIO
          * @return BoolResult indicating success or failure.
          */
         static BoolResult executeCP(const std::wstring &src, const std::wstring &dst);
+
     };
 }

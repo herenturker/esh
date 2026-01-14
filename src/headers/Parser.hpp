@@ -35,5 +35,5 @@ public:
 
     static CommandType parseCommand(const std::wstring &token);
 
-    static uint8_t parseFlags(const std::vector<std::wstring> &tokens);
+    static uint16_t parseFlags(const std::vector<std::wstring> &tokens);
 };

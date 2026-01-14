@@ -68,17 +68,17 @@ CommandType Parser::parseCommand(const std::wstring &token)
  * Unknown flags are silently ignored.
  *
  * @param tokens A list of flag tokens.
- * @return An 8-bit bitmask representing the parsed flags.
+ * @return An 16-bit bitmask representing the parsed flags.
  */
-uint8_t Parser::parseFlags(const std::vector<std::wstring> &tokens)
+uint16_t Parser::parseFlags(const std::vector<std::wstring> &tokens)
 {
-    uint8_t result = 0;
+    uint16_t result = 0;
     for (const auto &t : tokens)
     {
         auto it = flagMap.find(t);
         if (it != flagMap.end())
         {
-            result |= static_cast<uint8_t>(it->second);
+            result |= static_cast<uint16_t>(it->second);
         }
     }
     return result;

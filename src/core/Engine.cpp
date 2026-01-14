@@ -33,6 +33,7 @@ limitations under the License.
 #include "../process/ProcessCommands.hpp"
 #include "../system/SystemCommands.hpp"
 #include "../execution/Execution.hpp"
+#include "../headers/Helper.hpp"
 
 /**
  * @brief Dispatches and executes a parsed command.
@@ -49,9 +50,15 @@ limitations under the License.
  * @param args    Vector of command arguments.
  * @param ctx     Execution context carrying redirection and pipeline state.
  */
-void Engine::execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context &ctx)
+void Engine::execute(CommandType command, uint16_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context &ctx)
 {
     auto group = getCommandGroup(command); // Classifies the command given.
+
+    if (flags & FLAG_HELP)
+    {
+        helper::showHelp(command);
+        return;
+    }
 
     switch (group)
     {

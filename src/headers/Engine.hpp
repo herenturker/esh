@@ -31,5 +31,5 @@ limitations under the License.
 class Engine
 {
 public:
-    static void execute(CommandType command, uint8_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context&);
+    static void execute(CommandType command, uint16_t flags, const std::vector<std::wstring> &args, Execution::Executor::Context&);
 };

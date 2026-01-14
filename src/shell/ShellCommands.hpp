@@ -51,7 +51,7 @@ namespace ShellCmds
          * @param flags Bitwise flags affecting command behavior.
          * @param args Vector of string arguments for the command.
          */
-        static void execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args);
+        static void execute(CommandType cmd, uint16_t flags, const std::vector<std::wstring> &args);
 
     private:
         /**

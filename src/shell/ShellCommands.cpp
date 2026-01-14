@@ -36,7 +36,7 @@ limitations under the License.
 namespace ShellCmds
 { // DO NOT CHANGE the name to 'Shell'. It creates errors (because I tried before).
 
-    void ShellCommands::execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args)
+    void ShellCommands::execute(CommandType cmd, uint16_t flags, const std::vector<std::wstring> &args)
     {
         switch (cmd)
         {

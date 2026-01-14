@@ -40,7 +40,7 @@ limitations under the License.
 namespace System
 {
 
-    void SystemCommands::execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args)
+    void SystemCommands::execute(CommandType cmd, uint16_t flags, const std::vector<std::wstring> &args)
     {
 
         switch (cmd)

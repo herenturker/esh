@@ -90,3 +90,4 @@ bool Commands::isBuiltInCommand(const std::wstring &command)
 
     return builtinCommands.find(command) != builtinCommands.end();
 }
+

@@ -23,11 +23,16 @@ limitations under the License.
 
 #include <string>
 #include <sstream>
+#include <fstream>
 
 #include <iomanip>
 #include <windows.h>
 
+#include "..\external\json.hpp"
+
 #include "Console.hpp"
+#include "Commands.hpp"
+#include "Unicode.hpp"
 
 namespace helper
 {
@@ -180,4 +185,91 @@ namespace helper
 
         return result;
     }
+
+    inline const nlohmann::json &getHelpJson()
+    {
+        static nlohmann::json root;
+        static bool loaded = false;
+
+        if (!loaded)
+        {
+            std::ifstream file("esh.json");
+            if (!file)
+            {
+                throw std::runtime_error("Cannot open esh.json");
+            }
+
+            file >> root;
+            loaded = true;
+        }
+
+        return root;
+    }
+
+    inline std::wstring commandTypeToString(CommandType type)
+    {
+        for (const auto &[name, cmd] : commandMap)
+        {
+            if (cmd == type)
+                return name;
+        }
+        return L"";
+    }
+
+    inline void showHelp(CommandType command)
+    {
+        const auto &root = getHelpJson();
+
+        std::wstring cmdW = commandTypeToString(command);
+        if (cmdW.empty())
+        {
+            std::wcerr << L"No help available\n";
+            return;
+        }
+
+        std::string cmd(cmdW.begin(), cmdW.end());
+
+        auto builtin = root["commands"]["builtin"];
+        if (!builtin.contains(cmd))
+        {
+            std::wcerr << L"No help available for this command\n";
+            return;
+        }
+
+        const auto &entry = builtin[cmd];
+
+        console::setColor(ConsoleColor::Cyan);
+        std::wcout << L"\nDESCRIPTION\n";
+        console::reset();
+        std::wcout
+            << unicode::utf8_to_utf16(entry["description"].get<std::string>())
+            << L"\n\n";
+
+        console::setColor(ConsoleColor::Green);
+        std::wcout << L"USAGE\n";
+        console::reset();
+        std::wcout
+            << unicode::utf8_to_utf16(entry["usage"].get<std::string>())
+            << L"\n\n";
+
+        if (entry.contains("flags"))
+        {
+            console::setColor(ConsoleColor::Red);
+            std::wcout << L"FLAGS\n";
+            console::reset();
+
+            for (const auto &[flag, desc] : entry["flags"].items())
+            {
+                std::wcout
+                    << L"  "
+                    << unicode::utf8_to_utf16(flag)
+                    << L"  "
+                    << unicode::utf8_to_utf16(desc.get<std::string>())
+                    << L"\n";
+            }
+        }
+
+        std::wcout << std::endl;
+    }
+
 }

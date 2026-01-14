@@ -9,14 +9,6 @@
                 }
             },
 
-            "help": {
-                "description": "Provides help information for Esh commands.",
-                "usage": "help [command]",
-                "flags": {
-                    "-a": "Lists all available commands with brief descriptions."
-                }
-            },
-
             "pwd": {
                 "description": "Prints the current working directory.",
                 "usage": "pwd",
@@ -198,15 +190,6 @@
                     "--help": "Displays help information about the kill command."
                 }
             }
-
-        },
-
-        "external": {
-
-        },
-
-        "powershell": {
-
         }
     }
 }

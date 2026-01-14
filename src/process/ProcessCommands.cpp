@@ -38,7 +38,7 @@ limitations under the License.
 namespace Process
 {
 
-    void ProcessCommands::execute(CommandType cmd, uint8_t flags, const std::vector<std::wstring> &args)
+    void ProcessCommands::execute(CommandType cmd, uint16_t flags, const std::vector<std::wstring> &args)
     {
         // Helper lambda to print boolean command results
         auto printBoolResult =
