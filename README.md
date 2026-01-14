@@ -19,7 +19,6 @@ esh is a completed learning-oriented systems programming project.
 - Gain experience with Unicode handling (UTF-8 / UTF-16) on Windows
 - Build a non-trivial C++ project with clear structure and layering
 
----
 
 ## Features
 
@@ -31,10 +30,10 @@ esh is a completed learning-oriented systems programming project.
 - Unicode-safe input and output
 - Colored console output
 
----
 
 ## Project Structure
 
+```
 esh/
 ├─ src/
 │  ├─ core/        # Core shell engine (parser, lexer, execution flow)
@@ -59,9 +58,8 @@ esh/
 ├─ CMakeLists.txt  # CMake configuration
 ├─ Makefile        # Build entry point
 ├─ README.md
-├─ LICENSE
-
----
+└─ LICENSE
+```
 
 ## Build Information
 
@@ -71,7 +69,6 @@ esh/
 - **Encoding:** UTF-16 internally, UTF-8 at boundaries
 - **Build system:** CMake and Makefile
 
----
 
 ## Requirements
 
@@ -85,7 +82,6 @@ To build and run **esh**, you need:
 
 esh relies directly on the Windows API and is not portable to other platforms.
 
----
 
 ## Build & Run
 
@@ -101,20 +97,17 @@ make run # compiles the project and generates esh.exe
 This project is **feature-complete** and **not under active development**.
 The repository is preserved as a reference and learning artifact.
 
----
 
 ## Versioning
 
 Current version: **0.1.0**
 
----
 
 ## License
 
 Licensed under the **Apache License 2.0**.  
 See the `LICENSE` file for details.
 
----
 
 ## Disclaimer
 
