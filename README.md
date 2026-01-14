@@ -47,11 +47,12 @@ esh/
 │  ├─ history/     # Command history management
 │  ├─ platform/    # Platform-specific utilities (Windows)
 │  ├─ headers/     # Public headers and shared interfaces
-│  └─ external/    # Third-party headers (e.g. JSON)
+│  ├─ external/    # Third-party headers (e.g. JSON)
+│  └─ consoleOperations # Console-related operations
 │
-├─ resources.rc # Embeds json file to .exe
-├─ app.rc # Windows resource file
-├─ icon/esh.ico        # Application icon
+├─ resources.rc    # Embeds json file to .exe
+├─ app.rc          # Windows resource file
+├─ icon/esh.ico    # Application icon
 │
 ├─ build/          # Build output (not tracked)
 ├─ esh.json        # Command help and metadata
